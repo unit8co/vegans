@@ -87,7 +87,7 @@ class GAN:
                 """
                 ## Train with real
                 self.discriminator.zero_grad()
-                output = self.discriminator(real_device).view(-1)  # TODO: remove the view(-1)
+                output = self.discriminator(real_device)
                 errD_real = criterion(output, real_labels)  # loss on real batch
                 errD_real.backward()  # gradients for real batch
                 D_x = output.mean().item()
@@ -95,7 +95,7 @@ class GAN:
                 ## Train with fake
                 noise = torch.randn(batch_size, self.nz, device=device)
                 fake = self.generator(noise)
-                output = self.discriminator(fake.detach()).view(-1)  # TODO: remove the view(-1)
+                output = self.discriminator(fake.detach())
                 errD_fake = criterion(output, fake_labels)  # loss on fake batch
                 errD_fake.backward()  # gradients for fake batch
                 D_G_z1 = output.mean().item()
@@ -107,7 +107,7 @@ class GAN:
                 ###########################
                 self.generator.zero_grad()
                 # Since we just updated D, perform another forward pass of all-fake batch through D
-                output = self.discriminator(fake).view(-1)  # TODO: remove the view(-1)
+                output = self.discriminator(fake).view(-1)
                 errG = criterion(output, real_labels)  # loss. Fake labels are real for generator cost
                 errG.backward()
                 D_G_z2 = output.mean().item()
