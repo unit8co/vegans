@@ -45,9 +45,9 @@ class WGAN:
             TODO: abstract function?
         """
         if optimizer_D is None:
-            optimizer_D = torch.optim.RMSprop(self.discriminator.parameters(), lr=0.0002)
+            optimizer_D = torch.optim.RMSprop(self.discriminator.parameters(), lr=0.00005)
         if optimizer_G is None:
-            optimizer_G = torch.optim.RMSprop(self.generator.parameters(), lr=0.0002)
+            optimizer_G = torch.optim.RMSprop(self.generator.parameters(), lr=0.00005)
 
         """ Training Loop
         """
