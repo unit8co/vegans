@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision.utils as vutils  # TODO: dynamically handle image types
 
 
 class GAN:
