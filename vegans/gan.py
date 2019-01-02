@@ -26,14 +26,12 @@ class GAN:
               optimizerD=None,
               optimizerG=None,
               num_epochs=5,
-              fixed_latent_batch_size=64,
-              init_weights=True):
+              fixed_noise_size=64,
+              init_weights=True,
+              print_every=50,
+              save_every=500):
         """
-        TODO:
-            - checkpointing
-            - flat noise vector
-            - see if: https://github.com/eriklindernoren/PyTorch-GAN/blob/master/implementations/gan/gan.py
-              can help simplify implementation
+        TODO: checkpointing
 
         :param dataloader:
         :param ngpu:
@@ -41,6 +39,10 @@ class GAN:
         :param optimizerG:
         :param num_epochs:
         :param fixed_latent_batch_size:
+        :param init_weights:
+        :param print_every: print every [print_every] mini batches within an epoch
+        :param save_every: save generated samples every [save_every] iterations. In addition, it also saves
+                           samples generated during the last mini batch.
         :return:
         """
 
@@ -52,18 +54,8 @@ class GAN:
         # Initialize BCELoss function
         criterion = nn.BCELoss()
 
-
-        # Create batch of latent vectors that we will use to visualize
-        #  the progression of the generator
-
-        # TODO: remove the last two dimensions here and in [noise].
-        # TODO: this leaves responsibility of redimensioning to the generator
-        fixed_noise = torch.randn(fixed_latent_batch_size, self.nz, 1, 1, device=device)
-        # fixed_noise = torch.randn(fixed_latent_batch_size, self.nz, device=device)
-
-        # Establish convention for real and fake labels during training
-        real_label = 1
-        fake_label = 0
+        # Create batch of latent vectors that we will use to generate samples
+        fixed_noise = torch.randn(fixed_noise_size, self.nz, device=device)
 
         """ Default optimizers for G and D
             TODO: abstract function?
@@ -77,82 +69,66 @@ class GAN:
         """ Training Loop
         """
         # Lists to keep track of progress
-        img_list = []
+        samples_list = []
         G_losses = []
         D_losses = []
         iters = 0
 
         print("Starting training Loop...")
         for epoch in range(num_epochs):
-            for i, data in enumerate(dataloader):
+            for i, (data, _) in enumerate(dataloader):
+
+                real_device = data.to(device)
+                batch_size = real_device.size(0)
+                real_labels = torch.full((batch_size,), 1.0, device=device)
+                fake_labels = torch.full((batch_size,), 0.0, device=device)
 
                 """ (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
                     The BCE loss is: -[y log(x) + (1 - y) log(1 - x)], so we want to minimize it
                 """
-
-                ## Train with all-real batch
+                ## Train with real
                 self.discriminator.zero_grad()
-                # Format batch
-                real_cpu = data[0].to(device)
-                b_size = real_cpu.size(0)
-                label = torch.full((b_size,), real_label, device=device)
-                # Forward pass real batch through D
-                output = self.discriminator(real_cpu).view(-1)
-                # Calculate loss on all-real batch
-                errD_real = criterion(output, label)
-                # Calculate gradients for D in backward pass
-                errD_real.backward()
+                output = self.discriminator(real_device).view(-1)  # TODO: remove the view(-1)
+                errD_real = criterion(output, real_labels)  # loss on real batch
+                errD_real.backward()  # gradients for real batch
                 D_x = output.mean().item()
 
-                ## Train with all-fake batch
-                # Generate batch of latent vectors
-                noise = torch.randn(b_size, self.nz, 1, 1, device=device)
-                # Generate fake image batch with G
+                ## Train with fake
+                noise = torch.randn(batch_size, self.nz, device=device)
                 fake = self.generator(noise)
-                label.fill_(fake_label)
-                # Classify all fake batch with D
-                output = self.discriminator(fake.detach()).view(-1)
-                # Calculate D's loss on the all-fake batch
-                errD_fake = criterion(output, label)
-                # Calculate the gradients for this batch
-                errD_fake.backward()
+                output = self.discriminator(fake.detach()).view(-1)  # TODO: remove the view(-1)
+                errD_fake = criterion(output, fake_labels)  # loss on fake batch
+                errD_fake.backward()  # gradients for fake batch
                 D_G_z1 = output.mean().item()
-                # Add the gradients from the all-real and all-fake batches
-                errD = errD_real + errD_fake
-                # Update D
-                optimizerD.step()
+                errD = errD_real + errD_fake  # total loss (sum of real and fake losses)
+                optimizerD.step()  # Update D
 
                 ############################
                 # (2) Update G network: maximize log(D(G(z)))
                 ###########################
                 self.generator.zero_grad()
-                label.fill_(real_label)  # fake labels are real for generator cost
                 # Since we just updated D, perform another forward pass of all-fake batch through D
-                output = self.discriminator(fake).view(-1)
-                # Calculate G's loss based on this output
-                errG = criterion(output, label)
-                # Calculate gradients for G
+                output = self.discriminator(fake).view(-1)  # TODO: remove the view(-1)
+                errG = criterion(output, real_labels)  # loss. Fake labels are real for generator cost
                 errG.backward()
                 D_G_z2 = output.mean().item()
-                # Update G
-                optimizerG.step()
+                optimizerG.step()  # Update G
 
                 # Output training stats
-                if i % 50 == 0:
+                if i % print_every == 0:
                     print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                           % (epoch, num_epochs, i, len(dataloader),
                              errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
-                # Save Losses for plotting later
                 G_losses.append(errG.item())
                 D_losses.append(errD.item())
 
                 # Check how the generator is doing by saving G's output on fixed_noise
-                if (iters % 500 == 0) or ((epoch == num_epochs - 1) and (i == len(dataloader) - 1)):
+                if (iters % save_every == 0) or ((epoch == num_epochs - 1) and (i == len(dataloader) - 1)):
                     with torch.no_grad():
                         fake = self.generator(fixed_noise).detach().cpu()
-                    img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-
+                    # samples_list.append(vutils.make_grid(fake, padding=2, normalize=True))
+                    samples_list.append(fake)
                 iters += 1
 
-        return img_list, G_losses, D_losses
+        return samples_list, G_losses, D_losses
