@@ -19,6 +19,7 @@ class WGAN:
               print_every=50,
               save_every=500,
               critic_iters=5,
+              long_critic_iters=50,
               clip_value=0.01):
         """
         TODO: checkpointing
@@ -65,7 +66,7 @@ class WGAN:
 
                 # the number of mini batches we'll train the critic before training the generator
                 if gen_iters < 25 or gen_iters % 500 == 0:
-                    D_iters = 100
+                    D_iters = long_critic_iters
                 else:
                     D_iters = critic_iters
 
