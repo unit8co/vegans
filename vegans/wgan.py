@@ -3,7 +3,7 @@ import torch.optim as optim
 from .gan import GAN
 
 
-class WGANGP(GAN):
+class WGAN(GAN):
     """
     Original Wasserstein GAN
     https://arxiv.org/abs/1701.07875
