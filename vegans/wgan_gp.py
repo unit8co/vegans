@@ -90,7 +90,7 @@ class WGANGP:
                 noise = torch.randn(batch_size, self.nz, device=device)
                 fake = self.generator(noise).detach()
 
-                loss_D = self.discriminator(fake) - self.discriminator(real) + lambda_gp * _grad_penalty(real, fake)
+                loss_D = self.discriminator(fake).mean() - self.discriminator(real).mean() + lambda_gp * _grad_penalty(real, fake)
                 D_losses[(epoch, i)] = loss_D.item()
 
                 loss_D.backward()
