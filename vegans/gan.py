@@ -67,6 +67,8 @@ class GAN(ABC):
         self.nr_iters_since_last_print = 0
         self.last_print_time = None
         self.global_iter = 0
+        self.last_D_loss = None
+        self.last_G_loss = None
 
     def _init_structs(self,):
         self.D_losses, self.G_losses, self.samples = dict(), dict(), dict()
@@ -116,24 +118,19 @@ class GAN(ABC):
         # save losses, and possibly some samples obtained from fixed noise:
         if D_loss is not None:
             self.D_losses[(epoch, minibatch_iter)] = D_loss
+            self.last_D_loss = D_loss
         if G_loss is not None:
             self.G_losses[(epoch, minibatch_iter)] = G_loss
+            self.last_G_loss = G_loss
         if (self.global_iter % self.save_every == 0) or \
                 ((epoch == self.nr_epochs - 1) and (minibatch_iter == len(self.dataloader) - 1)):
             with torch.no_grad():
                 self.samples[(epoch, minibatch_iter)] = self.generator(self.fixed_noise).detach().cpu()
 
         # print every [self.print_every] iteration
-        self.nr_iters_since_last_print += 1
-        if self.nr_iters_since_last_print - 1 == self.print_every:
-            # Time to print
-
+        if self.nr_iters_since_last_print == self.print_every:
             def _format_none(v):
                 return '%.3f' % v if v is not None else '-'
-
-            # Get most recent G/D losses, if any
-            last_D_loss = self.D_losses[max(self.D_losses.keys())] if len(self.D_losses) > 0 else float('nan')
-            last_G_loss = self.G_losses[max(self.G_losses.keys())] if len(self.G_losses) > 0 else float('nan')
 
             now = time.time()
             if self.last_print_time is not None:
@@ -145,11 +142,12 @@ class GAN(ABC):
 
             s_accum = '[%d/%d][%d/%d](%s iter/s)' % (epoch, self.nr_epochs, minibatch_iter,
                                                      len(self.dataloader), _format_none(avg_iter_per_s))
-            for n, v in [('Loss_D', last_D_loss), ('Loss_G', last_G_loss), ('D(x)', D_x),
+            for n, v in [('Loss_D', self.last_D_loss), ('Loss_G', self.last_G_loss), ('D(x)', D_x),
                          ('D(G(z1))', D_G_z1), ('D(G(z2))', D_G_z2)]:
                 if v is not None:
                     s_accum += '\t%s: %.3f' % (n, v)
             print(s_accum)
+        self.nr_iters_since_last_print += 1
 
     @abstractmethod
     def train(self,):
