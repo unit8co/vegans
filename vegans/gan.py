@@ -96,34 +96,44 @@ class GAN(ABC):
 
     def _default_optimizers(self,):
         """
-        It is recommended (but not mandatory) for implementations to override these defaults
+        Implementations can provide different default optimizers here.
+        Those come from DCGAN
         """
         optimizer_D = optim.Adam(self.discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
         optimizer_G = optim.Adam(self.generator.parameters(), lr=0.0002, betas=(0.5, 0.999))
         return optimizer_D, optimizer_G
 
-    def _end_iteration(self, epoch, minibatch_iter, G_loss, D_loss, D_x=None, D_G_z1=None, D_G_z2=None):
+    def _end_iteration(self, epoch, minibatch_iter, G_loss=None, D_loss=None, D_x=None, D_G_z1=None, D_G_z2=None):
         """
         Some boilerplate work done at each iteration (printing, saving, timing)
-        :return:
+
+        Not all metrics (losses, accuracies) are present for both networks at each iteration
         """
 
         # increment global iteration counter:
         self.global_iter += 1
 
         # save losses, and possibly some samples obtained from fixed noise:
-        self.D_losses[(epoch, minibatch_iter)] = D_loss
-        self.G_losses[(epoch, minibatch_iter)] = G_loss
+        if D_loss is not None:
+            self.D_losses[(epoch, minibatch_iter)] = D_loss
+        if G_loss is not None:
+            self.G_losses[(epoch, minibatch_iter)] = G_loss
         if (self.global_iter % self.save_every == 0) or \
                 ((epoch == self.nr_epochs - 1) and (minibatch_iter == len(self.dataloader) - 1)):
             with torch.no_grad():
                 self.samples[(epoch, minibatch_iter)] = self.generator(self.fixed_noise).detach().cpu()
 
-        # possibly print
+        # print every [self.print_every] iteration
         self.nr_iters_since_last_print += 1
-        if minibatch_iter % self.print_every == 0:
-            def _f(v):
-                return '-' if v is None else '%.3f' % v
+        if self.nr_iters_since_last_print == self.print_every:
+            # Time to print
+
+            def _format_none(v):
+                return '%.3f' % v if v is not None else '-'
+
+            # Get most recent G/D losses, if any
+            last_D_loss = self.D_losses[max(self.D_losses.keys())] if len(self.D_losses) > 0 else float('nan')
+            last_G_loss = self.G_losses[max(self.G_losses.keys())] if len(self.G_losses) > 0 else float('nan')
 
             now = time.time()
             if self.last_print_time is not None:
@@ -133,9 +143,13 @@ class GAN(ABC):
             self.last_print_time = now
             self.nr_iters_since_last_print = 0
 
-            print('[%d/%d][%d/%d](%s iter/s) Loss_D: %s\tLoss_G: %s\tD(x): %s\tD(G(z)): %s / %s'
-                  % (epoch, self.nr_epochs, minibatch_iter, len(self.dataloader), _f(avg_iter_per_s),
-                     _f(D_loss), _f(G_loss), _f(D_x), _f(D_G_z1), _f(D_G_z2)))
+            s_accum = '[%d/%d][%d/%d](%s iter/s)' % (epoch, self.nr_epochs, minibatch_iter,
+                                                     len(self.dataloader), _format_none(avg_iter_per_s))
+            for n, v in [('Loss_D', last_D_loss), ('Loss_G', last_G_loss), ('D(x)', D_x),
+                         ('D(G(z1))', D_G_z1), ('D(G(z2))', D_G_z2)]:
+                if v is not None:
+                    s_accum += '\t%s: %.3f' % (n, v)
+            print(s_accum)
 
     @abstractmethod
     def train(self,):

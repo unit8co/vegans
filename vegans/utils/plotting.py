@@ -25,17 +25,29 @@ def plot_losses(G_losses, D_losses):
             last_D = D_losses[t]
         D_vals.append(last_D)
 
-    plt.figure(figsize=(10, 5))
-    plt.plot(range(len(time_axis)), G_vals, label='G')
-    plt.plot(range(len(time_axis)), D_vals, label='D')
-    plt.xlabel('Iterations')
-    plt.ylabel('Loss')
-    plt.title('Losses')
-    plt.legend()
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 8))
+    fig.subplots_adjust(hspace=0.4)
+
+    ax1.plot(range(len(time_axis)), G_vals, lw=2)
+    ax2.plot(range(len(time_axis)), D_vals, lw=2)
+    ax1.set_xlabel('Iterations')
+    ax2.set_xlabel('Iterations')
+    ax1.set_ylabel('G Loss')
+    ax2.set_ylabel('D Loss')
+    ax1.set_title('Generator loss')
+    ax2.set_title('Discriminator loss')
+
     plt.show()
 
 
 def plot_image_samples(image_samples, max_images=20):
+    """
+    Plots images when samples are images, of dimension (N, C, H, W), where N is the number of samples (at each step),
+    C is the number of channels, H is the image height and W the width.
+    :param image_samples: the samples to plot
+    :param max_images: maximum number of image grids (steps) to plot
+    """
+
     time_steps = sorted(image_samples.keys())
 
     if len(time_steps) > max_images:
