@@ -19,7 +19,7 @@ class WGAN:
               print_every=50,
               save_every=500,
               critic_iters=5,
-              long_critic_iters=50,
+              long_critic_iters=100,
               clip_value=0.01):
         """
         TODO: checkpointing
