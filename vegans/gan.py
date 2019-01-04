@@ -125,7 +125,7 @@ class GAN(ABC):
 
         # print every [self.print_every] iteration
         self.nr_iters_since_last_print += 1
-        if self.nr_iters_since_last_print == self.print_every:
+        if self.nr_iters_since_last_print - 1 == self.print_every:
             # Time to print
 
             def _format_none(v):

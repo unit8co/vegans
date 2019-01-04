@@ -3,9 +3,10 @@ import torch.optim as optim
 from .gan import GAN
 
 
-class WGAN(GAN):
+class WGANGP(GAN):
     """
-
+    Original Wasserstein GAN
+    https://arxiv.org/abs/1701.07875
     """
 
     def _default_optimizers(self,):
