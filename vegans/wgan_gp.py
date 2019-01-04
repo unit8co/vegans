@@ -90,11 +90,14 @@ class WGANGP:
                 noise = torch.randn(batch_size, self.nz, device=device)
                 fake = self.generator(noise).detach()
 
-                loss_D = self.discriminator(fake).mean() - self.discriminator(real).mean() + lambda_gp * _grad_penalty(real, fake)
+                loss_D = self.discriminator(fake).mean() - self.discriminator(real).mean()
+                loss_D_with_penalty = loss_D + lambda_gp * _grad_penalty(real, fake)
                 D_losses[(epoch, i)] = loss_D.item()
 
-                loss_D.backward()
+                loss_D_with_penalty.backward()
                 optimizer_D.step()
+
+                optimizer_G.zero_grad()
 
                 if iters % D_iters == 0:
                     """ Train the generator every [Diters]

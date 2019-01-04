@@ -81,7 +81,7 @@ class WGAN:
 
                 # Note: sign is inverse of paper because we minimize the loss
                 # (instead of maximizing as in paper)
-                loss_D = -torch.mean(self.discriminator(real)) + torch.mean(self.discriminator(fake))
+                loss_D = self.discriminator(fake).mean() - self.discriminator(real).mean()
                 D_losses[(epoch, i)] = loss_D.item()
 
                 loss_D.backward()
