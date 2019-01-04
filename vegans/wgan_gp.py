@@ -40,7 +40,7 @@ class WGANGP:
         def _grad_penalty(real, fake):
             assert real.size() == fake.size(), 'real and fake mini batches must have same size'
             batch_size = real.size(0)
-            epsilon = torch.rand(batch_size, *[1 for _ in real.dim()], device=device)
+            epsilon = torch.rand(batch_size, *[1 for _ in range(real.dim())], device=device)
             x_hat = (epsilon * real + (1. - epsilon) * fake).requires_grad_(True)
             output = self.discriminator(x_hat)
             grads = torch.autograd.grad(
