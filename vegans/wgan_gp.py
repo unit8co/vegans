@@ -2,7 +2,7 @@ import torch
 from .gan import GAN
 
 
-class WGAN(GAN):
+class WGANGP(GAN):
     """
     Wasserstein GAN with gradient penalty
     https://arxiv.org/abs/1704.00028
