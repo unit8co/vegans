@@ -7,7 +7,7 @@ class MMGAN(GAN):
     """
     Minimax GAN (classic GAN), in its non-saturated version (i.e., generator loss is log(D(x)) ).
     Also called NS-GAN sometimes.
-    
+
     https://arxiv.org/abs/1406.2661
     """
 
