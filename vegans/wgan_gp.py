@@ -29,7 +29,7 @@ class WGANGP(GAN):
             grads = torch.autograd.grad(
                 outputs=output,
                 inputs=x_hat,
-                grad_outputs=torch.ones((batch_size,), device=self.device)
+                grad_outputs=torch.ones(output.shape, device=self.device)
             )[0]
             return ((grads.norm(2, dim=1) - 1) ** 2).mean()
 
