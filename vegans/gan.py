@@ -145,7 +145,7 @@ class GAN(ABC):
             for n, v in [('Loss_D', self.last_D_loss), ('Loss_G', self.last_G_loss), ('D(x)', D_x),
                          ('D(G(z1))', D_G_z1), ('D(G(z2))', D_G_z2)]:
                 if v is not None:
-                    s_accum += '\t%s: %.3f' % (n, v)
+                    s_accum += '\t%s: %.8f' % (n, v)
             print(s_accum)
         self.nr_iters_since_last_print += 1
 
