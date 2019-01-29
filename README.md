@@ -28,3 +28,11 @@ img_list, D_losses, G_losses = gan.get_training_results()
 plot_losses(G_losses, D_losses)
 plot_image_samples(img_list, 50)
 ```
+
+Currently the best way to learn more about how to use VeGANs is to have a look at the example [notebooks](https://github.com/unit8co/vegans).
+
+## Credits
+Some of the code has been inspired by some existing GAN implementations:
+* https://github.com/eriklindernoren/PyTorch-GAN
+* https://github.com/martinarjovsky/WassersteinGAN
+* https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
