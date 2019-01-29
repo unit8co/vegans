@@ -7,6 +7,9 @@ However researchers may also find the GAN base class useful for quicker implemen
 
 The focus is on simplicity and providing reasonable defaults.
 
+## How to install
+`pip install vegans`
+
 ## How to use
 The basic idea is that the user provides discriminator and generator networks, and the library takes care of training them in a selected GAN setting:
 ```
@@ -30,6 +33,9 @@ plot_image_samples(img_list, 50)
 ```
 
 Currently the best way to learn more about how to use VeGANs is to have a look at the example [notebooks](https://github.com/unit8co/vegans).
+
+## Contribute
+PRs and suggestions are welcome.
 
 ## Credits
 Some of the code has been inspired by some existing GAN implementations:
