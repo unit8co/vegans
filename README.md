@@ -17,9 +17,9 @@ The basic idea is that the user provides discriminator and generator networks, a
 from vegans import WGAN
 from vegans.utils import plot_losses, plot_image_samples
 
-# Create your critic and generator
-netD = Discriminator().to(device)
-netG = Generator().to(device)
+netD = ### Your discriminator/critic (torch.nn.Module)
+netG = ### Your generator (torch.nn.Module)
+dataloader = ### Your dataloader (torch.utils.data.DataLoader)
 
 # Build a Wasserstein GAN
 gan = WGAN(netG, netD, dataloader, nr_epochs=20)
