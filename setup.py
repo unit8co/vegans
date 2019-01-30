@@ -15,6 +15,7 @@ setup(name='vegans',
       author_email='julien@unit8.co',
       license='MIT',
       packages=find_packages(),
+      python_requires='>=3.5',
       install_requires=[
         'numpy>=1.15.4', 
         'matplotlib>=3.0.2',
