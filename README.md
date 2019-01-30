@@ -58,6 +58,7 @@ If you are researching new GAN training algorithms, you may find it useful to in
 
 ### Learn more:
 Currently the best way to learn more about how to use VeGANs is to have a look at the example [notebooks](https://github.com/unit8co/vegans/tree/master/notebooks).
+You can start with this [simple example](https://github.com/unit8co/vegans/blob/master/notebooks/00_univariate_gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
 
 ## Contribute
 PRs and suggestions are welcome.
