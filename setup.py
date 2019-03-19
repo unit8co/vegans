@@ -20,5 +20,8 @@ setup(name='vegans',
         'numpy>=1.15.4', 
         'matplotlib>=3.0.2',
         'torch>=1.0.0',
-        'torchvision>=0.2.1'],
+        'torchvision>=0.2.1',
+        'tqdm',
+        'requests'
+      ],
       zip_safe=False)

@@ -1,9 +1,13 @@
 import numpy as np
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
+
+
+def gaussian_data_loader(batch_size=16):
+    return DataLoader(GaussianDataset(), batch_size)
 
 
 class GaussianDataset(Dataset):
-    def __init__(self, mu, sigma, seed=None):
+    def __init__(self, mu=3, sigma=1, seed=None):
         self.mu = mu
         self.sigma = sigma
         if seed:
