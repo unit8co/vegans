@@ -90,7 +90,7 @@ def celeb_a_data_loader(root, split, batch_size=32, scale_size=64, num_workers=2
         transforms.CenterCrop(160),
         transforms.Scale(scale_size),
         transforms.ToTensor(),
-        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
     ]))
 
     data_loader = torch.utils.data.DataLoader(
