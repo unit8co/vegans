@@ -30,7 +30,7 @@ class MMGAN(GAN):
                 """
                 # Train with real
                 self.optimizer_D.zero_grad()
-                output = self.discriminator(real)
+                output = self.discriminator(real).view(-1)
                 errD_real = criterion(output, real_labels)  # loss on real batch
                 errD_real.backward()  # gradients for real batch
                 D_x = output.mean().item()
@@ -38,7 +38,7 @@ class MMGAN(GAN):
                 # Train with fake
                 noise = torch.randn(batch_size, self.nz, device=self.device)
                 fake = self.generator(noise)
-                output = self.discriminator(fake.detach())
+                output = self.discriminator(fake.detach()).view(-1)
                 errD_fake = criterion(output, fake_labels)  # loss on fake batch
                 errD_fake.backward()  # gradients for fake batch
                 D_G_z1 = output.mean().item()
