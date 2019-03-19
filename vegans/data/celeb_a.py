@@ -19,11 +19,12 @@ def _download_celeb_a(base_path):
         print('[!] Found Celeb-A - skip')
         return
 
-    filename, drive_id= "img_align_celeba.zip", "0B7EVK8r0v71pZjFTYXZWM3FlRnM"
+    filename, drive_id = "img_align_celeba.zip", "0B7EVK8r0v71pZjFTYXZWM3FlRnM"
     save_path = os.path.join(base_path, filename)
 
     if os.path.exists(save_path):
         print('[*] {} already exists'.format(save_path))
+        return
     else:
         download_file_from_google_drive(drive_id, save_path)
 

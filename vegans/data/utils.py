@@ -27,7 +27,7 @@ def get_confirm_token(response):
     return None
 
 
-def save_response_content(response, destination, chunk_size=32*1024):
+def save_response_content(response, destination, chunk_size=32):
     total_size = int(response.headers.get('content-length', 0))
     with open(destination, "wb") as f:
         for chunk in tqdm(response.iter_content(chunk_size), total=total_size,
