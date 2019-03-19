@@ -2,7 +2,7 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
 
-def gaussian_data_loader(batch_size=16):
+def gaussian_data_loader(batch_size=32):
     return DataLoader(GaussianDataset(), batch_size)
 
 
