@@ -79,7 +79,7 @@ def get_celeb_a(path):
     _add_splits(path)
 
 
-def celeb_a_data_loader(root, split, batch_size, scale_size, num_workers=2, shuffle=True):
+def celeb_a_data_loader(root, split, batch_size=32, scale_size=64, num_workers=2, shuffle=True):
     # make sure the data exists and get it if not
     get_celeb_a(root)
 
