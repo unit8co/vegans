@@ -1,1 +1,1 @@
-from .gaussian import GaussianGenerator, GaussianDiscriminator
+from .single import SingleLayerNNReLU, SingleLayerNNSigmoid
