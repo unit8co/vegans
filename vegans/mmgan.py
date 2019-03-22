@@ -56,6 +56,7 @@ class MMGAN(GAN):
                 self.optimizer_G.step()  # Update G
 
                 # Finish iteration
-                self._end_iteration(epoch, minibatch_iter, G_loss.item(), D_loss.item(), D_x, D_G_z1, D_G_z2)
+                self._end_iteration(epoch, minibatch_iter, G_loss.item(), D_loss.item(),
+                                    **{'D(X)': D_x, 'D(G(z1))': D_G_z1, 'D(G(z2))': D_G_z2})
 
         return self.samples, self.D_losses, self.G_losses
