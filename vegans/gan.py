@@ -116,7 +116,7 @@ class GAN(ABC):
         optimizer_G = optim.Adam(self.generator.parameters(), lr=0.0002, betas=(0.5, 0.999))
         return optimizer_D, optimizer_G
 
-    def _end_iteration(self, epoch, minibatch_iter, G_loss=None, D_loss=None, D_x=None, D_G_z1=None, D_G_z2=None):
+    def _end_iteration(self, epoch, minibatch_iter, G_loss=None, D_loss=None, **kwargs):
         """
         Some boilerplate work done at each iteration (printing, saving, timing)
 
@@ -153,8 +153,7 @@ class GAN(ABC):
 
             s_accum = '[%d/%d][%d/%d](%s iter/s)' % (epoch, self.nr_epochs, minibatch_iter,
                                                      len(self.dataloader), _format_none(avg_iter_per_s))
-            for n, v in [('Loss_D', self.last_D_loss), ('Loss_G', self.last_G_loss), ('D(x)', D_x),
-                         ('D(G(z1))', D_G_z1), ('D(G(z2))', D_G_z2)]:
+            for n, v in [('Loss_D', self.last_D_loss), ('Loss_G', self.last_G_loss)] + list(kwargs.items()):
                 if v is not None:
                     s_accum += '\t%s: %.8f' % (n, v)
             print(s_accum)

@@ -60,9 +60,9 @@ class BEGAN(GAN):
                 k = min(max(k, 0), 1)  # Constraint to interval [0, 1]
 
                 # Update convergence metric
-                # M = (loss_D_real + torch.abs(diff)).data
+                m = loss_D_real.item() + abs(diff)
 
                 # Finish iteration
-                self._end_iteration(epoch, minibatch_iter, loss_G.item() if loss_G is not None else None, loss_D.item())
+                self._end_iteration(epoch, minibatch_iter, loss_G.item(), loss_D.item(), M=m)
 
         return self.samples, self.D_losses, self.G_losses
