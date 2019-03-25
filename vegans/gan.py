@@ -32,7 +32,7 @@ class GAN(ABC):
         :param optimizer_G: A [torch.optim.Optimizer] for G
         :param nz: the size of the latent space
         :param device: which device to use, e.g. 'cpu', 'cuda', or 'cuda:1'
-        :param ngpu: the number of GPUs to use if using gpu device;
+        :param ngpu: the number of GPUs to use if using gpu device
         :param fixed_noise_size: the number of samples to save with fixed noise
         :param nr_epochs: the number of epochs with which to train
         :param save_every: save some samples every [save_every] iterations
