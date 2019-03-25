@@ -17,8 +17,8 @@ class GAN(ABC):
                  optimizer_D=None,
                  optimizer_G=None,
                  nz=100,
-                 device='cuda',
-                 ngpu=1,
+                 device='cpu',
+                 ngpu=0,
                  fixed_noise_size=64,
                  nr_epochs=5,
                  save_every=500,
@@ -32,7 +32,7 @@ class GAN(ABC):
         :param optimizer_G: A [torch.optim.Optimizer] for G
         :param nz: the size of the latent space
         :param device: which device to use, e.g. 'cpu', 'cuda', or 'cuda:1'
-        :param ngpu: the number of GPUs to use, if using gpu device
+        :param ngpu: the number of GPUs to use if using gpu device;
         :param fixed_noise_size: the number of samples to save with fixed noise
         :param nr_epochs: the number of epochs with which to train
         :param save_every: save some samples every [save_every] iterations
@@ -40,12 +40,11 @@ class GAN(ABC):
         :param init_weights: whether to re-initialize the weights of G and D when building this GAN
         """
 
-        # TODO: use ngpu to auto-parallelize nn.modules
         self.device = torch.device(device)
         self.ngpu = ngpu
 
-        self.generator = generator.to(self.device)
-        self.discriminator = discriminator.to(self.device)
+        self.generator = self._init_nn(generator)
+        self.discriminator = self._init_nn(discriminator)
         self.nz = nz
         self.dataloader = dataloader
         self.nr_epochs = nr_epochs
@@ -71,6 +70,16 @@ class GAN(ABC):
         self.global_iter = 0
         self.last_D_loss = None
         self.last_G_loss = None
+
+    def _init_nn(self, net):
+        # make sure nn.Module is set on correct device
+        net = net.to(self.device)
+
+        # auto-parallelize if multiple gpu's available
+        if self.ngpu > 1:
+            net = nn.DataParallel(net)
+
+        return net
 
     def _init_structs(self,):
         self.D_losses, self.G_losses, self.samples = dict(), dict(), dict()
