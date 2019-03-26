@@ -51,8 +51,8 @@ class GAN(ABC):
         self.save_every = save_every
         self.print_every = print_every
 
-        self.optimizer_D = self._init_optimizer(optimizer_D, 0)
-        self.optimizer_G = self._init_optimizer(optimizer_G, 1)
+        self.optimizer_D = optimizer_D if optimizer_D is not None else self._default_optimizers()[0]
+        self.optimizer_G = optimizer_G if optimizer_G is not None else self._default_optimizers()[1]
 
         # Optionally (re-)init G and D
         if init_weights:
@@ -106,12 +106,6 @@ class GAN(ABC):
             elif classname.find('BatchNorm') != -1:
                 nn.init.normal_(m.weight.data, 1.0, 0.02)
                 nn.init.constant_(m.bias.data, 0)
-
-    def _init_optimizer(self, optimizer, default_index):
-        if optimizer is not None:
-            return optimizer.to(self.device)
-        else:
-            return self._default_optimizers()[default_index]
 
     def _default_optimizers(self,):
         """
