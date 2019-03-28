@@ -1,0 +1,9 @@
+# setup.py dependencies
+-e .
+
+# notebooks & examples
+jupyter
+torchsummary
+
+# dev
+pytest

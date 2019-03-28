@@ -17,7 +17,8 @@ class GAN(ABC):
                  optimizer_D=None,
                  optimizer_G=None,
                  nz=100,
-                 ngpu=1,
+                 device='cpu',
+                 ngpu=0,
                  fixed_noise_size=64,
                  nr_epochs=5,
                  save_every=500,
@@ -30,7 +31,8 @@ class GAN(ABC):
         :param optimizer_D: A [torch.optim.Optimizer] for D
         :param optimizer_G: A [torch.optim.Optimizer] for G
         :param nz: the size of the latent space
-        :param ngpu: the number of GPUs to use
+        :param device: which device to use, e.g. 'cpu', 'cuda', or 'cuda:1'
+        :param ngpu: the number of GPUs to use if using gpu device
         :param fixed_noise_size: the number of samples to save with fixed noise
         :param nr_epochs: the number of epochs with which to train
         :param save_every: save some samples every [save_every] iterations
@@ -38,17 +40,16 @@ class GAN(ABC):
         :param init_weights: whether to re-initialize the weights of G and D when building this GAN
         """
 
-        self.generator = generator
-        self.discriminator = discriminator
+        self.device = torch.device(device)
+        self.ngpu = ngpu
+
+        self.generator = self._init_nn(generator)
+        self.discriminator = self._init_nn(discriminator)
         self.nz = nz
         self.dataloader = dataloader
         self.nr_epochs = nr_epochs
         self.save_every = save_every
         self.print_every = print_every
-
-        # TODO: several
-        self.device = torch.device("cuda:0" if (torch.cuda.is_available() and ngpu > 0) else "cpu")
-        print('device: {}'.format(self.device))
 
         self.optimizer_D = optimizer_D if optimizer_D is not None else self._default_optimizers()[0]
         self.optimizer_G = optimizer_G if optimizer_G is not None else self._default_optimizers()[1]
@@ -69,6 +70,16 @@ class GAN(ABC):
         self.global_iter = 0
         self.last_D_loss = None
         self.last_G_loss = None
+
+    def _init_nn(self, net):
+        # make sure nn.Module is set on correct device
+        net = net.to(self.device)
+
+        # auto-parallelize if multiple gpu's available
+        if self.ngpu > 1:
+            net = nn.DataParallel(net)
+
+        return net
 
     def _init_structs(self,):
         self.D_losses, self.G_losses, self.samples = dict(), dict(), dict()
