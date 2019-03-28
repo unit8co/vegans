@@ -6,8 +6,12 @@ from torch.utils.data import DataLoader, Dataset
 
 
 class GaussianDataset(Dataset):
+    def __init__(self, sigma=1.0, mu=0.0):
+        self.sigma = sigma
+        self.mu = mu
+
     def __getitem__(self, idx):
-        return np.array([1. * np.random.randn() + 3.]).astype(np.float32), 0
+        return np.array([self.sigma * np.random.randn() + self.mu]).astype(np.float32), 0
 
     def __len__(self):
         return 1000
