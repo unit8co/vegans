@@ -61,7 +61,7 @@ Currently the best way to learn more about how to use VeGANs is to have a look a
 You can start with this [simple example](https://github.com/unit8co/vegans/blob/master/notebooks/00_univariate_gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
 
 ## Contribute
-PRs and suggestions are welcome.
+PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING) for more details on the setup.
 
 ## Credits
 Some of the code has been inspired by some existing GAN implementations:
