@@ -5,10 +5,6 @@ from .conftest import nz
 
 
 class TestIntegration(object):
-    @pytest.mark.parametrize('device', [
-        'cpu',
-        'cuda'
-    ])
     @pytest.mark.parametrize('nn', [
         MMGAN,
         WGAN,

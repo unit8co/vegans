@@ -59,3 +59,18 @@ def generator():
 @pytest.fixture(scope='module')
 def critic():
     return Critic()
+
+
+# ability to also test on gpu on demand
+def pytest_addoption(parser):
+    parser.addoption('--gpu', action='store_true', help='include gpu tests')
+
+
+def pytest_generate_tests(metafunc):
+    if 'device' in metafunc.fixturenames:
+        devices = ['cpu']
+
+        if metafunc.config.getoption('gpu'):
+            devices.append('cuda')
+
+        metafunc.parametrize('device', devices)
