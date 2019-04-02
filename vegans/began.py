@@ -16,15 +16,16 @@ class BEGAN(GAN):
                  optimizer_D=None,
                  optimizer_G=None,
                  nz=100,
-                 ngpu=1,
+                 device='cpu',
+                 ngpu=0,
                  fixed_noise_size=64,
                  nr_epochs=5,
                  save_every=500,
                  print_every=50,
                  init_weights=False,
                  lr_decay_every=None):
-        super().__init__(generator, discriminator, dataloader, optimizer_D, optimizer_G, nz, ngpu, fixed_noise_size,
-                         nr_epochs, save_every, print_every, init_weights)
+        super().__init__(generator, discriminator, dataloader, optimizer_D, optimizer_G, nz, device, ngpu,
+                         fixed_noise_size, nr_epochs, save_every, print_every, init_weights)
         self.lr_decay_every = lr_decay_every
 
     def _adjust_learning_rate(self, optimizer, niter):
