@@ -10,36 +10,20 @@ class BEGAN(GAN):
     https://arxiv.org/abs/1703.10717
     """
 
-    def __init__(self, generator,
-                 discriminator,
-                 dataloader,
-                 optimizer_D=None,
-                 optimizer_G=None,
-                 nz=100,
-                 device='cpu',
-                 ngpu=0,
-                 fixed_noise_size=64,
-                 nr_epochs=5,
-                 save_every=500,
-                 print_every=50,
-                 init_weights=False,
-                 lr_decay_every=None):
-        super().__init__(generator, discriminator, dataloader, optimizer_D, optimizer_G, nz, device, ngpu,
-                         fixed_noise_size, nr_epochs, save_every, print_every, init_weights)
-        self.lr_decay_every = lr_decay_every
-
-    def _adjust_learning_rate(self, optimizer, niter):
+    @staticmethod
+    def _adjust_learning_rate(optimizer, niter, lr_decay_every):
         for param_group in optimizer.param_groups:
-            param_group['lr'] *= (0.95 ** (niter // self.lr_decay_every))
+            param_group['lr'] *= (0.95 ** (niter // lr_decay_every))
 
         return optimizer
 
-    def train(self, gamma=0.75, lambda_k=0.001, k=0.0):
+    def train(self, gamma=0.75, lambda_k=0.001, k=0.0, lr_decay_every=None):
         """
 
         :param gamma:
         :param lambda_k:
         :param k:
+        :param lr_decay_every:
         :return:
         """
         for epoch in range(self.nr_epochs):
@@ -87,9 +71,9 @@ class BEGAN(GAN):
                 m = loss_D_real.item() + abs(diff)
 
                 # Learning rate decay, optional
-                if self.lr_decay_every is not None:
-                    self.optimizer_D = self._adjust_learning_rate(self.optimizer_D, minibatch_iter)
-                    self.optimizer_G = self._adjust_learning_rate(self.optimizer_G, minibatch_iter)
+                if lr_decay_every is not None:
+                    self.optimizer_D = self._adjust_learning_rate(self.optimizer_D, minibatch_iter, lr_decay_every)
+                    self.optimizer_G = self._adjust_learning_rate(self.optimizer_G, minibatch_iter, lr_decay_every)
 
                 # Finish iteration
                 self._end_iteration(epoch, minibatch_iter, loss_G.item(), loss_D.item(), M=m, K=k)
