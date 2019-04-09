@@ -38,7 +38,7 @@ class BEGAN(GAN):
 
                 # generate fake
                 noise = torch.randn(batch_size, self.nz, device=self.device)
-                fake = self.generator(noise).detach()
+                fake = self.generator(noise)
 
                 loss_G = torch.mean(torch.abs(self.discriminator(fake) - fake))
 
