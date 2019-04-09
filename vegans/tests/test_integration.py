@@ -1,6 +1,6 @@
 import pytest
 
-from vegans import MMGAN, WGAN, WGANGP
+from vegans import MMGAN, WGAN, WGANGP, BEGAN
 from .conftest import nz
 
 
@@ -9,6 +9,7 @@ class TestIntegration(object):
         MMGAN,
         WGAN,
         WGANGP,
+        BEGAN,
     ])
     def test_run(self, device, nn, generator, critic, gaussian_dataloader):
         nn(generator, critic, gaussian_dataloader, nz=nz, device=device).train()
