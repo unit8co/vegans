@@ -89,6 +89,5 @@ nz = 62
 gan = BEGAN(dataloader=MNISTLoader('../../data', img_size),
             discriminator=Discriminator(img_size, channels),
             generator=Generator(img_size, channels, nz),
-            nz=nz,
-            lr_decay_every=3000)
-gan.train()
+            nz=nz)
+gan.train(lr_decay_every=3000)
