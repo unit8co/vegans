@@ -1,8 +1,10 @@
-from abc import ABC, abstractmethod
-import torch
-import torch.optim as optim
-import torch.nn as nn
 import time
+from abc import ABC, abstractmethod
+from collections import OrderedDict
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
 
 class GAN(ABC):
@@ -82,7 +84,7 @@ class GAN(ABC):
         return net
 
     def _init_structs(self,):
-        self.D_losses, self.G_losses, self.samples = dict(), dict(), dict()
+        self.D_losses, self.G_losses, self.samples = OrderedDict(), OrderedDict(), OrderedDict()
 
     def get_training_results(self,):
         """
