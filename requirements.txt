@@ -4,6 +4,7 @@
 # notebooks & examples
 jupyter
 torchsummary
+# imagemagick for gif; need to install manually
 
 # dev
 pytest
