@@ -1,9 +1,10 @@
+# MAC fix
 import matplotlib
 matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.animation import FuncAnimation
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
@@ -167,44 +168,43 @@ def train_wgan_gp(**kwargs):
 def plot_single_gif(samples, filename):
     fig, axes = plt.subplots()
 
-    # general config
+    # remove axes
     plt.axis("off")
+    fig.subplots_adjust(left=0, bottom=0.02, right=1, top=0.90, wspace=None, hspace=None)
 
-    # stages = list(samples.keys())
+    stages = list(samples.keys())
     samples = list(samples.values())
 
     def prepare_image(sample):
         return np.transpose(make_grid(sample, padding=2, normalize=True), (1, 2, 0))
 
-    # stage = axes.set_title(stages[0])
-    image = (axes.imshow(prepare_image(samples[0])),)
+    # init things to show
+    image = (axes.imshow(prepare_image(samples[0])), axes.text(10, -10, '', fontsize=16))
 
     def init():
-        image[0].set_data(prepare_image(samples[0]))
-
         return image
 
     def run(it):
-        print(it)
         image[0].set_data(prepare_image(samples[it]))
+        image[1].set_text('{} Epoch {} Batch {}'.format(filename.upper(), stages[it][0], stages[it][1]))
 
         return image
 
-    anim = FuncAnimation(fig, run, frames=list(range(len(samples))), init_func=init, interval=30, blit=True)
-    anim.save(filename, dpi=80, writer='imagemagick', fps=30)
+    anim = FuncAnimation(fig, run, frames=len(samples), init_func=init, interval=30, blit=True)
+    anim.save('../resources/{}.gif'.format(filename), dpi=80, writer='imagemagick', fps=1)
 
 
 def save_gif(trained_gan, name):
     samples, _, _ = trained_gan.get_training_results()
-    plot_single_gif(samples, '../resources/{}.gif'.format(name))
+    plot_single_gif(samples, name)
 
 
 def train_gans(**kwargs):
-    wganp_gp = train_wgan_gp(**kwargs)
+    wgan_gp = train_wgan_gp(**kwargs)
     began = train_began(**kwargs)
 
-    save_gif(wganp_gp, 'wgan_gp')
+    save_gif(wgan_gp, 'wgan_gp')
     save_gif(began, 'began')
 
 
-train_gans(device='cpu', ngpu=0, nr_epochs=1, save_every=5, print_every=5)
+train_gans(device='cpu', ngpu=0)
