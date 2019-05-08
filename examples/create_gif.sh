@@ -21,4 +21,4 @@ magick convert -loop 0 -delay 60 a-*.gif combined.gif                      # rej
 
 # post
 rm -rf a-* b-*                                                             # cleanup
-magick convert combined.gif -fuzz 10% -layers Optimize combined.gif        # reduce size
+magick convert combined.gif -fuzz 10% -layers Optimize combined.gif        # reduce size; TODO: currently big quality loss?
