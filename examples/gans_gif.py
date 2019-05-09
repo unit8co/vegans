@@ -7,31 +7,32 @@ import numpy as np
 from matplotlib.animation import FuncAnimation
 from torch import nn
 from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
+from torchvision.datasets import ImageFolder
 from torchvision.transforms import transforms
 from torchvision.utils import make_grid
 
 from vegans import BEGAN, WGANGP
 
-# general params
-image_size = 32
-num_channels = 1
-latent_dim = 64
+image_size = 64
+num_channels = 3
+latent_dim = 20
 image_shape = (num_channels, image_size, image_size)
+batch_size = 64
+celeba_path = '../../data/celebA_redux'
 
 
-class MNISTLoader(DataLoader):
-    def __init__(self, path, img_size, train=True):
-        dataset = MNIST(path,
-                        train=train,
-                        download=True,
-                        transform=transforms.Compose([
-                            transforms.Resize(img_size),
-                            transforms.ToTensor(),
-                            transforms.Normalize((0.5,), (0.5,))
-                        ]))
+# https://drive.google.com/a/unit8.co/uc?id=1p6WtrxprsjsiedQJkKVoiqvdrP1m9BuF&export=download
+class CelebALoader(DataLoader):
+    def __init__(self, img_size):
+        dataset = ImageFolder(celeba_path,
+                              transform=transforms.Compose([
+                                  transforms.Resize(img_size),
+                                  transforms.CenterCrop(img_size),
+                                  transforms.ToTensor(),
+                                  transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+                              ]))
         # shuffle=False to have some stability between different models' training
-        super().__init__(dataset, batch_size=64, shuffle=False)
+        super().__init__(dataset, batch_size=batch_size, shuffle=False)
 
 
 class BEGANGenerator(nn.Module):
@@ -144,7 +145,7 @@ class WGANGPDiscriminator(nn.Module):
 
 
 def train_began(**kwargs):
-    gan = BEGAN(dataloader=MNISTLoader('../../data', image_size),
+    gan = BEGAN(dataloader=CelebALoader(image_size),
                 discriminator=BEGANDiscriminator(image_size, num_channels),
                 generator=BEGANGenerator(image_size, num_channels, latent_dim),
                 nz=latent_dim,
@@ -155,7 +156,7 @@ def train_began(**kwargs):
 
 
 def train_wgan_gp(**kwargs):
-    gan = WGANGP(dataloader=MNISTLoader('../../data', image_size),
+    gan = WGANGP(dataloader=CelebALoader(image_size),
                  discriminator=WGANGPDiscriminator(image_shape),
                  generator=WGANGPGenerator(image_shape, latent_dim),
                  nz=latent_dim,
@@ -207,4 +208,4 @@ def train_gans(**kwargs):
     save_gif(began, 'began')
 
 
-train_gans(device='cpu', ngpu=0)
+train_gans(device='cuda', ngpu=1, print_every=2, save_every=200, nr_epochs=15)
