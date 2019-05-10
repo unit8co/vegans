@@ -1,6 +1,6 @@
 # MAC fix
-import matplotlib
-matplotlib.use('TkAgg')
+# import matplotlib
+# matplotlib.use('TkAgg')
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,13 +15,14 @@ from vegans import BEGAN, WGANGP
 
 image_size = 64
 num_channels = 3
-latent_dim = 20
+latent_dim = 100
 image_shape = (num_channels, image_size, image_size)
 batch_size = 64
-celeba_path = '../../data/celebA_redux'
+celeba_path = '../../data/celebA_full'
 
 
-# https://drive.google.com/a/unit8.co/uc?id=1p6WtrxprsjsiedQJkKVoiqvdrP1m9BuF&export=download
+# celebA_redux https://drive.google.com/a/unit8.co/uc?id=1p6WtrxprsjsiedQJkKVoiqvdrP1m9BuF
+# celebA_full https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg
 class CelebALoader(DataLoader):
     def __init__(self, img_size):
         dataset = ImageFolder(celeba_path,
@@ -208,4 +209,4 @@ def train_gans(**kwargs):
     save_gif(began, 'began')
 
 
-train_gans(device='cuda', ngpu=1, print_every=2, save_every=200, nr_epochs=15)
+train_gans(device='cuda', ngpu=1, save_every=200, nr_epochs=25)
