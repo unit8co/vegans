@@ -3,7 +3,10 @@
 
 # notebooks & examples
 jupyter
+matplotlib
 torchsummary
+tensorboard
+torch
 
 # dev
 pytest
