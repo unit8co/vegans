@@ -21,6 +21,7 @@ class DataSet(Dataset):
 
 
 def load_mnist(datapath, normalize=True, pad=None, return_datasets=False):
+    datapath = datapath if datapath.endswith("/") else datapath+"/"
     with open(datapath+"train_images.pickle", "rb") as f:
         X_train, y_train = pickle.load(f)
     with open(datapath+"test_images.pickle", "rb") as f:
@@ -43,10 +44,10 @@ def load_mnist(datapath, normalize=True, pad=None, return_datasets=False):
 
 
 def wasserstein_loss(input, target):
-    if np.all((target==1).cpu().numpy()):
-        return -torch.mean(input)
-    elif np.all((target==0).cpu().numpy()):
-        return torch.mean(input)
+    assert torch.unique(target).shape[0] == 2, "Only two different values for target allowed."
+    target[target==0] = -1
+
+    return torch.mean(target*input)
 
 
 def concatenate(tensor1, tensor2):
@@ -85,8 +86,10 @@ def concatenate(tensor1, tensor2):
         y_dim = tensor1.shape[1]
         tensor1 = torch.reshape(tensor1, shape=(batch_size, y_dim, 1, 1))
         tensor1 = torch.tile(tensor1, dims=(1, 1, *tensor2.shape[2:]))
+    elif (len(tensor1.shape) == 4) and (len(tensor2.shape) == 4):
+        return torch.cat((tensor1, tensor2), axis=1)
     else:
-        raise NotImplementedError("tensor1 and tensor2 must have 2 or 4 dimensions. Given: {} and {}.".format(tensor1.shape, tensor2.shape))
+        raise AssertionError("tensor1 and tensor2 must have 2 or 4 dimensions. Given: {} and {}.".format(tensor1.shape, tensor2.shape))
     return torch.cat((tensor1, tensor2), axis=1)
 
 def get_input_dim(dim1, dim2):
@@ -113,18 +116,20 @@ def get_input_dim(dim1, dim2):
         Output dimension after concatenation.
     """
     dim1 = [dim1] if isinstance(dim1, int) else dim1
-    dim2 = [dim2] if isinstance(dim1, int) else dim2
+    dim2 = [dim2] if isinstance(dim2, int) else dim2
     if len(dim1)==1 and len(dim2)==1:
         out_dim = [dim1[0] + dim2[0]]
     elif len(dim1)==3 and len(dim2)==1:
         out_dim = [dim1[0]+dim2[0], *dim1[1:]]
     elif len(dim1)==1 and len(dim2)==3:
         out_dim = [dim2[0]+dim1[0], *dim2[1:]]
-    else:
+    elif len(dim1)==3 and len(dim2)==3:
         assert (dim1[1] == dim2[1]) and (dim1[2] == dim2[2]), (
             "If both dim1 and dim2 are arrays, must have same shape. dim1: {}. dim2: {}.".format(dim1, dim2)
         )
         out_dim = [dim1[0]+dim2[0], *dim1[1:]]
+    else:
+        raise AssertionError("dim1 and dim2 must have length one or three. Given: {} and {}.".format(dim1, dim2))
     return out_dim
 
 def plot_losses(losses, show=True, share=False):
