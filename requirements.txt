@@ -4,6 +4,7 @@
 # notebooks & examples
 jupyter
 matplotlib
+torchsummary
 
 # dev
 pytest

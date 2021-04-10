@@ -21,5 +21,6 @@ setup(name='vegans',
         'matplotlib>=3.0.2',
         'torch>=1.0.0',
         'torchvision>=0.2.1',
-        'tensorboard>=2.4.0'],
+        'tensorboard>=2.4.0',
+        'torchsummary>=1.5.1'],
       zip_safe=False)
