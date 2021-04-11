@@ -12,30 +12,45 @@ You need python 3.5 or above. Then:
 ~~`pip install vegans`~~ (Not yet)
 
 ## How to use
-The basic idea is that the user provides discriminator and generator networks, and the library takes care of training them in a selected GAN setting:
-```
+The basic idea is that the user provides discriminator and generator networks, and the library takes care of training them in a selected GAN setting. Several different use cases are shown below.
+
+#### Unsupervised Learning
+
+```python
 from vegans.GAN import WassersteinGAN
-from vegans.utils import plot_losses, plot_images
+import vegans.utils.utils as utils
 
-generator = ### Your generator (torch.nn.Module)
-adversariat = ### Your discriminator/critic (torch.nn.Module)
-X_train = ### Your dataloader (torch.utils.data.DataLoader) or pd.DataFrame
-
-z_dim = 64
+datapath =  "./data/mnist/"
+X_train, y_train, X_test, y_test = (
+    utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+)
+X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
+X_test = X_test.reshape((-1, 1, 32, 32))
 x_dim = X_train.shape[1:] # [nr_channels, height, width]
+z_dim = 64
 
-# Build a WassersteinGAN
-gan = WassersteinGAN(generator, discriminator, z_dim, x_dim)
-gan.summary() # optional
-
-# Fit the WassersteinGAN
-gan.fit(X_train)
+# Define your own architectures here. You can use a Sequential model or an object
+# inheriting from torch.nn.Module.
+generator, adversariat, _ = utils.load_example_architectures(
+    x_dim=x_dim, z_dim=z_dim
+)
+gan = WassersteinGAN(
+    generator=generator, adversariat=adversariat,
+    z_dim=z_dim, x_dim=x_dim, folder=None
+)
+gan.summary() # optional, shows architecture
+gan.fit(X_train, enable_tensorboard=False)
 
 # Vizualise results
 images, losses = gan.get_training_results()
-images = images.reshape(-1, *samples.shape[2:]) # remove nr_channels
-plot_images(images)
-plot_losses(losses)
+images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
+utils.plot_images(images)
+utils.plot_losses(losses)
+
+# Sample new images, you can also pass a specific noise vector
+samples = gan.generate(n=36)
+samples = samples.reshape(-1, *samples.shape[2:]) # remove nr_channels for plotting
+utils.plot_images(samples)
 ```
 
 You can currently use the following GANs:
@@ -58,7 +73,64 @@ Models can either be passed as `torch.nn.Sequential` objects or by defining cust
 
 Also look at the [jupyter notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks) for better visualized examples and how to use the library.
 
+#### Supervised Learning
 
+```python
+import torch
+import numpy as np
+import vegans.utils.utils as utils
+from vegans.GAN import ConditionalWassersteinGAN
+from sklearn.preprocessing import OneHotEncoder # Download sklearn
+
+datapath =  "./data/mnist/"
+X_train, y_train, X_test, y_test = (
+    utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+)
+X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
+X_test = X_test.reshape((-1, 1, 32, 32))
+one_hot_encoder = OneHotEncoder(sparse=False)
+y_train = one_hot_encoder.fit_transform(y_train.reshape(-1, 1))
+y_test = one_hot_encoder.transform(y_test.reshape(-1, 1))
+
+x_dim = X_train.shape[1:] # [nr_channels, height, width]
+y_dim = y_train.shape[1:]
+z_dim = 64
+
+# Define your own architectures here. You can use a Sequential model or an object
+# inheriting from torch.nn.Module.
+generator, adversariat, _ = utils.load_example_architectures(
+    x_dim=x_dim, z_dim=z_dim, y_dim=y_dim
+)
+gan = ConditionalWassersteinGAN(
+    generator=generator, adversariat=adversariat,
+    z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder=None,
+    optim={"Generator": torch.optim.RMSprop, "Adversariat": torch.optim.Adam}, # optional
+    optim_kwargs={"Generator": {"lr": 0.0001}, "Adversariat": {"lr": 0.0001}}, # optional
+    fixed_noise_size=32, # optional
+    clip_val=0.01, # optional
+    device=None, # optional
+    ngpu=0 # optional
+
+)
+gan.summary() # optional, shows architecture
+gan.fit(
+    X_train, y_train, X_test, y_test,
+    epochs=5, # optional
+    batch_size=32, # optional
+    steps={"Generator": 1, "Adversariat": 5}, # optional
+    print_every="0.1e", # optional
+    save_model_every=None, # optional
+    save_images_every=None, # optional
+    save_losses_every="0.1e", # optional
+    enable_tensorboard=False # optional
+)
+
+# Vizualise results
+images, losses = gan.get_training_results()
+images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
+utils.plot_images(images, labels=np.argmax(gan.fixed_labels.cpu().numpy(), axis=1))
+utils.plot_losses(losses)
+```
 
 ### Slightly More Details:
 
@@ -119,19 +191,24 @@ Some of the code has been inspired by some existing GAN implementations:
   - Minibatch discrimination
 - Other
 
-  - Write tests
-  
+  - New links to correct github files
+
+  - GIF the results
+
   - Feature loss
-  
+
   - enable Wasserstein loss for all architectures (when it makes sense)
-  
+
   - Do not save Discriminator
-  
+
     
 
 
 
 - Done
+  - ~~Better use case in README file~~
+  - ~~Import good architectures (probably with help of torch)~~
+  - ~~Write tests~~
   - ~~Test dependencies~~
   - ~~LR-GAN~~
   - ~~Least Squares GAN~~
