@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     X_train = X_train.reshape((-1, 1, 32, 32))
     X_test = X_test.reshape((-1, 1, 32, 32))
-    im_dim = X_train.shape[1:]
+    x_dim = X_train.shape[1:]
 
 
     ######################################C###################################
@@ -41,8 +41,8 @@ if __name__ == '__main__':
                 nn.Linear(512, 1024),
                 nn.LeakyReLU(0.2),
                 nn.BatchNorm1d(1024),
-                nn.Linear(1024, int(np.prod(im_dim))),
-                LayerReshape(im_dim)
+                nn.Linear(1024, int(np.prod(x_dim))),
+                LayerReshape(x_dim)
             )
             self.output = nn.Sigmoid()
 
@@ -93,16 +93,16 @@ if __name__ == '__main__':
     #########################################################################
 
     generator = MyGenerator(z_dim=z_dim)
-    adversariat = MyAdversariat(x_dim=im_dim)
-    encoder = MyEncoder(x_dim=im_dim)
+    adversariat = MyAdversariat(x_dim=x_dim)
+    encoder = MyEncoder(x_dim=x_dim)
     gan_model = WassersteinGAN(
         generator=generator, adversariat=adversariat,
-        z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
+        z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     )
     # gan_model = LRGAN(
     #     generator=generator, adversariat=adversariat, encoder=encoder,
-    #     z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
+    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
     #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     # )
     gan_model.summary(save=True)

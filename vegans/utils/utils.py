@@ -2,9 +2,11 @@ import torch
 import pickle
 
 import numpy as np
+import torch.nn as nn
 import matplotlib.pyplot as plt
 
 from torch.utils.data import Dataset
+from vegans.utils.layers import LayerReshape
 
 class DataSet(Dataset):
     def __init__(self, X, y=None):
@@ -202,3 +204,120 @@ def plot_images(images, labels=None, show=True, n=None):
     if show:
         plt.show()
     return fig, axs
+
+
+def check_conditional_network_input(network, in_dim, y_dim, name):
+    from vegans.utils.networks import NeuralNetwork
+    arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
+
+    has_error = False
+    for i, layer in enumerate(arch):
+        if "in_features" in layer.__dict__:
+            inpt_layer = layer
+            inpt_dim = int(layer.__dict__["in_features"])
+            if inpt_dim == in_dim:
+                has_error = True
+            elif np.prod(inpt_dim) == np.prod(in_dim):
+                has_error = True
+            break
+        elif "in_channels" in layer.__dict__:
+            inpt_layer = layer
+            inpt_dim = int(layer.__dict__["in_channels"])
+            if inpt_dim == in_dim[0]:
+                has_error = True
+            break
+    else:
+        raise TypeError("No input layer found. No Linear or Conv2d layers?")
+
+    if has_error:
+        good_dim = get_input_dim(in_dim, y_dim)
+        if len(good_dim) == 1:
+            first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(good_dim[0])
+
+        else:
+            first_layer = (
+                "torch.nn.Conv2d(in_channels={}, out_channels=...) # or torch.nn.ConvTranspose2d or\n\t\t\t\t\t\t\t\t\t".format(good_dim[0]) +
+                "torch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(good_dim))
+            )
+        raise AssertionError(
+            "\n\n**{}** is a conditional network. The y_dim (label) will be concatenated to the input of this network.\n\n".format(name) +
+            "The correct input size in first layer would be: {} due to y_dim={}. Given: {}.\n".format(good_dim, y_dim, str(layer)) +
+            "First layer should be of the form: {}.\n\n".format(first_layer) +
+            "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
+            "Check on github for notebooks of conditional GANs.\n\n"
+        )
+
+
+
+def load_example_architectures(x_dim, z_dim, y_dim=None):
+    if y_dim is not None:
+        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
+        gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+    else:
+        adv_in_dim = x_dim
+        gen_in_dim = z_dim
+
+    class MyGenerator(nn.Module):
+        def __init__(self, z_dim):
+            super().__init__()
+            self.hidden_part = nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(np.prod(gen_in_dim), 128),
+                nn.LeakyReLU(0.2),
+                nn.Linear(128, 256),
+                nn.LeakyReLU(0.2),
+                nn.BatchNorm1d(256),
+                nn.Linear(256, 512),
+                nn.LeakyReLU(0.2),
+                nn.BatchNorm1d(512),
+                nn.Linear(512, 1024),
+                nn.LeakyReLU(0.2),
+                nn.BatchNorm1d(1024),
+                nn.Linear(1024, int(np.prod(x_dim))),
+                LayerReshape(x_dim)
+            )
+            self.output = nn.Sigmoid()
+
+        def forward(self, x):
+            x = self.hidden_part(x)
+            y_pred = self.output(x)
+            return y_pred
+
+    class MyAdversariat(nn.Module):
+        def __init__(self, x_dim):
+            super().__init__()
+            self.hidden_part = nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(np.prod(adv_in_dim), 512),
+                nn.LeakyReLU(0.2),
+                nn.Linear(512, 256),
+                nn.LeakyReLU(0.2),
+                nn.Linear(256, 1)
+            )
+            self.output = nn.Identity()
+
+        def forward(self, x):
+            x = self.hidden_part(x)
+            y_pred = self.output(x)
+            return y_pred
+
+    class MyEncoder(nn.Module):
+        def __init__(self, x_dim):
+            super().__init__()
+            self.hidden_part = nn.Sequential(
+                nn.Flatten(),
+                nn.Linear(np.prod(adv_in_dim), 256),
+                nn.LeakyReLU(0.2),
+                nn.Linear(256, 128),
+                nn.LeakyReLU(0.2),
+                nn.Linear(128, np.prod(z_dim)),
+                LayerReshape(z_dim)
+            )
+            self.output = nn.Identity()
+
+        def forward(self, x):
+            x = self.hidden_part(x)
+            y_pred = self.output(x)
+            return y_pred
+
+    return MyGenerator(z_dim=z_dim), MyAdversariat(x_dim=x_dim), MyEncoder(x_dim=x_dim)

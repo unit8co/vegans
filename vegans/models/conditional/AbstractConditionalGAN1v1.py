@@ -3,9 +3,9 @@ import torch
 
 import numpy as np
 
-from vegans.utils.utils import get_input_dim
 from vegans.utils.networks import Generator, Adversariat
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
+from vegans.utils.utils import get_input_dim, check_conditional_network_input
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
 
@@ -35,6 +35,8 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
 
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+        check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
+        check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
         AbstractGAN1v1.__init__(
             self, generator=generator, adversariat=adversariat, x_dim=adv_in_dim, z_dim=gen_in_dim,
             adv_type=adv_type, optim=optim, optim_kwargs=optim_kwargs,

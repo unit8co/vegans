@@ -45,8 +45,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         ngpu : int
             Number of gpus used during training if device == "cuda".
         """
-        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+        self.adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
+        self.gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         AbstractGenerativeModel.__init__(
             self, x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
@@ -196,7 +196,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                     self._save_losses_plot()
 
                 if save_losses_every is not None and step % save_losses_every == 0:
-                    self._log_losses(X_batch=X, Z_batch=Z, y_batch=test_y_batch, mode="Train")
+                    self._log_losses(X_batch=X, Z_batch=Z, y_batch=y, mode="Train")
                     if enable_tensorboard:
                         self._log_scalars(step=step, writer=writer_train)
                     if test_x_batch is not None:

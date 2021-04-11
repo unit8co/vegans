@@ -26,18 +26,19 @@ if __name__ == '__main__':
     y_test = one_hot_encoder.transform(y_test.reshape(-1, 1))
 
     im_dim = X_train.shape[1:]
-    label_dim = y_train.shape[1:]
+    y_dim = y_train.shape[1:]
     #########################################################################
     # Flat network
     #########################################################################
-    z_dim = 32
-    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=label_dim)
-    adv_in_dim = utils.get_input_dim(dim1=im_dim, dim2=label_dim)
+    z_dim = 128
+    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
+    adv_in_dim = utils.get_input_dim(dim1=im_dim, dim2=y_dim)
 
     class MyGenerator(nn.Module):
         def __init__(self, z_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
+                nn.Flatten(),
                 nn.Linear(np.prod(gen_in_dim), 128),
                 nn.LeakyReLU(0.2),
                 nn.Linear(128, 256),
@@ -87,7 +88,7 @@ if __name__ == '__main__':
                 nn.LeakyReLU(0.2),
                 nn.Linear(256, 128),
                 nn.LeakyReLU(0.2),
-                nn.Linear(128, z_dim)
+                nn.Linear(128, np.prod(z_dim))
             )
             self.output = nn.Identity()
 
@@ -102,14 +103,15 @@ if __name__ == '__main__':
     generator = MyGenerator(z_dim=z_dim)
     adversariat = MyAdversariat(x_dim=im_dim)
     encoder = MyEncoder(x_dim=im_dim)
+
     # gan_model = ConditionalWassersteinGAN(
     #     generator=generator, adversariat=adversariat,
-    #     x_dim=im_dim, z_dim=z_dim, y_dim=label_dim, folder="TrainedModels/CGAN", optim=None,
+    #     x_dim=im_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
     #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     # )
     gan_model = ConditionalLRGAN(
         generator=generator, adversariat=adversariat, encoder=encoder,
-        x_dim=im_dim, z_dim=z_dim, y_dim=label_dim, folder="TrainedModels/CGAN", optim=None,
+        x_dim=im_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     )
     gan_model.summary(save=True)

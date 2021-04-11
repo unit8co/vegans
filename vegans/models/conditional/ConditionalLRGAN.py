@@ -23,8 +23,8 @@ import torch
 from torch.nn import BCELoss, L1Loss
 from torch.nn import MSELoss as L2Loss
 
-from vegans.utils.utils import get_input_dim
 from vegans.utils.networks import Generator, Adversariat, Encoder
+from vegans.utils.utils import get_input_dim, check_conditional_network_input
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
 class ConditionalLRGAN(AbstractConditionalGenerativeModel):
@@ -51,6 +51,8 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
+        check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
+        check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
         self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type="Discriminator", device=device, ngpu=ngpu)
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)

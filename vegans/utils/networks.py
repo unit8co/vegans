@@ -47,7 +47,7 @@ class NeuralNetwork(Module):
         return output
 
     def _validate_input(self):
-        iterative_layers = self._get_iterative_layers()
+        iterative_layers = self._get_iterative_layers(self.network, self.input_type)
 
         for layer in iterative_layers:
             if "in_features" in layer.__dict__:
@@ -68,17 +68,21 @@ class NeuralNetwork(Module):
             raise TypeError(
                 "\n\tInput mismatch for {}:\n".format(self.name) +
                 "\t\tFirst input layer 'in_features' or 'in_channels': {}. self.input_size: {}.\n".format(
-                    first_input, self.input_size
-                )
+                    first_input, self.input_size) +
+                "\t\tIf you are trying to use a conditional model please make sure you adjusted the input size\n" +
+                "\t\tof the first layer in this architecture for the label vector / image.\n"
+                "\t\tIn this case, use vegans.utils.utils.get_input_dim(in_dim, y_dim) and adjust this architecture's\n" +
+                "\t\tfirst layer input accordingly. See the conditional examples on github for help."
             )
         return True
 
-    def _get_iterative_layers(self):
-        if self.input_type == "Sequential":
-            return self.network
-        elif self.input_type == "Object":
+    @staticmethod
+    def _get_iterative_layers(network, input_type):
+        if input_type == "Sequential":
+            return network
+        elif input_type == "Object":
             iterative_net = []
-            for _, layers in self.network.__dict__["_modules"].items():
+            for _, layers in network.__dict__["_modules"].items():
                 try:
                     for layer in layers:
                         iterative_net.append(layer)
