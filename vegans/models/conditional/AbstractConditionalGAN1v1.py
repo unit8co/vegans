@@ -35,15 +35,18 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
 
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-        self._is_conditional = True
         AbstractGAN1v1.__init__(
             self, generator=generator, adversariat=adversariat, x_dim=adv_in_dim, z_dim=gen_in_dim,
             adv_type=adv_type, optim=optim, optim_kwargs=optim_kwargs,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=0
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=0,
+            _called_from_conditional=True
         )
         AbstractConditionalGenerativeModel.__init__(
             self, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+        )
+        assert (self.generator.output_size == self.x_dim), (
+            "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
         )
 
 

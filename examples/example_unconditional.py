@@ -9,7 +9,7 @@ from vegans.GAN import VanillaGAN, WassersteinGAN, WassersteinGANGP, LSGAN, LRGA
 
 if __name__ == '__main__':
 
-    datapath = "../data/mnist/"
+    datapath = "./data/mnist/"
     X_train, y_train, X_test, y_test = utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
     lr_gen = 0.0001
     lr_adv = 0.00005
@@ -62,7 +62,7 @@ if __name__ == '__main__':
                 nn.LeakyReLU(0.2),
                 nn.Linear(256, 1)
             )
-            self.output = nn.Sigmoid()
+            self.output = nn.Identity()
 
         def forward(self, x):
             x = self.hidden_part(x)
@@ -95,16 +95,16 @@ if __name__ == '__main__':
     generator = MyGenerator(z_dim=z_dim)
     adversariat = MyAdversariat(x_dim=im_dim)
     encoder = MyEncoder(x_dim=im_dim)
-    # gan_model = LSGAN(
-    #     generator=generator, adversariat=adversariat,
-    #     z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
-    # )
-    gan_model = LRGAN(
-        generator=generator, adversariat=adversariat, encoder=encoder,
+    gan_model = WassersteinGAN(
+        generator=generator, adversariat=adversariat,
         z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     )
+    # gan_model = LRGAN(
+    #     generator=generator, adversariat=adversariat, encoder=encoder,
+    #     z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
+    # )
     gan_model.summary(save=True)
     gan_model.fit(
         X_train=X_train,

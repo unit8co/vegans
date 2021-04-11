@@ -69,8 +69,7 @@ class NeuralNetwork(Module):
                 "\n\tInput mismatch for {}:\n".format(self.name) +
                 "\t\tFirst input layer 'in_features' or 'in_channels': {}. self.input_size: {}.\n".format(
                     first_input, self.input_size
-                ) +
-                "\t\tMaybe forgot to adjust size of input layer for y_dim."
+                )
             )
         return True
 

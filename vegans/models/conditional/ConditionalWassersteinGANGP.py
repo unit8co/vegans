@@ -65,9 +65,12 @@ class ConditionalWassersteinGANGP(AbstractConditionalGAN1v1):
     def _define_loss(self):
         self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "GP": self._gradient_penalty}
 
-    def _gradient_penalty(self, real_images, fake_images):
-        alpha = torch.Tensor(np.random.random((real_images.size(0), 1, 1, 1))).to(self.device)
-        interpolates = (alpha * real_images + ((1 - alpha) * fake_images)).requires_grad_(True).float()
+    def _gradient_penalty(self, real_samples, fake_samples):
+        if len(real_samples.shape) == 2:
+            alpha = torch.Tensor(np.random.random((real_samples.size(0), 1))).to(self.device)
+        elif len(real_samples.shape) == 4:
+            alpha = torch.Tensor(np.random.random((real_samples.size(0), 1, 1, 1))).to(self.device)
+        interpolates = (alpha * real_samples + ((1 - alpha) * fake_samples)).requires_grad_(True).float()
         d_interpolates = self.adversariat(interpolates).to(self.device)
         dummy = torch.ones_like(d_interpolates, requires_grad=False).to(self.device)
         gradients = torch.autograd.grad(

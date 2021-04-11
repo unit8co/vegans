@@ -11,7 +11,7 @@ from vegans.GAN import ConditionalVanillaGAN, ConditionalWassersteinGAN, Conditi
 
 if __name__ == '__main__':
 
-    datapath = "../data/mnist/"
+    datapath = "./data/mnist/"
     X_train, y_train, X_test, y_test = utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
 
     lr_gen = 0.0001

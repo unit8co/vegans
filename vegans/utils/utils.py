@@ -44,7 +44,7 @@ def load_mnist(datapath, normalize=True, pad=None, return_datasets=False):
 
 
 def wasserstein_loss(input, target):
-    assert torch.unique(target).shape[0] == 2, "Only two different values for target allowed."
+    assert torch.unique(target).shape[0] <= 2, "Only two different values for target allowed."
     target[target==0] = -1
 
     return torch.mean(target*input)
@@ -130,7 +130,7 @@ def get_input_dim(dim1, dim2):
         out_dim = [dim1[0]+dim2[0], *dim1[1:]]
     else:
         raise AssertionError("dim1 and dim2 must have length one or three. Given: {} and {}.".format(dim1, dim2))
-    return out_dim
+    return tuple(out_dim)
 
 def plot_losses(losses, show=True, share=False):
     """

@@ -81,23 +81,23 @@ def test_concatenate():
 def test_get_input_dim():
     dim1 = 12
     dim2 = 34
-    assert utils.get_input_dim(dim1, dim2) == [46]
+    assert utils.get_input_dim(dim1, dim2) == tuple([46])
 
     dim1 = [12]
     dim2 = [34]
-    assert utils.get_input_dim(dim1, dim2) == [46]
+    assert utils.get_input_dim(dim1, dim2) == tuple([46])
 
     dim1 = [1, 3, 4]
     dim2 = [5]
-    assert utils.get_input_dim(dim1, dim2) == [6, 3, 4]
+    assert utils.get_input_dim(dim1, dim2) == tuple([6, 3, 4])
 
     dim1 = 5
     dim2 = [1, 3, 4]
-    assert utils.get_input_dim(dim1, dim2) == [6, 3, 4]
+    assert utils.get_input_dim(dim1, dim2) == tuple([6, 3, 4])
 
     dim1 = [3, 4, 6]
     dim2 = [7, 4, 6]
-    assert utils.get_input_dim(dim1, dim2) == [10, 4, 6]
+    assert utils.get_input_dim(dim1, dim2) == tuple([10, 4, 6])
 
     with pytest.raises(AssertionError):
         dim1 = [3, 4]

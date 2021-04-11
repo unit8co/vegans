@@ -28,7 +28,8 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             folder="./AbstractGAN1v1",
-            ngpu=0):
+            ngpu=0,
+            _called_from_conditional=False):
 
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -40,11 +41,7 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
-        if hasattr(self, "_is_conditional"):
-            assert (self.generator.output_size[1:] == self.x_dim[1:]), (
-                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-            )
-        else:
+        if not _called_from_conditional:
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )

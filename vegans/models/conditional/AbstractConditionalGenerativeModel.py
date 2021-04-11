@@ -65,6 +65,43 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self.fixed_labels = torch.from_numpy(self.fixed_labels).to(self.device)
         return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
 
+    def _assert_shapes(self, X_train, y_train, X_test, y_test):
+        assert len(X_train.shape) == 2 or len(X_train.shape) == 4, (
+            "X_train must be either have 2 or 4 shape dimensions. Given: {}.".format(X_train.shape) +
+            "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
+        )
+        assert get_input_dim(X_train.shape[1:], y_train.shape[1:]) == self.adversariat.input_size[:], (
+            "Wrong input shape for adversariat. Given: {}. Needed: {}.".format(X_train.shape, self.adversariat.input_size)
+        )
+
+        if X_test is not None:
+            assert X_train.shape[1:] == X_test.shape[1:], (
+                "X_train and X_test must have same dimensions. Given: {} and {}.".format(X_train.shape[1:], X_test.shape[1:])
+            )
+            if y_test is not None:
+                assert X_test.shape[0] == y_test.shape[0], (
+                    "Same number if X_test and y_test needed.Given: {} and {}.".format(X_test.shape[0], y_test.shape[0])
+                )
+
+        assert X_train.shape[0] == y_train.shape[0], (
+            "Same number if X_train and y_train needed.Given: {} and {}.".format(X_train.shape[0], y_train.shape[0])
+        )
+        assert len(y_train.shape) == 2 or len(y_train.shape) == 4, (
+            "y_train must be either have 2 or 4 shape dimensions. Given: {}.".format(y_train.shape) +
+            "Try to use y_train.reshape(-1, 1) or y_train.reshape(-1, 1, height, width)."
+        )
+        assert y_train.shape[2:] == self.y_dim[1:], (
+            "Wrong input shape for y_train. Given: {}. Needed: {}.".format(y_train.shape, self.y_dim)
+        )
+        if len(y_train.shape) == 4:
+            assert X_train.shape == y_train.shape, (
+                "If y_train is an image (Image-to-Image translation task) it must have the same shape as X_train" +
+                " to be concatenated before passing it to the discriminator. x_shape: {}. y_shape: {}.".format(X_train.shape, y_train.shape)
+            )
+        if X_test is not None:
+            assert y_train.shape[1:] == y_test.shape[1:], (
+                "y_train and y_test must have same dimensions. Given: {} and {}.".format(y_train.shape[1:], y_test.shape[1:])
+            )
 
     #########################################################################
     # Actions during training
