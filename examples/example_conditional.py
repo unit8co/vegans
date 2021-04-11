@@ -64,7 +64,7 @@ if __name__ == '__main__':
         def __init__(self, x_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
-                nn.Conv2d(in_channels=adv_in_dim[0], out_channels=1, kernel_size=4, stride=4, padding=0),
+                nn.Conv2d(in_channels=x_dim[0], out_channels=1, kernel_size=4, stride=4, padding=0),
                 nn.Flatten(),
                 nn.Linear(64, 512),
                 nn.LeakyReLU(0.2),

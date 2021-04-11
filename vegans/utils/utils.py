@@ -209,8 +209,8 @@ def plot_images(images, labels=None, show=True, n=None):
 def check_conditional_network_input(network, in_dim, y_dim, name):
     from vegans.utils.networks import NeuralNetwork
     arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
-
     has_error = False
+
     for i, layer in enumerate(arch):
         if "in_features" in layer.__dict__:
             inpt_layer = layer
@@ -236,12 +236,56 @@ def check_conditional_network_input(network, in_dim, y_dim, name):
 
         else:
             first_layer = (
-                "torch.nn.Conv2d(in_channels={}, out_channels=...) # or torch.nn.ConvTranspose2d or\n\t\t\t\t\t\t\t\t\t".format(good_dim[0]) +
-                "torch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(good_dim))
+                "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
+                "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
+                "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(good_dim))
             )
         raise AssertionError(
             "\n\n**{}** is a conditional network. The y_dim (label) will be concatenated to the input of this network.\n\n".format(name) +
-            "The correct input size in first layer would be: {} due to y_dim={}. Given: {}.\n".format(good_dim, y_dim, str(layer)) +
+            "The first layer receives: {} due to y_dim={}. Given: {}.(Reshape & Flatten not considered)\n".format(good_dim, y_dim, str(layer)) +
+            "First layer should be of the form: {}.\n\n".format(first_layer) +
+            "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
+            "Check on github for notebooks of conditional GANs.\n\n"
+        )
+
+
+def check_unconditional_network_input(network, in_dim, y_dim, name):
+    from vegans.utils.networks import NeuralNetwork
+    arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
+    has_error = False
+    concat_input = get_input_dim(in_dim, y_dim)
+
+    for i, layer in enumerate(arch):
+        if "in_features" in layer.__dict__:
+            inpt_layer = layer
+            inpt_dim = int(layer.__dict__["in_features"])
+            if inpt_dim == concat_input:
+                has_error = True
+            elif np.prod(inpt_dim) == np.prod(concat_input):
+                has_error = True
+            break
+        elif "in_channels" in layer.__dict__:
+            inpt_layer = layer
+            inpt_dim = int(layer.__dict__["in_channels"])
+            if inpt_dim == concat_input[0]:
+                has_error = True
+            break
+    else:
+        raise TypeError("No input layer found. No Linear or Conv2d layers?")
+
+    if has_error:
+        if len(in_dim) == 1:
+            first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(in_dim[0])
+
+        else:
+            first_layer = (
+                "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(in_dim[0]) +
+                "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(in_dim[0]) +
+                "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(in_dim))
+            )
+        raise AssertionError(
+            "\n\n**{}** is **not** a conditional network. The y_dim (label) will **not** be concatenated to the input of this network.\n\n".format(name) +
+            "The first layer receives: {} (same as x_dim). Given: {}.(Reshape & Flatten not considered)\n".format(in_dim, str(layer)) +
             "First layer should be of the form: {}.\n\n".format(first_layer) +
             "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
             "Check on github for notebooks of conditional GANs.\n\n"
