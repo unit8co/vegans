@@ -175,6 +175,7 @@ Some of the code has been inspired by some existing GAN implementations:
 ## TODO
 
 - GAN Implementations (sorted by priority)
+  - KLGAN
   - VAEGAN
   - BicycleGAN
   - InfoGAN
