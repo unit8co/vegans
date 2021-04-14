@@ -8,7 +8,6 @@ import utils.utils as utils
 import matplotlib.pyplot as plt
 
 
-
 def plot_2d_grid(model, nr_images=10, show=True):
     image_dim = model.adversariat.input_size[1]
     the_max = 2
@@ -33,14 +32,12 @@ def plot_2d_grid(model, nr_images=10, show=True):
         plt.show()
     return fig, ax
 
-
 def plot_on_click(model):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(9, 9))
     plt.plot([-2, -2, 2, 2, -2], [-2, 2, 2, -2, -2])
     ax.set_title("Latent space")
     fig.canvas.mpl_connect('button_press_event', onclick)
     plt.show()
-
 
 def onclick(event):
     z_input = torch.Tensor([[event.xdata, event.ydata]]).to(model.device)
@@ -49,8 +46,6 @@ def onclick(event):
     ax.imshow(generated_image[0, 0, :, :], cmap="gray", origin=None)
     ax.set_title("(x, y) = ({}, {})".format(round(event.xdata, 2), round(event.ydata, 2)))
     plt.show()
-
-
 
 if __name__ == '__main__':
     datapath = "./Data/mnist/"

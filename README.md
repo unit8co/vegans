@@ -175,12 +175,14 @@ Some of the code has been inspired by some existing GAN implementations:
 ## TODO
 
 - GAN Implementations (sorted by priority)
+  - ConditionalEBGAN
+  - VAE
   - VAEGAN
   - BicycleGAN
   - InfoGAN
-  - BEGAN
-  - EBGAN
+  - ConditionalKLGAN
   - CycleGAN
+  - BEGAN
   - WassersteinGAN SpectralNorm
   - DiscoGAN
   - CycleGAN
@@ -193,19 +195,40 @@ Some of the code has been inspired by some existing GAN implementations:
 
   - New links to correct github files
 
-  - GIF the results
+  - Better default folder (probably None or make current subfolder)
 
-  - Feature loss
+  - Include well defined loaders for
 
+    - CelebA
+  - Mnist
+    
+    - Pix2Pix 
+  - Map translation
+    
+  - ImageNet
+    
+  - Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))
+  
+    - ```python
+      activation = {}
+      def the_hook(model, input, output):
+          activation["This"] = output.detach()
+      
+       adversariat.feature_part.register_forward_hook(the_hook)
+       print(adversariat(torch.from_numpy(X_train[:25]).float()).shape)
+       print(activation["This"].shape)
+      ```
+  
   - enable Wasserstein loss for all architectures (when it makes sense)
-
+  
   - Do not save Discriminator
-
+  
     
 
 
 
 - Done
+  - ~~GIF the results~~
   - ~~Better use case in README file~~
   - ~~Import good architectures (probably with help of torch)~~
   - ~~Write tests~~

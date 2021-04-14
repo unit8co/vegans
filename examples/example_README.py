@@ -1,12 +1,13 @@
-mode = "supervised"
+mode = "unsupervised"
 
 if mode == "unsupervised":
     from vegans.GAN import WassersteinGAN
     import vegans.utils.utils as utils
+    import vegans.utils.loading as loading
 
     datapath =  "./data/mnist/"
     X_train, y_train, X_test, y_test = (
-        utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+        loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
     )
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
@@ -15,7 +16,7 @@ if mode == "unsupervised":
 
     # Define your own architectures here. You can use a Sequential model or an object
     # inheriting from torch.nn.Module.
-    generator, adversariat, _ = utils.load_example_architectures(
+    generator, adversariat, _ = loading.load_example_architectures(
         x_dim=x_dim, z_dim=z_dim
     )
     gan = WassersteinGAN(
@@ -40,12 +41,13 @@ elif mode == "supervised":
     import torch
     import numpy as np
     import vegans.utils.utils as utils
+    import vegans.utils.loading as loading
     from vegans.GAN import ConditionalWassersteinGAN
     from sklearn.preprocessing import OneHotEncoder # Download sklearn
 
     datapath =  "./data/mnist/"
     X_train, y_train, X_test, y_test = (
-        utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+        loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
     )
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
@@ -59,7 +61,7 @@ elif mode == "supervised":
 
     # Define your own architectures here. You can use a Sequential model or an object
     # inheriting from torch.nn.Module.
-    generator, adversariat, _ = utils.load_example_architectures(
+    generator, adversariat, _ = loading.load_example_architectures(
         x_dim=x_dim, z_dim=z_dim, y_dim=y_dim
     )
     gan = ConditionalWassersteinGAN(

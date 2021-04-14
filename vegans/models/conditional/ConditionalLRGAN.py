@@ -23,9 +23,9 @@ import torch
 from torch.nn import BCELoss, L1Loss
 from torch.nn import MSELoss as L2Loss
 
+from vegans.utils.utils import get_input_dim
 from vegans.utils.networks import Generator, Adversariat, Encoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
-from vegans.utils.utils import get_input_dim, check_conditional_network_input, check_unconditional_network_input
 
 class ConditionalLRGAN(AbstractConditionalGenerativeModel):
     #########################################################################
@@ -44,16 +44,16 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
             lambda_L1=10,
             fixed_noise_size=32,
             device=None,
-            folder="./AbstractGAN1v1",
+            folder="./ConditionalLRGAN",
             ngpu=0):
 
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-        check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
-        check_unconditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
+        AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
+        AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
+        AbstractConditionalGenerativeModel._check_unconditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
         self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type="Discriminator", device=device, ngpu=ngpu)
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)
@@ -114,7 +114,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         self._losses.update({
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
-            "Generator_L1": latent_space_regression
+            "Generator_L1": self.lambda_L1*latent_space_regression
         })
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch, y_batch):

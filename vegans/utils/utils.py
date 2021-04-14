@@ -21,36 +21,27 @@ class DataSet(Dataset):
             return self.X[index], self.y[index]
         return self.X[index]
 
-
-def load_mnist(datapath, normalize=True, pad=None, return_datasets=False):
-    datapath = datapath if datapath.endswith("/") else datapath+"/"
-    with open(datapath+"train_images.pickle", "rb") as f:
-        X_train, y_train = pickle.load(f)
-    with open(datapath+"test_images.pickle", "rb") as f:
-        X_test, y_test = pickle.load(f)
-
-    if normalize:
-        max_number = X_train.max()
-        X_train = X_train / max_number
-        X_test = X_test / max_number
-
-    if pad:
-        X_train = np.pad(X_train, [(0, 0), (pad, pad), (pad, pad)], mode='constant')
-        X_test = np.pad(X_test, [(0, 0), (pad, pad), (pad, pad)], mode='constant')
-
-    if return_datasets:
-        train = DataSet(X_train, y_train)
-        test = DataSet(X_test, y_test)
-        return(train, test)
-    return X_train, y_train, X_test, y_test
-
-
 def wasserstein_loss(input, target):
+    """ Computes the Wasserstein loss / divergence.
+
+    Also known as earthmover distance.
+
+    Parameters
+    ----------
+    input : torch.Tensor
+        Input tensor. Output of a critic.
+    target : TYPE
+        Label, either 1 or -1. Zeros are translated to -1.
+
+    Returns
+    -------
+    torch.Tensor
+        Wasserstein divergence
+    """
     assert torch.unique(target).shape[0] <= 2, "Only two different values for target allowed."
     target[target==0] = -1
 
     return torch.mean(target*input)
-
 
 def concatenate(tensor1, tensor2):
     """ Concatenates two 2D or 4D tensors.
@@ -205,163 +196,25 @@ def plot_images(images, labels=None, show=True, n=None):
         plt.show()
     return fig, axs
 
+def create_gif(source_path, target_path=None):
+    """Create a GIF from images contained on the source path.
 
-def check_conditional_network_input(network, in_dim, y_dim, name):
-    from vegans.utils.networks import NeuralNetwork
-    arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
-    has_error = False
+    Parameters
+    ----------
+    source_path : string
+        Path pointing to the source directory with .png files.
+    target_path : string, optional
+        Name of the created GIF.
+    """
+    import os
+    import imageio
+    source_path = source_path+"/" if not source_path.endswith("/") else source_path
+    images = []
+    for file_name in sorted(os.listdir(source_path)):
+        if file_name.endswith('.png'):
+            file_path = os.path.join(source_path, file_name)
+            images.append(imageio.imread(file_path))
 
-    for i, layer in enumerate(arch):
-        if "in_features" in layer.__dict__:
-            inpt_layer = layer
-            inpt_dim = int(layer.__dict__["in_features"])
-            if inpt_dim == in_dim:
-                has_error = True
-            elif np.prod(inpt_dim) == np.prod(in_dim):
-                has_error = True
-            break
-        elif "in_channels" in layer.__dict__:
-            inpt_layer = layer
-            inpt_dim = int(layer.__dict__["in_channels"])
-            if inpt_dim == in_dim[0]:
-                has_error = True
-            break
-    else:
-        raise TypeError("No input layer found. No Linear or Conv2d layers?")
-
-    if has_error:
-        good_dim = get_input_dim(in_dim, y_dim)
-        if len(good_dim) == 1:
-            first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(good_dim[0])
-
-        else:
-            first_layer = (
-                "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
-                "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
-                "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(good_dim))
-            )
-        raise AssertionError(
-            "\n\n**{}** is a conditional network. The y_dim (label) will be concatenated to the input of this network.\n\n".format(name) +
-            "The first layer receives: {} due to y_dim={}. Given: {}.(Reshape & Flatten not considered)\n".format(good_dim, y_dim, str(layer)) +
-            "First layer should be of the form: {}.\n\n".format(first_layer) +
-            "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
-            "Check on github for notebooks of conditional GANs.\n\n"
-        )
-
-
-def check_unconditional_network_input(network, in_dim, y_dim, name):
-    from vegans.utils.networks import NeuralNetwork
-    arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
-    has_error = False
-    concat_input = get_input_dim(in_dim, y_dim)
-
-    for i, layer in enumerate(arch):
-        if "in_features" in layer.__dict__:
-            inpt_layer = layer
-            inpt_dim = int(layer.__dict__["in_features"])
-            if inpt_dim == concat_input:
-                has_error = True
-            elif np.prod(inpt_dim) == np.prod(concat_input):
-                has_error = True
-            break
-        elif "in_channels" in layer.__dict__:
-            inpt_layer = layer
-            inpt_dim = int(layer.__dict__["in_channels"])
-            if inpt_dim == concat_input[0]:
-                has_error = True
-            break
-    else:
-        raise TypeError("No input layer found. No Linear or Conv2d layers?")
-
-    if has_error:
-        if len(in_dim) == 1:
-            first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(in_dim[0])
-
-        else:
-            first_layer = (
-                "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(in_dim[0]) +
-                "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(in_dim[0]) +
-                "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(in_dim))
-            )
-        raise AssertionError(
-            "\n\n**{}** is **not** a conditional network. The y_dim (label) will **not** be concatenated to the input of this network.\n\n".format(name) +
-            "The first layer receives: {} (same as x_dim). Given: {}.(Reshape & Flatten not considered)\n".format(in_dim, str(layer)) +
-            "First layer should be of the form: {}.\n\n".format(first_layer) +
-            "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
-            "Check on github for notebooks of conditional GANs.\n\n"
-        )
-
-
-
-def load_example_architectures(x_dim, z_dim, y_dim=None):
-    if y_dim is not None:
-        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-    else:
-        adv_in_dim = x_dim
-        gen_in_dim = z_dim
-
-    class MyGenerator(nn.Module):
-        def __init__(self, z_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(gen_in_dim), 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, 256),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(256),
-                nn.Linear(256, 512),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(512),
-                nn.Linear(512, 1024),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(1024),
-                nn.Linear(1024, int(np.prod(x_dim))),
-                LayerReshape(x_dim)
-            )
-            self.output = nn.Sigmoid()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
-
-    class MyAdversariat(nn.Module):
-        def __init__(self, x_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(adv_in_dim), 512),
-                nn.LeakyReLU(0.2),
-                nn.Linear(512, 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 1)
-            )
-            self.output = nn.Identity()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
-
-    class MyEncoder(nn.Module):
-        def __init__(self, x_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(adv_in_dim), 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, np.prod(z_dim)),
-                LayerReshape(z_dim)
-            )
-            self.output = nn.Identity()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
-
-    return MyGenerator(z_dim=z_dim), MyAdversariat(x_dim=x_dim), MyEncoder(x_dim=x_dim)
+    if target_path is None:
+        target_path = source_path+"movie.gif"
+    imageio.mimsave(target_path, images)

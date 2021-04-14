@@ -2,6 +2,7 @@ import torch
 
 import numpy as np
 import vegans.utils.utils as utils
+import vegans.utils.loading as loading
 
 from torch import nn
 from sklearn.preprocessing import OneHotEncoder
@@ -12,7 +13,7 @@ from vegans.GAN import ConditionalVanillaGAN, ConditionalWassersteinGAN, Conditi
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
 
     lr_gen = 0.0001
     lr_adv = 0.00005
@@ -57,8 +58,7 @@ if __name__ == '__main__':
 
         def forward(self, x):
             x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
+            return self.output(x)
 
     class MyAdversariat(nn.Module):
         def __init__(self, x_dim):
@@ -76,8 +76,7 @@ if __name__ == '__main__':
 
         def forward(self, x):
             x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
+            return self.output(x)
 
     class MyEncoder(nn.Module):
         def __init__(self, x_dim):
@@ -94,8 +93,7 @@ if __name__ == '__main__':
 
         def forward(self, x):
             x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
+            return self.output(x)
 
     #########################################################################
     # Training

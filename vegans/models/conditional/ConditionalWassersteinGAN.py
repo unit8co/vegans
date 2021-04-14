@@ -44,7 +44,7 @@ class ConditionalWassersteinGAN(AbstractConditionalGAN1v1):
             fixed_noise_size=32,
             clip_val=0.01,
             device=None,
-            folder="./WassersteinGAN",
+            folder="./ConditionalWassersteinGAN",
             ngpu=None):
 
         super().__init__(

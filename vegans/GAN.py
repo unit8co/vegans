@@ -1,5 +1,7 @@
 from vegans.models.unconditional.LSGAN import LSGAN
 from vegans.models.unconditional.LRGAN import LRGAN
+from vegans.models.unconditional.EBGAN import EBGAN
+from vegans.models.unconditional.KLGAN import KLGAN
 from vegans.models.unconditional.VanillaGAN import VanillaGAN
 from vegans.models.unconditional.WassersteinGAN import WassersteinGAN
 from vegans.models.unconditional.WassersteinGANGP import WassersteinGANGP

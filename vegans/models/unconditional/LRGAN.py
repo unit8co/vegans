@@ -42,7 +42,7 @@ class LRGAN(AbstractGenerativeModel):
             lambda_L1=10,
             fixed_noise_size=32,
             device=None,
-            folder="./AbstractGAN1v1",
+            folder="./LRGAN1v1",
             ngpu=0):
 
         if device is None:
@@ -107,13 +107,13 @@ class LRGAN(AbstractGenerativeModel):
         self._losses.update({
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
-            "Generator_L1": latent_space_regression
+            "Generator_L1": self.lambda_L1*latent_space_regression
         })
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch).detach()
         fake_predictions = self.predict(x=fake_images)
-        real_predictions = self.predict(x=X_batch.float())
+        real_predictions = self.predict(x=X_batch)
 
         adv_loss_fake = self.loss_functions["Adversariat"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)

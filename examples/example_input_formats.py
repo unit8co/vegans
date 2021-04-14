@@ -2,6 +2,7 @@ import torch
 
 import numpy as np
 import vegans.utils.utils as utils
+import vegans.utils.loading as loading
 
 from torch import nn
 from vegans.utils.layers import LayerReshape, LayerPrintSize
@@ -33,8 +34,8 @@ def call_gan_training(generator, adversariat):
 
 if __name__ == '__main__':
 
-    datapath = "../data/mnist/"
-    X_train, y_train, X_test, y_test = utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    datapath = "./data/mnist/"
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
     lr_gen = 0.0001
     lr_adv = 0.00005
     epochs = 1

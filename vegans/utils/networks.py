@@ -13,9 +13,8 @@ class NeuralNetwork(Module):
     """ Basic abstraction for single networks.
 
     These networks form the building blocks for the generative adversarial networks.
-    Mainly do some consistency checks.
+    Mainly responsible for consistency checks.
     """
-
     def __init__(self, network, name, input_size, device, ngpu):
         super(NeuralNetwork, self).__init__()
         self.name = name
@@ -108,7 +107,6 @@ class NeuralNetwork(Module):
         return self.name
 
 
-
 class Generator(NeuralNetwork):
     def __init__(self, network, input_size, device, ngpu):
         super().__init__(network, input_size=input_size, name="Generator", device=device, ngpu=ngpu)
@@ -120,23 +118,26 @@ class Adversariat(NeuralNetwork):
     Might either be a discriminator (output [0, 1]) or critic (output [-Inf, Inf]).
     """
     def __init__(self, network, input_size, adv_type, device, ngpu):
-        valid_types = ["Discriminator", "Critic"]
-        if adv_type == "Discriminator":
-            valid_last_layer = [torch.nn.Sigmoid]
-            self._type = "Discriminator"
-        elif adv_type == "Critic":
-            valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
-            self._type = "Critic"
-        else:
-            raise TypeError("adv_type must be one of {}.".format(valid_types))
-
         try:
             last_layer_type = type(network[-1])
         except TypeError:
             last_layer_type = type(network.__dict__["_modules"]["output"])
-        assert last_layer_type in valid_last_layer, (
-            "Last layer activation function of {} needs to be one of '{}'.".format(adv_type, valid_last_layer)
-        )
+
+        valid_types = ["Discriminator", "Critic", "AutoEncoder"]
+        if adv_type == "Discriminator":
+            valid_last_layer = [torch.nn.Sigmoid]
+        elif adv_type == "Critic":
+            valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
+        elif adv_type == "AutoEncoder":
+            valid_last_layer = []
+        else:
+            raise TypeError("adv_type must be one of {}.".format(valid_types))
+        self._type = adv_type
+
+        if len(valid_last_layer) > 0:
+            assert last_layer_type in valid_last_layer, (
+                "Last layer activation function of {} needs to be one of '{}'.".format(adv_type, valid_last_layer)
+            )
 
         super().__init__(network, input_size=input_size, name="Adversariat", device=device, ngpu=ngpu)
 
@@ -155,3 +156,23 @@ class Encoder(NeuralNetwork):
             "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer)
         )
         super().__init__(network, input_size=input_size, name="Encoder", device=device, ngpu=ngpu)
+
+
+class Decoder(NeuralNetwork):
+    def __init__(self, network, input_size, device, ngpu):
+        super().__init__(network, input_size=input_size, name="Decoder", device=device, ngpu=ngpu)
+
+
+class Autoencoder(nn.Module):
+    def __init__(self, encoder, decoder):
+        super(Autoencoder, self).__init__()
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, x):
+        z = self.encoder(x)
+        return self.decoder(z)
+
+    def summary(self):
+        self.encoder.summary()
+        self.decoder.summary()

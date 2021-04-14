@@ -78,7 +78,7 @@ class AbstractGenerativeModel(ABC):
         )
         self.to(self.device)
 
-        self.images_produced = True if len(self.adversariat.input_size) > 1 else False
+        self.images_produced = True if len(self.generator.output_size) > 1 else False
         self.fixed_noise = self.sample(n=fixed_noise_size)
         self._check_attributes()
         self.hyperparameters = {
@@ -278,7 +278,7 @@ class AbstractGenerativeModel(ABC):
             save_losses_every=save_losses_every, enable_tensorboard=enable_tensorboard
         )
         max_batches = len(train_dataloader)
-        test_x_batch = iter(test_dataloader).next().to(self.device) if X_test is not None else None
+        test_x_batch = iter(test_dataloader).next().to(self.device).float() if X_test is not None else None
         print_every, save_model_every, save_images_every, save_losses_every = save_periods
 
         self.train()
@@ -291,7 +291,7 @@ class AbstractGenerativeModel(ABC):
             for batch, X in enumerate(train_dataloader):
                 batch += 1
                 step = epoch*max_batches + batch
-                X = X.to(self.device)
+                X = X.to(self.device).float()
                 Z = self.sample(n=len(X))
                 for name, _ in self.neural_nets.items():
                     for _ in range(self.steps[name]):
@@ -612,7 +612,6 @@ class AbstractGenerativeModel(ABC):
             sys_stdout_temp = sys.stdout
             sys.stdout = open(self.folder+'summary.txt', 'w')
         for name, neural_net in self.neural_nets.items():
-            print(neural_net)
             neural_net.summary()
             print("\n\n")
         if save:

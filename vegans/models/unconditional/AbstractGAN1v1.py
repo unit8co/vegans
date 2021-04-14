@@ -27,7 +27,7 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             optim_kwargs=None,
             fixed_noise_size=32,
             device=None,
-            folder="./AbstractGAN1v1",
+            folder=None,
             ngpu=0,
             _called_from_conditional=False):
 
@@ -71,7 +71,7 @@ class AbstractGAN1v1(AbstractGenerativeModel):
     def _calculate_adversariat_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch).detach()
         fake_predictions = self.predict(x=fake_images)
-        real_predictions = self.predict(x=X_batch.float())
+        real_predictions = self.predict(x=X_batch)
 
         adv_loss_fake = self.loss_functions["Adversariat"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)

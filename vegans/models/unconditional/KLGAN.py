@@ -1,19 +1,15 @@
 """
 LSGAN
 -----
-Implements the Least-Squares GAN[1].
+Implements the Kullback Leibler GAN.
 
-Uses the L2 norm for evaluating the realness of real and fake images.
+Uses the Kullback Leibler loss for the generator.
 
 Losses:
-    - Generator: L2 (Mean Squared Error)
-    - Discriminator: L2 (Mean Squared Error)
+    - Generator: Kullback-Leibler
+    - Autoencoder: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
-
-References
-----------
-.. [1] https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf
 """
 
 import torch
@@ -21,7 +17,7 @@ import torch
 from torch.nn import MSELoss
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
-class LSGAN(AbstractGAN1v1):
+class KLGAN(AbstractGAN1v1):
     #########################################################################
     # Actions before training
     #########################################################################
@@ -33,6 +29,7 @@ class LSGAN(AbstractGAN1v1):
             z_dim,
             optim=None,
             optim_kwargs=None,
+            eps=1e-7,
             fixed_noise_size=32,
             device=None,
             folder="./LSGAN",
@@ -45,9 +42,19 @@ class LSGAN(AbstractGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
         )
+        self.eps = eps
+        self.hyperparameters["eps"] = eps
 
     def _default_optimizer(self):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
+        self.loss_functions = {"Generator": torch.nn.BCELoss(), "Adversariat": torch.nn.BCELoss()}
+
+    def _calculate_generator_loss(self, X_batch, Z_batch):
+        fake_images = self.generate(z=Z_batch)
+        fake_predictions = self.predict(x=fake_images)
+        fake_logits = torch.log(fake_predictions / (1 + self.eps - fake_predictions) + self.eps)
+
+        gen_loss = -torch.mean(fake_logits)
+        self._losses.update({"Generator": gen_loss})
