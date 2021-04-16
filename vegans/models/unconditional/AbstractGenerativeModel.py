@@ -78,7 +78,6 @@ class AbstractGenerativeModel(ABC):
         )
         self.to(self.device)
 
-        self.images_produced = True if len(self.generator.output_size) > 1 else False
         self.fixed_noise = self.sample(n=fixed_noise_size)
         self._check_attributes()
         self.hyperparameters = {
@@ -86,6 +85,21 @@ class AbstractGenerativeModel(ABC):
             "device": self.device, "loss_functions": self.loss_functions
         }
         self._init_run = True
+
+        if hasattr(self, "generator") and hasattr(self, "adversariat"):
+            self.TYPE = "GAN"
+            self._Z_transformer = self.generator
+            self._X_transformer = self.adversariat
+        elif hasattr(self, "encoder") and hasattr(self, "decoder"):
+            self.TYPE = "VAE"
+            self._Z_transformer = self.decoder
+            self._X_transformer = self.encoder
+        else:
+            raise NotImplementedError(
+                "Model should either have self.generator and self.adversariat (self.TYPE = 'GAN') or \n"+
+                "self.decoder and self.encoder (self.TYPE = 'VAE')."
+            )
+        self.images_produced = True if len(self._Z_transformer.output_size) > 1 else False
         self.eval()
 
     def _define_optimizers(self, optim, optim_kwargs):
@@ -189,8 +203,8 @@ class AbstractGenerativeModel(ABC):
             "X_train must be either have 2 or 4 shape dimensions. Given: {}.".format(X_train.shape) +
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
-        assert X_train.shape[1:] == self.adversariat.input_size[:], (
-            "Wrong input shape for adversariat. Given: {}. Needed: {}.".format(X_train.shape, self.adversariat.input_size)
+        assert X_train.shape[1:] == self._X_transformer.input_size[:], (
+            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self._X_transformer.input_size)
         )
 
         if X_test is not None:
@@ -211,27 +225,27 @@ class AbstractGenerativeModel(ABC):
             self._check_dict_keys(self.steps, where="_create_steps")
 
     def _set_up_saver(self, print_every, save_model_every, save_images_every, save_losses_every, nr_batches):
-        if isinstance(print_every, str):
-            save_epochs = float(print_every.split("e")[0])
-            print_every = max([int(save_epochs*nr_batches), 1])
+        print_every = self._string_to_batchnr(log_string=print_every, nr_batches=nr_batches, name="print_every")
         if save_model_every is not None:
+            save_model_every = self._string_to_batchnr(log_string=save_model_every, nr_batches=nr_batches, name="save_model_every")
             os.mkdir(self.folder+"models/")
-            if isinstance(save_model_every, str):
-                save_epochs = float(save_model_every.split("e")[0])
-                save_model_every = max([int(save_epochs*nr_batches), 1])
         if save_images_every is not None:
+            save_images_every = self._string_to_batchnr(log_string=save_images_every, nr_batches=nr_batches, name="save_images_every")
             os.mkdir(self.folder+"images/")
-            if isinstance(save_images_every, str):
-                save_epochs = float(save_images_every.split("e")[0])
-                save_images_every = max([int(save_epochs*nr_batches), 1])
-        if isinstance(save_losses_every, str):
-            save_epochs = float(save_losses_every.split("e")[0])
-            save_losses_every = max([int(save_epochs*nr_batches), 1])
+        save_losses_every = self._string_to_batchnr(log_string=save_losses_every, nr_batches=nr_batches, name="save_losses_every")
         self.total_training_time = 0
         self.current_timer = time.perf_counter()
         self.batch_training_times = []
 
         return print_every, save_model_every, save_images_every, save_losses_every
+
+    def _string_to_batchnr(self, log_string, nr_batches, name):
+        if isinstance(log_string, str):
+            assert log_string.endswith("e"), "If `{}` is string, must end with 'e' (for epoch), e.g. 0.25e.".format(name)
+            save_epochs = float(log_string.split("e")[0])
+            log_string = max([int(save_epochs*nr_batches), 1])
+        return log_string
+
 
 
     #########################################################################
@@ -239,14 +253,14 @@ class AbstractGenerativeModel(ABC):
     #########################################################################
     def fit(self, X_train, X_test=None, epochs=5, batch_size=32, steps=None,
         print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
-        """ Method to call when the generative adversarial network should be trained.
+        """ Method to call when the generative network should be trained.
 
         Parameters
         ----------
         X_train : np.array or torch.utils.data.DataLoader
-            Training data for the generative adversarial network. Usually images.
+            Training data for the generative network. Usually images.
         X_test : np.array, optional
-            Testing data for the generative adversarial network. Must have same shape as X_train.
+            Testing data for the generative network. Must have same shape as X_train.
         epochs : int, optional
             Number of epochs (passes over the training data set) performed during training.
         batch_size : int, optional
@@ -380,8 +394,8 @@ class AbstractGenerativeModel(ABC):
         self.current_timer = time.perf_counter()
 
     def _log_images(self, images, step, writer):
-        assert len(self.adversariat.input_size) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversariat.input_size = {}.".format(self.adversariat.input_size)
+        assert len(self._X_transformer.input_size) > 1, (
+            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self._X_transformer.input_size)
         )
         if writer is not None:
             grid = make_grid(images)
@@ -541,12 +555,12 @@ class AbstractGenerativeModel(ABC):
     # Utility functions
     #########################################################################
     def sample(self, n):
-        """ Sample from the latent generator distribution.
+        """ Sample from the latent distribution.
 
         Parameters
         ----------
         n : int
-            Number of samples drawn from the latent generator distribution.
+            Number of samples drawn from the latent distribution.
 
         Returns
         -------
@@ -556,7 +570,7 @@ class AbstractGenerativeModel(ABC):
         return torch.randn(n, *self.z_dim, requires_grad=True, device=self.device)
 
     def generate(self, z=None, n=None):
-        """ Generate output with generator.
+        """ Generate output with generator / decoder.
 
         Parameters
         ----------
@@ -568,7 +582,7 @@ class AbstractGenerativeModel(ABC):
         Returns
         -------
         np.array
-            Output produced by generator.
+            Output produced by generator / decoder.
         """
         return self(z=z, n=n)
 
@@ -587,7 +601,7 @@ class AbstractGenerativeModel(ABC):
         """
         if not isinstance(x, torch.Tensor):
             x = torch.from_numpy(x).to(self.device)
-        predictions = self.adversariat(x)
+        predictions = self._X_transformer(x)
         return predictions
 
     def get_hyperparameters(self):
@@ -614,6 +628,9 @@ class AbstractGenerativeModel(ABC):
         for name, neural_net in self.neural_nets.items():
             neural_net.summary()
             print("\n\n")
+        print("Hyperparameters\n---------------")
+        for key, value in self.get_hyperparameters().items():
+            print("{}: ---> {}".format(str(key), str(value)))
         if save:
             sys.stdout = sys_stdout_temp
             sys_stdout_temp
@@ -642,7 +659,7 @@ class AbstractGenerativeModel(ABC):
             raise ValueError("Either 'z' or 'n' must be not None.")
         elif n is not None:
             z = self.sample(n=n)
-        sample = self.generator(z)
+        sample = self._Z_transformer(z)
         if self._is_training:
             return sample
         return sample.detach().cpu().numpy()

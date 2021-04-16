@@ -152,10 +152,19 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     else:
         adv_in_dim = x_dim
 
+    if len(adv_in_dim) == 3 and np.prod(adv_in_dim)>1024:
+        first_layer = nn.Conv2d(in_channels=adv_in_dim[0], out_channels=3, kernel_size=5, stride=2)
+        out_pixels_x = int((adv_in_dim[1] - (5 - 1) - 1) / 2 + 1)
+        out_pixels_y = int((adv_in_dim[2] - (5 - 1) - 1) / 2 + 1)
+        adv_in_dim = (3, out_pixels_x, out_pixels_y)
+    else:
+        first_layer = nn.Identity()
+
     class MyAdversariat(nn.Module):
-        def __init__(self, x_dim):
+        def __init__(self, adv_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
+                first_layer,
                 nn.Flatten(),
                 nn.Linear(np.prod(adv_in_dim), 512),
                 nn.LeakyReLU(0.2),
@@ -169,7 +178,7 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
             x = self.hidden_part(x)
             return self.output(x)
 
-    return MyAdversariat(x_dim=x_dim)
+    return MyAdversariat(adv_in_dim=adv_in_dim)
 
 
 def load_example_encoder(x_dim, z_dim, y_dim=None):
@@ -190,12 +199,27 @@ def load_example_encoder(x_dim, z_dim, y_dim=None):
         Architectures for encoder.
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
+
+    if y_dim is not None:
+        enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
+    else:
+        enc_in_dim = x_dim
+
+    if len(enc_in_dim) == 3 and np.prod(enc_in_dim)>1024:
+        first_layer = nn.Conv2d(in_channels=enc_in_dim[0], out_channels=3, kernel_size=5, stride=2)
+        out_pixels_x = int((enc_in_dim[1] - (5 - 1) - 1) / 2 + 1)
+        out_pixels_y = int((enc_in_dim[2] - (5 - 1) - 1) / 2 + 1)
+        enc_in_dim = (3, out_pixels_x, out_pixels_y)
+    else:
+        first_layer = nn.Identity()
+
     class MyEncoder(nn.Module):
-        def __init__(self, x_dim):
+        def __init__(self, enc_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
+                first_layer,
                 nn.Flatten(),
-                nn.Linear(np.prod(x_dim), 256),
+                nn.Linear(np.prod(enc_in_dim), 256),
                 nn.LeakyReLU(0.2),
                 nn.Linear(256, 128),
                 nn.LeakyReLU(0.2),
@@ -208,7 +232,7 @@ def load_example_encoder(x_dim, z_dim, y_dim=None):
             x = self.hidden_part(x)
             return self.output(x)
 
-    return MyEncoder(x_dim=x_dim)
+    return MyEncoder(enc_in_dim=enc_in_dim)
 
 
 def load_example_decoder(x_dim, z_dim, y_dim=None):
@@ -229,12 +253,18 @@ def load_example_decoder(x_dim, z_dim, y_dim=None):
         Architectures for decoder.
     """
     x_dim = [x_dim] if isinstance(x_dim, int) else x_dim
+
+    if y_dim is not None:
+        dec_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+    else:
+        dec_in_dim = z_dim
+
     class MyDecoder(nn.Module):
-        def __init__(self, z_dim, x_dim):
+        def __init__(self, x_dim, dec_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
                 nn.Flatten(),
-                nn.Linear(np.prod(z_dim), 256),
+                nn.Linear(np.prod(dec_in_dim), 256),
                 nn.LeakyReLU(0.2),
                 nn.Linear(256, 128),
                 nn.LeakyReLU(0.2),
@@ -247,7 +277,7 @@ def load_example_decoder(x_dim, z_dim, y_dim=None):
             x = self.hidden_part(x)
             return self.output(x)
 
-    return MyDecoder(x_dim=x_dim, z_dim=z_dim)
+    return MyDecoder(x_dim=x_dim, dec_in_dim=dec_in_dim)
 
 
 def load_example_autoencoder(x_dim, z_dim, y_dim=None):
@@ -272,10 +302,19 @@ def load_example_autoencoder(x_dim, z_dim, y_dim=None):
     else:
         adv_in_dim = x_dim
 
+    if len(adv_in_dim) == 3 and np.prod(adv_in_dim)>1024:
+        first_layer = nn.Conv2d(in_channels=adv_in_dim[0], out_channels=3, kernel_size=5, stride=2)
+        out_pixels_x = int((adv_in_dim[1] - (5 - 1) - 1) / 2 + 1)
+        out_pixels_y = int((adv_in_dim[2] - (5 - 1) - 1) / 2 + 1)
+        adv_in_dim = (3, out_pixels_x, out_pixels_y)
+    else:
+        first_layer = nn.Identity()
+
     class MyAutoEncoder(nn.Module):
-        def __init__(self, x_dim):
+        def __init__(self, adv_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
+                first_layer,
                 nn.Flatten(),
                 nn.Linear(np.prod(adv_in_dim), 256),
                 nn.LeakyReLU(0.2),
@@ -296,4 +335,4 @@ def load_example_autoencoder(x_dim, z_dim, y_dim=None):
             x = self.hidden_part(x)
             return self.output(x)
 
-    return MyAutoEncoder(x_dim=x_dim)
+    return MyAutoEncoder(adv_in_dim=adv_in_dim)

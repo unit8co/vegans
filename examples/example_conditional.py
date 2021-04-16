@@ -7,7 +7,16 @@ import vegans.utils.loading as loading
 from torch import nn
 from sklearn.preprocessing import OneHotEncoder
 from vegans.utils.layers import LayerReshape, LayerPrintSize
-from vegans.GAN import ConditionalVanillaGAN, ConditionalWassersteinGAN, ConditionalWassersteinGANGP, ConditionalLRGAN
+from vegans.GAN import (
+    ConditionalLRGAN,
+    ConditionalEBGAN,
+    ConditionalKLGAN,
+    ConditionalVAEGAN,
+    ConditionalVanillaGAN,
+    ConditionalWassersteinGAN,
+    ConditionalWassersteinGANGP,
+)
+from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVAE
 
 
 if __name__ == '__main__':
@@ -26,92 +35,55 @@ if __name__ == '__main__':
     y_train = one_hot_encoder.fit_transform(y_train.reshape(-1, 1))
     y_test = one_hot_encoder.transform(y_test.reshape(-1, 1))
 
-    im_dim = X_train.shape[1:]
+    x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
-    #########################################################################
-    # Flat network
-    #########################################################################
     z_dim = 128
     gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
-    adv_in_dim = utils.get_input_dim(dim1=im_dim, dim2=y_dim)
+    adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
-    class MyGenerator(nn.Module):
-        def __init__(self, z_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(gen_in_dim), 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, 256),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(256),
-                nn.Linear(256, 512),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(512),
-                nn.Linear(512, 1024),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(1024),
-                nn.Linear(1024, int(np.prod(im_dim))),
-                LayerReshape(im_dim)
-            )
-            self.output = nn.Sigmoid()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
-
-    class MyAdversariat(nn.Module):
-        def __init__(self, x_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Conv2d(in_channels=adv_in_dim[0], out_channels=1, kernel_size=4, stride=4, padding=0),
-                nn.Flatten(),
-                nn.Linear(64, 512),
-                nn.LeakyReLU(0.2),
-                nn.Linear(512, 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 1)
-            )
-            self.output = nn.Sigmoid()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
-
-    class MyEncoder(nn.Module):
-        def __init__(self, x_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(int(np.prod(x_dim)), 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, np.prod(z_dim))
-            )
-            self.output = nn.Identity()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
+    ######################################C###################################
+    # Architecture
+    #########################################################################
+    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
+    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
+    encoder = loading.load_example_encoder(x_dim=x_dim, z_dim=z_dim+10, y_dim=y_dim)
+    autoencoder = loading.load_example_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    decoder = loading.load_example_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
     #########################################################################
     # Training
     #########################################################################
-    generator = MyGenerator(z_dim=z_dim)
-    adversariat = MyAdversariat(x_dim=im_dim)
-    encoder = MyEncoder(x_dim=im_dim)
 
-    # gan_model = ConditionalWassersteinGAN(
-    #     generator=generator, adversariat=adversariat,
-    #     x_dim=im_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+    # gan_model = ConditionalKLGAN(
+    #     generator=generator, adversariat=discriminator,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
     #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     # )
-    gan_model = ConditionalLRGAN(
-        generator=generator, adversariat=adversariat, encoder=encoder,
-        x_dim=im_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
-        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
+
+    # gan_model = ConditionalLRGAN(
+    #     generator=generator, adversariat=adversariat, encoder=encoder,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
+    # )
+
+    # gan_model = ConditionalEBGAN(
+    #     generator=generator, adversariat=autoencoder,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/EBGAN", optim=None,
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16, m=np.mean(X_train)
+    # )
+
+    # gan_model = ConditionalVanillaVAE(
+    #     encoder=encoder, decoder=decoder,
+    #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", optim={"Autoencoder": torch.optim.Adam}
+    # )
+
+    gan_model = ConditionalVAEGAN(
+        encoder=encoder, generator=generator, adversariat=critic,
+        z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", adv_type="Critic",
+        optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
     )
+
     gan_model.summary(save=True)
     gan_model.fit(
         X_train=X_train,
@@ -120,14 +92,14 @@ if __name__ == '__main__':
         y_test=y_test,
         batch_size=batch_size,
         epochs=epochs,
-        steps={"Adversariat": 5},
+        # steps={"Adversariat": 5},
         print_every=200,
         save_model_every="3e",
-        save_images_every="0.5",
+        save_images_every="0.25e",
         save_losses_every=10,
         enable_tensorboard=True
     )
     samples, losses = gan_model.get_training_results(by_epoch=False)
-    utils.plot_images(images=samples.reshape(-1, 32, 32))
+    utils.plot_images(images=samples.reshape(-1, 32, 32), labels=np.argmax(gan_model.fixed_labels.cpu().numpy(), axis=1))
     utils.plot_losses(losses=losses)
     # gan_model.save()

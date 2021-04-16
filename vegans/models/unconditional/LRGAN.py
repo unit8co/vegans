@@ -54,8 +54,8 @@ class LRGAN(AbstractGenerativeModel):
             "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
         }
 
-        AbstractGenerativeModel.__init__(
-            self, x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+        super().__init__(
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.lambda_L1 = lambda_L1

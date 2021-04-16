@@ -47,22 +47,23 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
             folder="./ConditionalLRGAN",
             ngpu=0):
 
-        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
+        enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
         AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
-        AbstractConditionalGenerativeModel._check_unconditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
+        AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
         self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type="Discriminator", device=device, ngpu=ngpu)
-        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)
+        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
         self.neural_nets = {
             "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
         }
 
-        AbstractConditionalGenerativeModel.__init__(
-            self, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+        super().__init__(
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.lambda_L1 = lambda_L1
@@ -84,8 +85,9 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x):
-        return self.encoder(x)
+    def encode(self, x, y):
+        inpt = self.concatenate(x, y).float()
+        return self.encoder(inpt)
 
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
         if who == "Generator":
@@ -102,7 +104,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
         fake_predictions = self.predict(x=fake_images, y=y_batch)
-        encoded_space = self.encode(x=fake_images)
+        encoded_space = self.encode(x=fake_images, y=y_batch)
 
         gen_loss_original = self.loss_functions["Generator"](
             fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)

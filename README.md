@@ -175,19 +175,13 @@ Some of the code has been inspired by some existing GAN implementations:
 ## TODO
 
 - GAN Implementations (sorted by priority)
-  - KLGAN
-  - ConditionalEBGAN
-  - VAE
-  - VAEGAN
   - BicycleGAN
   - InfoGAN
-  - ConditionalKLGAN
+  - Adversarial Autoencoder
   - CycleGAN
   - BEGAN
   - WassersteinGAN SpectralNorm
   - DiscoGAN
-  - CycleGAN
-  - Adversarial Autoencoder
 - Layers 
   - Inception
   - Residual Block
@@ -198,15 +192,15 @@ Some of the code has been inspired by some existing GAN implementations:
 
   - Better default folder (probably None or make current subfolder)
 
-  - Include well defined loaders for
+  - Architectures that at least work for mnist
 
+  - Include well defined loaders for
+  
     - CelebA
-  - Mnist
-    
+    - Mnist
     - Pix2Pix 
-  - Map translation
-    
-  - ImageNet
+    - Map translation
+    - ImageNet
     
   - Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))
   
@@ -224,11 +218,18 @@ Some of the code has been inspired by some existing GAN implementations:
   
   - Do not save Discriminator
   
+  - Images to compare algorithms
+  
     
 
 
 
 - Done
+  - ~~Introduce latent_space_net and real_space_net to make VAE abstraction better~~
+  - ~~VAEGAN~~
+  - ~~VAE~~
+  - ~~KLGAN~~
+  - ~~EBGAN~~
   - ~~GIF the results~~
   - ~~Better use case in README file~~
   - ~~Import good architectures (probably with help of torch)~~

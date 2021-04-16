@@ -1,7 +1,7 @@
 """
-VanillaVAE
-----------
-Implements the Variational Autoencoder[1].
+ConditionalVanillaVAE
+---------------------
+Implements the conditional variant of the Variational Autoencoder[1].
 
 Trains on Kullback-Leibler loss and mean squared error reconstruction loss.
 
@@ -22,10 +22,11 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import MSELoss
+from vegans.utils.utils import get_input_dim
 from vegans.utils.networks import Encoder, Decoder, Autoencoder
-from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
+from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
-class VanillaVAE(AbstractGenerativeModel):
+class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
     #########################################################################
     # Actions before training
     #########################################################################
@@ -35,6 +36,7 @@ class VanillaVAE(AbstractGenerativeModel):
             decoder,
             x_dim,
             z_dim,
+            y_dim,
             optim=None,
             optim_kwargs=None,
             lambda_KL=10,
@@ -43,10 +45,14 @@ class VanillaVAE(AbstractGenerativeModel):
             folder="./LRGAN1v1",
             ngpu=0):
 
+        enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
+        dec_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu)
-        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)
+        AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
+        AbstractConditionalGenerativeModel._check_conditional_network_input(decoder, in_dim=z_dim, y_dim=y_dim, name="Decoder")
+        self.decoder = Decoder(decoder, input_size=dec_in_dim, device=device, ngpu=ngpu)
+        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
         self.autoencoder = Autoencoder(self.encoder, self.decoder)
         self.neural_nets = {
             "Autoencoder": self.autoencoder
@@ -54,7 +60,7 @@ class VanillaVAE(AbstractGenerativeModel):
 
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.mu = nn.Sequential(
@@ -87,21 +93,22 @@ class VanillaVAE(AbstractGenerativeModel):
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x):
-        return self.encoder(x)
+    def encode(self, x, y):
+        inpt = self.concatenate(x, y).float()
+        return self.encoder(inpt)
 
-    def calculate_losses(self, X_batch, Z_batch, who=None):
+    def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
         if who == "Autoencoder":
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
         else:
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
 
-    def _calculate_autoencoder_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(X_batch)
+    def _calculate_autoencoder_loss(self, X_batch, Z_batch, y_batch):
+        encoded_output = self.encode(x=X_batch, y=y_batch)
         mu = self.mu(encoded_output)
         log_variance = self.log_variance(encoded_output)
         Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-        fake_images = self.generate(Z_batch_encoded)
+        fake_images = self.generate(z=Z_batch_encoded, y=y_batch)
 
         kl_loss = 0.5*(log_variance.exp() + mu**2 - log_variance - 1).sum()
         reconstruction_loss = self.loss_functions["Autoencoder"](

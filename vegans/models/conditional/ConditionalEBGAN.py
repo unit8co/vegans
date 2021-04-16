@@ -1,7 +1,7 @@
 """
-EBGAN
------
-Implements the Energy based GAN[1].
+ConditionalEBGAN
+----------------
+Implements conditional variant of the Energy based GAN[1].
 
 Uses an auto-encoder as the adversariat structure.
 
@@ -19,9 +19,9 @@ References
 import torch
 
 from torch.nn import MSELoss
-from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
+from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
-class EBGAN(AbstractGAN1v1):
+class ConditionalEBGAN(AbstractConditionalGAN1v1):
     #########################################################################
     # Actions before training
     #########################################################################
@@ -31,6 +31,7 @@ class EBGAN(AbstractGAN1v1):
             adversariat,
             x_dim,
             z_dim,
+            y_dim,
             m,
             optim=None,
             optim_kwargs=None,
@@ -41,7 +42,7 @@ class EBGAN(AbstractGAN1v1):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
-            z_dim=z_dim, x_dim=x_dim, adv_type="AutoEncoder",
+            z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, adv_type="AutoEncoder",
             optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
@@ -59,18 +60,18 @@ class EBGAN(AbstractGAN1v1):
     def _define_loss(self):
         self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch)
-        fake_predictions = self.predict(x=fake_images)
+    def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
+        fake_images = self.generate(y=y_batch, z=Z_batch)
+        fake_predictions = self.predict(x=fake_images, y=y_batch)
         gen_loss = self.loss_functions["Generator"](
             fake_images, fake_predictions
         )
         self._losses.update({"Generator": gen_loss})
 
-    def _calculate_adversariat_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
-        fake_predictions = self.predict(x=fake_images)
-        real_predictions = self.predict(x=X_batch)
+    def _calculate_adversariat_loss(self, X_batch, Z_batch, y_batch):
+        fake_images = self.generate(y=y_batch, z=Z_batch).detach()
+        fake_predictions = self.predict(x=fake_images, y=y_batch)
+        real_predictions = self.predict(x=X_batch, y=y_batch)
 
         adv_loss_fake = self.loss_functions["Adversariat"](
             fake_predictions, fake_images

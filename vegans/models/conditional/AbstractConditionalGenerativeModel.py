@@ -70,8 +70,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             "X_train must be either have 2 or 4 shape dimensions. Given: {}.".format(X_train.shape) +
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
-        assert get_input_dim(X_train.shape[1:], y_train.shape[1:]) == self.adversariat.input_size[:], (
-            "Wrong input shape for adversariat. Given: {}. Needed: {}.".format(X_train.shape, self.adversariat.input_size)
+        assert get_input_dim(X_train.shape[1:], y_train.shape[1:]) == self._X_transformer.input_size[:], (
+            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self._X_transformer.input_size)
         )
 
         if X_test is not None:
@@ -125,23 +125,23 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                     has_error = True
                 break
         else:
-            raise TypeError("No input layer found. No Linear or Conv2d layers?")
+            raise TypeError("No input layer found. No Linear or Conv2d /ConvTranspose2d layers?")
 
         if has_error:
-            good_dim = get_input_dim(in_dim, y_dim)
-            if len(good_dim) == 1:
-                first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(good_dim[0])
+            required_dim = get_input_dim(in_dim, y_dim)
+            if len(required_dim) == 1:
+                first_layer = "torch.nn.Linear(in_features={}, out_features=...)".format(required_dim[0])
 
             else:
                 first_layer = (
-                    "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
-                    "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(good_dim[0]) +
-                    "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(good_dim))
+                    "torch.nn.Conv2d(in_channels={}, out_channels=...)\n".format(required_dim[0]) +
+                    "\t\t\t\t\t\t\t\t\ttorch.nn.ConvTranspose2d(in_channels={}, out_channels=...)\n".format(required_dim[0]) +
+                    "\t\t\t\t\t\t\t\t\ttorch.nn.Linear(in_features={}, out_features=...) if torch.nn.Flatten() is used before".format(np.prod(required_dim))
                 )
             raise AssertionError(
                 "\n\n**{}** is a conditional network.".format(name) +
                 "The y_dim (label) will be concatenated to the input of this network.\n\n" +
-                "The first layer will receive input shape: {} due to y_dim={}. ".format(good_dim, y_dim) +
+                "The first layer will receive input shape: {} due to y_dim={}. ".format(required_dim, y_dim) +
                 "Given: {}.(Reshape & Flatten not considered)\n".format(str(layer)) +
                 "First layer should be of the form: {}.\n\n".format(first_layer) +
                 "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
@@ -254,7 +254,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             for batch, (X, y) in enumerate(train_dataloader):
                 batch += 1
                 step = epoch*max_batches + batch
-                X = X.to(self.device)
+                X = X.to(self.device).float()
                 y = y.to(self.device)
                 Z = self.sample(n=len(X))
                 for name, _ in self.neural_nets.items():
@@ -303,8 +303,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Logging during training
     #########################################################################
     def _log_images(self, images, step, writer):
-        assert len(self.adversariat.input_size) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversariat.input_size = {}.".format(self.adversariat.input_size)
+        assert len(self._X_transformer.input_size) > 1, (
+            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self._X_transformer.input_size)
         )
         if writer is not None:
             grid = make_grid(images)
@@ -392,7 +392,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             Array with one output per x indicating the realness of an input.
         """
         inpt = self.concatenate(x, y).float().to(self.device)
-        return self.adversariat(inpt)
+        return self._X_transformer(inpt)
 
     def __call__(self, y, z=None):
         if z is None:
@@ -401,7 +401,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         if not isinstance(y, torch.Tensor):
             y = torch.from_numpy(y).to(self.device)
         inpt = self.concatenate(z, y).float()
-        sample = self.generator(inpt)
+        sample = self._Z_transformer(inpt)
         if self._is_training:
             return sample
         return sample.detach().cpu().numpy()

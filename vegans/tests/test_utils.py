@@ -3,6 +3,7 @@ import pytest
 
 import numpy as np
 import vegans.utils.utils as utils
+import vegans.utils.loading as loading
 
 def test_Dataset():
     X = list(range(100))
@@ -12,17 +13,17 @@ def test_Dataset():
 
 def test_load_mnist():
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = utils.load_mnist(datapath)
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath)
     assert X_train.shape == (60000, 28, 28)
     assert np.max(X_train) == 1
     assert X_test.shape == (10000, 28, 28)
     assert np.max(X_test) == 1
 
-    X_train, y_train, X_test, y_test = utils.load_mnist(datapath, normalize=False)
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=False)
     assert np.max(X_train) == 255
     assert np.max(X_test) == 255
 
-    X_train, y_train, X_test, y_test = utils.load_mnist(datapath, pad=2)
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, pad=2)
     assert X_train.shape == (60000, 32, 32)
     assert X_test.shape == (10000, 32, 32)
 

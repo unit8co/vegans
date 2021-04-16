@@ -100,6 +100,8 @@ class NeuralNetwork(Module):
     # Utility functions
     #########################################################################
     def summary(self):
+        print(self.name)
+        print("-"*len(self.name))
         print("Input shape: ", self.input_size)
         return summary(self, input_size=self.input_size, device=self.device)
 
@@ -175,4 +177,5 @@ class Autoencoder(nn.Module):
 
     def summary(self):
         self.encoder.summary()
+        print("\n\n")
         self.decoder.summary()
