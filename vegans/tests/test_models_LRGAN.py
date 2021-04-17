@@ -3,16 +3,19 @@ import pytest
 
 import numpy as np
 
-from vegans.GAN import LRGAN
+from vegans.GAN import BicycleGAN, LRGAN
 from vegans.utils.layers import LayerReshape
 
 gans = [
+    BicycleGAN,
     LRGAN,
 ]
 last_layers = [
     torch.nn.Sigmoid,
+    torch.nn.Sigmoid,
 ]
 optimizers = [
+    torch.optim.Adam,
     torch.optim.Adam,
 ]
 

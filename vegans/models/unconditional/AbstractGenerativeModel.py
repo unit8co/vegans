@@ -203,8 +203,8 @@ class AbstractGenerativeModel(ABC):
             "X_train must be either have 2 or 4 shape dimensions. Given: {}.".format(X_train.shape) +
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
-        assert X_train.shape[1:] == self._X_transformer.input_size[:], (
-            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self._X_transformer.input_size)
+        assert X_train.shape[1:] == self.x_dim, (
+            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
         )
 
         if X_test is not None:
@@ -394,7 +394,7 @@ class AbstractGenerativeModel(ABC):
         self.current_timer = time.perf_counter()
 
     def _log_images(self, images, step, writer):
-        assert len(self._X_transformer.input_size) > 1, (
+        assert len(self.x_dim) > 1, (
             "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self._X_transformer.input_size)
         )
         if writer is not None:
@@ -634,6 +634,20 @@ class AbstractGenerativeModel(ABC):
         if save:
             sys.stdout = sys_stdout_temp
             sys_stdout_temp
+
+    def get_number_params(self):
+        """ Returns the number of parameters in the model.
+
+        Returns
+        -------
+        dict
+            Dictionary containing the number of parameters per network.
+        """
+        nr_params_dict = {}
+        for name, neural_net in self.neural_nets.items():
+            nr_params_dict[name] = neural_net.get_number_params()
+        return nr_params_dict
+
 
     def eval(self):
         """ Set all networks to evaluation mode.

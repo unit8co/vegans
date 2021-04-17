@@ -1,50 +1,53 @@
 """
-LRGAN
------
-Implements the conditional variant of the latent regressor GAN well described in the BicycleGAN paper[1].
+ConditionalAAE
+--------------
+Implements the conditional variant of the  Adversarial Autoencoder[1].
 
-It introduces an encoder network which maps the generator output back to the latent
-input space. This should help to prevent mode collapse and improve image variety.
+Instead of using the Kullback Leibler divergence to improve the latent space distribution
+we use a discriminator to determine the "realness" of the latent vector.
 
 Losses:
-    - Generator: Binary cross-entropy + L1-latent-loss (Mean Absolute Error)
-    - Discriminator: Binary cross-entropy
-    - Encoder: L1-latent-loss (Mean Absolute Error)
+    - Encoder: Kullback-Leibler
+    - Decoder: Binary cross-entropy
+    - Adversariat: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
 
 References
 ----------
-.. [1] https://arxiv.org/pdf/1711.11586.pdf
+.. [1] https://arxiv.org/pdf/1511.05644.pdf
 """
 
 import torch
 
-from torch.nn import BCELoss, L1Loss
-from torch.nn import MSELoss as L2Loss
+import numpy as np
+import torch.nn as nn
 
 from vegans.utils.utils import get_input_dim
-from vegans.utils.networks import Generator, Adversariat, Encoder
+from torch.nn import MSELoss, BCELoss, L1Loss
+from vegans.utils.utils import wasserstein_loss
+from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversariat
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
-class ConditionalLRGAN(AbstractConditionalGenerativeModel):
+class ConditionalAAE(AbstractConditionalGenerativeModel):
     #########################################################################
     # Actions before training
     #########################################################################
     def __init__(
             self,
+            encoder,
             generator,
             adversariat,
-            encoder,
             x_dim,
             z_dim,
             y_dim,
             optim=None,
             optim_kwargs=None,
-            lambda_L1=10,
+            lambda_z=10,
+            adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
-            folder="./ConditionalLRGAN",
+            folder="./LRGAN1v1",
             ngpu=0):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
@@ -55,31 +58,40 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
         AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
         AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=z_dim, y_dim=y_dim, name="Adversariat")
+        self.adv_type = adv_type
         self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
-        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type="Discriminator", device=device, ngpu=ngpu)
+        self.autoencoder = Autoencoder(self.encoder, self.generator)
+        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, device=device, ngpu=ngpu, adv_type=adv_type)
         self.neural_nets = {
-            "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
+            "Generator": self.generator, "Encoder": self.encoder, "Adversariat": self.adversariat
         }
 
         super().__init__(
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
-        self.lambda_L1 = lambda_L1
-        self.hyperparameters["lambda_L1"] = lambda_L1
-        assert (self.generator.output_size == self.x_dim), (
-            "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-        )
+
+        self.lambda_z = lambda_z
+        self.hyperparameters["lambda_z"] = lambda_z
+        self.hyperparameters["adv_type"] = adv_type
         assert (self.encoder.output_size == self.z_dim), (
             "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
+        )
+        assert (self.generator.output_size == self.x_dim), (
+            "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
         )
 
     def _default_optimizer(self):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+        if self.adv_type == "Discriminator":
+            self.loss_functions = {"Generator": MSELoss(), "Adversariat": BCELoss()}
+        elif self.adv_type == "Critic":
+            self.loss_functions = {"Generator": MSELoss(), "Adversariat": wasserstein_loss}
+        else:
+            raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
 
 
     #########################################################################
@@ -92,47 +104,54 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
         if who == "Generator":
             self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        elif who == "Adversariat":
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
         elif who == "Encoder":
             self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
+        elif who == "Adversariat":
+            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
         else:
             self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
             self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
+            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
-        fake_images = self.generate(y=y_batch, z=Z_batch)
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
-        encoded_space = self.encode(x=fake_images, y=y_batch)
+        encoded_output = self.encode(x=X_batch, y=y_batch).detach()
 
-        gen_loss_original = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+        fake_images = self.generate(y=y_batch, z=encoded_output)
+
+        gen_loss_reconstruction = self.loss_functions["Generator"](
+            fake_images, X_batch
         )
-        latent_space_regression = self.loss_functions["L1"](
-            encoded_space, Z_batch
-        )
-        gen_loss = gen_loss_original + self.lambda_L1*latent_space_regression
+
+        gen_loss = gen_loss_reconstruction
         self._losses.update({
             "Generator": gen_loss,
-            "Generator_Original": gen_loss_original,
-            "Generator_L1": self.lambda_L1*latent_space_regression
         })
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):
-        fake_images = self.generate(y=y_batch, z=Z_batch).detach()
-        encoded_space = self.encoder(fake_images)
-        latent_space_regression = self.loss_functions["L1"](
-            encoded_space, Z_batch
+        encoded_output = self.encode(x=X_batch, y=y_batch)
+
+        fake_images = self.generate(y=y_batch, z=encoded_output)
+        fake_predictions = self.predict(x=encoded_output, y=y_batch)
+
+        enc_loss_fake = self.loss_functions["Generator"](
+            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
         )
+        enc_loss_reconstruction = self.loss_functions["Generator"](
+            fake_images, X_batch
+        )
+
+        enc_loss = enc_loss_fake + enc_loss_reconstruction
         self._losses.update({
-            "Encoder": latent_space_regression
+            "Encoder": enc_loss,
+            "Encoder_x": enc_loss_fake,
+            "Encoder_fake": enc_loss_reconstruction,
         })
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch, y_batch):
-        fake_images = self.generate(y=y_batch, z=Z_batch).detach()
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
-        real_predictions = self.predict(x=X_batch.float(), y=y_batch)
+        encoded_output = self.encode(x=X_batch, y=y_batch).detach()
+
+        fake_predictions = self.predict(y=y_batch, x=encoded_output)
+        real_predictions = self.predict(x=Z_batch, y=y_batch)
 
         adv_loss_fake = self.loss_functions["Adversariat"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
@@ -140,10 +159,21 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         adv_loss_real = self.loss_functions["Adversariat"](
             real_predictions, torch.ones_like(real_predictions, requires_grad=False)
         )
-        adv_loss = 0.5*(adv_loss_fake + adv_loss_real)
+
+        adv_loss = 1/3*(adv_loss_real + adv_loss_fake)
         self._losses.update({
             "Adversariat": adv_loss,
             "Adversariat_fake": adv_loss_fake,
             "Adversariat_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
         })
+
+    def _step(self, who=None):
+        if who is not None:
+            self.optimizers[who].step()
+            if who == "Adversariat":
+                if self.adv_type == "Critic":
+                    for p in self.adversariat.parameters():
+                        p.data.clamp_(-0.01, 0.01)
+        else:
+            [optimizer.step() for _, optimizer in self.optimizers.items()]

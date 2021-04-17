@@ -147,6 +147,7 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     else:
         raise ValueError("'adv_type' must be one of: {}.".format(possible_types))
 
+    x_dim = [x_dim] if isinstance(x_dim, int) else x_dim
     if y_dim is not None:
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
     else:

@@ -12,17 +12,18 @@ You need python 3.5 or above. Then:
 ~~`pip install vegans`~~ (Not yet)
 
 ## How to use
-The basic idea is that the user provides discriminator and generator networks, and the library takes care of training them in a selected GAN setting. Several different use cases are shown below.
+The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. Several different use cases are shown below.
 
 #### Unsupervised Learning
 
 ```python
 from vegans.GAN import WassersteinGAN
 import vegans.utils.utils as utils
+import vegans.utils.loading as loading
 
 datapath =  "./data/mnist/"
 X_train, y_train, X_test, y_test = (
-    utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
 )
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
@@ -31,11 +32,11 @@ z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module.
-generator, adversariat, _ = utils.load_example_architectures(
-    x_dim=x_dim, z_dim=z_dim
-)
+generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim)
+critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic")
+
 gan = WassersteinGAN(
-    generator=generator, adversariat=adversariat,
+    generator=generator, adversariat=critic,
     z_dim=z_dim, x_dim=x_dim, folder=None
 )
 gan.summary() # optional, shows architecture
@@ -54,11 +55,29 @@ utils.plot_images(samples)
 ```
 
 You can currently use the following GANs:
-* `VanillaGAN`: [Classic minimax GAN](https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf), in its non-saturated version
-* `WassersteinGAN`: [Wasserstein GAN](https://arxiv.org/abs/1701.07875)
-* `WassersteinGANGP`: [Wasserstein GAN with gradient penalty](https://arxiv.org/abs/1704.00028)
-* `LSGAN`: [Least-Squares GAN](https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf)
+* `AAE`: [Adversarial Auto-Encoder](https://arxiv.org/pdf/1511.05644.pdf)
+
+* `BicycleGAN`: [BicycleGAN](https://arxiv.org/pdf/1711.11586.pdf)
+
+* `EBGAN`: [Energy-Based GAN](https://arxiv.org/pdf/1609.03126.pdf)
+
+* `KLGAN`: Kullback-Leib GAN
+
 * `LRGAN`: [Latent-Regressor GAN](https://arxiv.org/pdf/1711.11586.pdf)
+
+* `LSGAN`: [Least-Squares GAN](https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf)
+
+* `VAEGAN`: [Variational Auto-Encoder GAN](https://arxiv.org/pdf/1512.09300.pdf)
+
+* `VanillaGAN`: [Classic minimax GAN](https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf), in its non-saturated version
+
+* `VanillaVAE`: [Variational Auto-Encoder](https://arxiv.org/pdf/1512.09300.pdf)
+
+* `WassersteinGAN`: [Wasserstein GAN](https://arxiv.org/abs/1701.07875)
+
+* `WassersteinGANGP`: [Wasserstein GAN with gradient penalty](https://arxiv.org/abs/1704.00028)
+
+  
 
 All current GAN implementations come with a conditional variant to allow for the usage of training labels to produce specific outputs:
 
@@ -73,18 +92,19 @@ Models can either be passed as `torch.nn.Sequential` objects or by defining cust
 
 Also look at the [jupyter notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks) for better visualized examples and how to use the library.
 
-#### Supervised Learning
+#### Supervised / Conditional Learning
 
 ```python
 import torch
 import numpy as np
 import vegans.utils.utils as utils
+import vegans.utils.loading as loading
 from vegans.GAN import ConditionalWassersteinGAN
 from sklearn.preprocessing import OneHotEncoder # Download sklearn
 
 datapath =  "./data/mnist/"
 X_train, y_train, X_test, y_test = (
-    utils.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
 )
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
@@ -98,12 +118,13 @@ z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module.
-generator, adversariat, _ = utils.load_example_architectures(
-    x_dim=x_dim, z_dim=z_dim, y_dim=y_dim
-)
+generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
+
 gan = ConditionalWassersteinGAN(
-    generator=generator, adversariat=adversariat,
-    z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder=None,
+    generator=generator, adversariat=critic,
+    z_dim=z_dim, x_dim=x_dim, y_dim=y_dim,
+    folder=None, # optional
     optim={"Generator": torch.optim.RMSprop, "Adversariat": torch.optim.Adam}, # optional
     optim_kwargs={"Generator": {"lr": 0.0001}, "Adversariat": {"lr": 0.0001}}, # optional
     fixed_noise_size=32, # optional
@@ -172,12 +193,12 @@ Some of the code has been inspired by some existing GAN implementations:
 * https://github.com/martinarjovsky/WassersteinGAN
 * https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html
 
+
+
 ## TODO
 
 - GAN Implementations (sorted by priority)
-  - BicycleGAN
   - InfoGAN
-  - Adversarial Autoencoder
   - CycleGAN
   - BEGAN
   - WassersteinGAN SpectralNorm
@@ -194,6 +215,11 @@ Some of the code has been inspired by some existing GAN implementations:
 
   - Architectures that at least work for mnist
 
+    - Images to compare algorithms
+    - Note number params / training time
+  
+  - Update tests / notebooks
+  
   - Include well defined loaders for
   
     - CelebA
@@ -202,6 +228,8 @@ Some of the code has been inspired by some existing GAN implementations:
     - Map translation
     - ImageNet
     
+  - Better number of default steps for critic
+  
   - Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))
   
     - ```python
@@ -218,13 +246,14 @@ Some of the code has been inspired by some existing GAN implementations:
   
   - Do not save Discriminator
   
-  - Images to compare algorithms
-  
     
 
 
 
 - Done
+  - ~~Adversarial Autoencoder~~
+  - ~~get_number_params()~~
+  - ~~BicycleGAN~~
   - ~~Introduce latent_space_net and real_space_net to make VAE abstraction better~~
   - ~~VAEGAN~~
   - ~~VAE~~

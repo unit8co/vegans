@@ -70,8 +70,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             "X_train must be either have 2 or 4 shape dimensions. Given: {}.".format(X_train.shape) +
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
-        assert get_input_dim(X_train.shape[1:], y_train.shape[1:]) == self._X_transformer.input_size[:], (
-            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self._X_transformer.input_size)
+        assert X_train.shape[1:] == self.x_dim[:], (
+            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
         )
 
         if X_test is not None:
@@ -303,8 +303,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Logging during training
     #########################################################################
     def _log_images(self, images, step, writer):
-        assert len(self._X_transformer.input_size) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self._X_transformer.input_size)
+        assert len(self.x_dim) > 1, (
+            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self.x_dim)
         )
         if writer is not None:
             grid = make_grid(images)

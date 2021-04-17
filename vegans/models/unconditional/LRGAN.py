@@ -95,19 +95,29 @@ class LRGAN(AbstractGenerativeModel):
     def _calculate_generator_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch)
         fake_predictions = self.predict(x=fake_images)
-        encoded_space = self.encode(x=fake_images)
+        fake_Z = self.encode(x=fake_images)
 
         gen_loss_original = self.loss_functions["Generator"](
             fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
         )
         latent_space_regression = self.loss_functions["L1"](
-            encoded_space, Z_batch
+            fake_Z, Z_batch
         )
         gen_loss = gen_loss_original + self.lambda_L1*latent_space_regression
         self._losses.update({
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
             "Generator_L1": self.lambda_L1*latent_space_regression
+        })
+
+    def _calculate_encoder_loss(self, X_batch, Z_batch):
+        fake_images = self.generate(z=Z_batch).detach()
+        fake_Z = self.encode(x=fake_images)
+        latent_space_regression = self.loss_functions["L1"](
+            fake_Z, Z_batch
+        )
+        self._losses.update({
+            "Encoder": latent_space_regression
         })
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch):
@@ -127,14 +137,4 @@ class LRGAN(AbstractGenerativeModel):
             "Adversariat_fake": adv_loss_fake,
             "Adversariat_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
-        })
-
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
-        encoded_space = self.encoder(fake_images)
-        latent_space_regression = self.loss_functions["L1"](
-            encoded_space, Z_batch
-        )
-        self._losses.update({
-            "Encoder": latent_space_regression
         })

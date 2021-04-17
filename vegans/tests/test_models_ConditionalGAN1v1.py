@@ -4,6 +4,7 @@ import pytest
 import numpy as np
 
 from vegans.GAN import (
+    ConditionalKLGAN,
     ConditionalLSGAN,
     ConditionalVanillaGAN,
     ConditionalWassersteinGAN,
@@ -14,6 +15,7 @@ from vegans.utils.utils import get_input_dim
 from vegans.utils.layers import LayerReshape
 
 gans = [
+    ConditionalKLGAN,
     ConditionalLSGAN,
     ConditionalVanillaGAN,
     ConditionalWassersteinGAN,
@@ -23,11 +25,13 @@ gans = [
 last_layers = [
     torch.nn.Sigmoid,
     torch.nn.Sigmoid,
+    torch.nn.Sigmoid,
     torch.nn.Identity,
     torch.nn.Identity,
     torch.nn.Sigmoid,
 ]
 optimizers = [
+    torch.optim.Adam,
     torch.optim.Adam,
     torch.optim.Adam,
     torch.optim.RMSprop,
@@ -68,8 +72,6 @@ def test_init():
         adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
 
         testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
-        names = [key for key, _ in testgan.loss_functions.items()]
-        assert ("Generator" in names) and ("Adversariat" in names)
         names = [key for key, _ in testgan.optimizers.items()]
         assert ("Generator" in names) and ("Adversariat" in names)
         with pytest.raises(TypeError):

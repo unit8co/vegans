@@ -108,6 +108,9 @@ class NeuralNetwork(Module):
     def __str__(self):
         return self.name
 
+    def get_number_params(self):
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
 
 class Generator(NeuralNetwork):
     def __init__(self, network, input_size, device, ngpu):

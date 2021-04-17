@@ -16,11 +16,11 @@ if mode == "unsupervised":
 
     # Define your own architectures here. You can use a Sequential model or an object
     # inheriting from torch.nn.Module.
-    generator, adversariat, _ = loading.load_example_architectures(
-        x_dim=x_dim, z_dim=z_dim
-    )
+    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim)
+    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic")
+
     gan = WassersteinGAN(
-        generator=generator, adversariat=adversariat,
+        generator=generator, adversariat=critic,
         z_dim=z_dim, x_dim=x_dim, folder=None
     )
     gan.summary() # optional, shows architecture
@@ -61,12 +61,13 @@ elif mode == "supervised":
 
     # Define your own architectures here. You can use a Sequential model or an object
     # inheriting from torch.nn.Module.
-    generator, adversariat, _ = loading.load_example_architectures(
-        x_dim=x_dim, z_dim=z_dim, y_dim=y_dim
-    )
+    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
+
     gan = ConditionalWassersteinGAN(
-        generator=generator, adversariat=adversariat,
-        z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder=None,
+        generator=generator, adversariat=critic,
+        z_dim=z_dim, x_dim=x_dim, y_dim=y_dim,
+        folder=None, # optional
         optim={"Generator": torch.optim.RMSprop, "Adversariat": torch.optim.Adam}, # optional
         optim_kwargs={"Generator": {"lr": 0.0001}, "Adversariat": {"lr": 0.0001}}, # optional
         fixed_noise_size=32, # optional
@@ -93,8 +94,3 @@ elif mode == "supervised":
     images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
     utils.plot_images(images, labels=np.argmax(gan.fixed_labels.cpu().numpy(), axis=1))
     utils.plot_losses(losses)
-
-    # Sample new images, you can also pass a specific noise vector
-    samples = gan.generate(y=y_test[:36])
-    samples = samples.reshape(-1, *samples.shape[2:]) # remove nr_channels for plotting
-    utils.plot_images(samples, labels=np.argmax(y_test[:36], axis=1))
