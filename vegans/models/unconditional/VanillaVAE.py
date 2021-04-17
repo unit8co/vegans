@@ -40,7 +40,7 @@ class VanillaVAE(AbstractGenerativeModel):
             lambda_KL=10,
             fixed_noise_size=32,
             device=None,
-            folder="./LRGAN1v1",
+            folder="./VanillaVAE",
             ngpu=0):
 
         if device is None:

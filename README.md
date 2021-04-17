@@ -211,12 +211,10 @@ Some of the code has been inspired by some existing GAN implementations:
 
   - New links to correct github files
 
-  - Better default folder (probably None or make current subfolder)
-
   - Architectures that at least work for mnist
 
     - Images to compare algorithms
-    - Note number params / training time
+  - Note number params / training time
   
   - Update tests / notebooks
   
@@ -228,8 +226,6 @@ Some of the code has been inspired by some existing GAN implementations:
     - Map translation
     - ImageNet
     
-  - Better number of default steps for critic
-  
   - Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))
   
     - ```python
@@ -242,8 +238,6 @@ Some of the code has been inspired by some existing GAN implementations:
        print(activation["This"].shape)
       ```
   
-  - enable Wasserstein loss for all architectures (when it makes sense)
-  
   - Do not save Discriminator
   
     
@@ -251,6 +245,9 @@ Some of the code has been inspired by some existing GAN implementations:
 
 
 - Done
+  - ~~enable Wasserstein loss for all architectures (when it makes sense)~~
+  - ~~Better default folder (probably None or make current subfolder)~~
+  - ~~Better number of default steps for critic~~
   - ~~Adversarial Autoencoder~~
   - ~~get_number_params()~~
   - ~~BicycleGAN~~

@@ -247,6 +247,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 images=self.generate(y=self.fixed_labels, z=self.fixed_noise),
                 step=0, writer=writer_train
             )
+
         for epoch in range(epochs):
             print("---"*20)
             print("EPOCH:", epoch+1)

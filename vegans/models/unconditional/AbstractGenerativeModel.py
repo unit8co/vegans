@@ -59,18 +59,13 @@ class AbstractGenerativeModel(ABC):
         elif device not in ["cuda", "cpu"]:
             raise ValueError("device must be cuda or cpu.")
 
-        if hasattr(self, "folder"):
-            pass
-        elif folder is None:
-            self.folder = ""
-        else:
-            folder = folder if not folder.endswith("/") else folder[-1]
-            if os.path.exists(folder):
-                now = datetime.now()
-                now = now.strftime("%Y%m%d_%H%M%S")
-                folder += now
-            self.folder = folder + "/"
-            os.makedirs(self.folder)
+        folder = folder if not folder.endswith("/") else folder[-1]
+        if os.path.exists(folder):
+            now = datetime.now()
+            now = now.strftime("%Y%m%d_%H%M%S")
+            folder += now
+        self.folder = folder + "/"
+        os.makedirs(self.folder)
 
         self._define_loss()
         self._define_optimizers(
@@ -173,6 +168,9 @@ class AbstractGenerativeModel(ABC):
 
         writer_train = writer_test = None
         if enable_tensorboard:
+            assert self.folder is not None, (
+                "`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified."
+            )
             writer_train = SummaryWriter(self.folder+"tensorboard/train/")
 
         if not isinstance(X_train, DataLoader):
@@ -214,8 +212,11 @@ class AbstractGenerativeModel(ABC):
 
     def _create_steps(self, steps):
         self.steps = {}
-        for name, _ in self.neural_nets.items():
+        for name, neural_net in self.neural_nets.items():
             self.steps[name] = 1
+            if neural_net.name == "Adversariat":
+                if neural_net._type == "Critic":
+                    self.steps[name] = 5
         if steps is not None:
             assert isinstance(steps, dict), "steps parameter must be of type dict. Given: {}.".format(type(steps))
             self.steps = steps
@@ -228,9 +229,15 @@ class AbstractGenerativeModel(ABC):
         print_every = self._string_to_batchnr(log_string=print_every, nr_batches=nr_batches, name="print_every")
         if save_model_every is not None:
             save_model_every = self._string_to_batchnr(log_string=save_model_every, nr_batches=nr_batches, name="save_model_every")
+            assert self.folder is not None, (
+                "`folder` argument in constructor was set to `None`. `save_model_every` must be None or `folder` needs to be specified."
+            )
             os.mkdir(self.folder+"models/")
         if save_images_every is not None:
             save_images_every = self._string_to_batchnr(log_string=save_images_every, nr_batches=nr_batches, name="save_images_every")
+            assert self.folder is not None, (
+                "`folder` argument in constructor was set to `None`. `save_images_every` must be None or `folder` needs to be specified."
+            )
             os.mkdir(self.folder+"images/")
         save_losses_every = self._string_to_batchnr(log_string=save_losses_every, nr_batches=nr_batches, name="save_losses_every")
         self.total_training_time = 0

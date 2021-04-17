@@ -38,7 +38,7 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             lambda_l1 = 10,
             fixed_noise_size=32,
             device=None,
-            folder="./ConditionalPix2Pix",
+            folder="./CPix2Pix",
             ngpu=None):
 
         super().__init__(

@@ -32,7 +32,7 @@ class KLGAN(AbstractGAN1v1):
             eps=1e-5,
             fixed_noise_size=32,
             device=None,
-            folder="./LSGAN",
+            folder="./KLGAN",
             ngpu=None):
 
         super().__init__(

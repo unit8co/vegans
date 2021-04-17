@@ -44,7 +44,7 @@ class ConditionalWassersteinGANGP(AbstractConditionalGAN1v1):
             fixed_noise_size=32,
             lmbda_grad=10,
             device=None,
-            folder="./ConditionalWassersteinGANGP",
+            folder="./CWassersteinGANGP",
             ngpu=None):
 
         super().__init__(

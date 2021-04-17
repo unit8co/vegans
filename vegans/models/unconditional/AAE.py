@@ -24,9 +24,9 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import MSELoss, BCELoss, L1Loss
+from vegans.utils.utils import wasserstein_loss
 from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversariat
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
-from vegans.utils.utils import wasserstein_loss
 
 class AAE(AbstractGenerativeModel):
     #########################################################################
@@ -45,7 +45,7 @@ class AAE(AbstractGenerativeModel):
             adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
-            folder="./LRGAN1v1",
+            folder="./AAE",
             ngpu=0):
 
         if device is None:

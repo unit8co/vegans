@@ -23,6 +23,7 @@ import torch
 from torch.nn import BCELoss, L1Loss
 from torch.nn import MSELoss as L2Loss
 
+from vegans.utils.utils import wasserstein_loss
 from vegans.utils.networks import Generator, Adversariat, Encoder
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
@@ -40,15 +41,17 @@ class LRGAN(AbstractGenerativeModel):
             optim=None,
             optim_kwargs=None,
             lambda_L1=10,
+            adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
-            folder="./LRGAN1v1",
+            folder="./LRGAN",
             ngpu=0):
 
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.adv_type = adv_type
         self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu)
-        self.adversariat = Adversariat(adversariat, input_size=x_dim, adv_type="Discriminator", device=device, ngpu=ngpu)
+        self.adversariat = Adversariat(adversariat, input_size=x_dim, adv_type=adv_type, device=device, ngpu=ngpu)
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)
         self.neural_nets = {
             "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
@@ -71,7 +74,12 @@ class LRGAN(AbstractGenerativeModel):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+        if self.adv_type == "Discriminator":
+            sself.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+        elif self.adv_type == "Critic":
+            self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "L1": L1Loss()}
+        else:
+            raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
 
 
     #########################################################################
@@ -138,3 +146,13 @@ class LRGAN(AbstractGenerativeModel):
             "Adversariat_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
         })
+
+    def _step(self, who=None):
+        if who is not None:
+            self.optimizers[who].step()
+            if who == "Adversariat":
+                if self.adv_type == "Critic":
+                    for p in self.adversariat.parameters():
+                        p.data.clamp_(-0.01, 0.01)
+        else:
+            [optimizer.step() for _, optimizer in self.optimizers.items()]

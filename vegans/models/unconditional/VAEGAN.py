@@ -46,7 +46,7 @@ class VAEGAN(AbstractGenerativeModel):
             adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
-            folder="./LRGAN1v1",
+            folder="./VAEGAN",
             ngpu=0):
 
         if device is None:

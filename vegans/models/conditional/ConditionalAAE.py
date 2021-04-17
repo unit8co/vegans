@@ -47,7 +47,7 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
             adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
-            folder="./LRGAN1v1",
+            folder="./CAAE",
             ngpu=0):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)

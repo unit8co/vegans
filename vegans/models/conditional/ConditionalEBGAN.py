@@ -37,7 +37,7 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1):
             optim_kwargs=None,
             fixed_noise_size=32,
             device=None,
-            folder="./LSGAN",
+            folder="./CEBGAN",
             ngpu=None):
 
         super().__init__(
