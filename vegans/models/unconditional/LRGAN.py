@@ -42,6 +42,7 @@ class LRGAN(AbstractGenerativeModel):
             optim_kwargs=None,
             lambda_L1=10,
             adv_type="Discriminator",
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./LRGAN",
@@ -58,7 +59,7 @@ class LRGAN(AbstractGenerativeModel):
         }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.lambda_L1 = lambda_L1
@@ -75,7 +76,7 @@ class LRGAN(AbstractGenerativeModel):
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":
-            sself.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+            self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
         elif self.adv_type == "Critic":
             self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "L1": L1Loss()}
         else:
@@ -102,12 +103,15 @@ class LRGAN(AbstractGenerativeModel):
 
     def _calculate_generator_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch)
-        fake_predictions = self.predict(x=fake_images)
         fake_Z = self.encode(x=fake_images)
 
-        gen_loss_original = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=fake_images)
+            gen_loss_original = self.loss_functions["Generator"](
+                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+            )
+        else:
+            gen_loss_original = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)
         latent_space_regression = self.loss_functions["L1"](
             fake_Z, Z_batch
         )

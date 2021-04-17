@@ -68,9 +68,9 @@ def concatenate(tensor1, tensor2):
     )
     batch_size = tensor1.shape[0]
     if tensor1.shape == tensor2.shape:
-        return torch.cat((tensor1, tensor2), axis=1)
+        return torch.cat((tensor1, tensor2), axis=1).float()
     elif (len(tensor1.shape) == 2) and (len(tensor2.shape) == 2):
-        return torch.cat((tensor1, tensor2), axis=1)
+        return torch.cat((tensor1, tensor2), axis=1).float()
     elif (len(tensor1.shape) == 4) and (len(tensor2.shape) == 2):
         y_dim = tensor2.shape[1]
         tensor2 = torch.reshape(tensor2, shape=(batch_size, y_dim, 1, 1))
@@ -80,10 +80,10 @@ def concatenate(tensor1, tensor2):
         tensor1 = torch.reshape(tensor1, shape=(batch_size, y_dim, 1, 1))
         tensor1 = torch.tile(tensor1, dims=(1, 1, *tensor2.shape[2:]))
     elif (len(tensor1.shape) == 4) and (len(tensor2.shape) == 4):
-        return torch.cat((tensor1, tensor2), axis=1)
+        return torch.cat((tensor1, tensor2), axis=1).float()
     else:
         raise AssertionError("tensor1 and tensor2 must have 2 or 4 dimensions. Given: {} and {}.".format(tensor1.shape, tensor2.shape))
-    return torch.cat((tensor1, tensor2), axis=1)
+    return torch.cat((tensor1, tensor2), axis=1).float()
 
 def get_input_dim(dim1, dim2):
     """ Get the number of input dimension from two inputs.

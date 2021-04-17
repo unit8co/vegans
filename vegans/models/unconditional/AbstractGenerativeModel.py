@@ -1,13 +1,14 @@
 import os
 import sys
+import time
 import json
 import torch
 
 import numpy as np
 import vegans.utils.utils as utils
 import matplotlib.pyplot as plt
-import time
 
+from torch.nn import MSELoss
 from datetime import datetime
 from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
@@ -15,13 +16,12 @@ from torchvision.utils import make_grid
 from vegans.utils.utils import plot_losses
 from torch.utils.tensorboard import SummaryWriter
 
-
 class AbstractGenerativeModel(ABC):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, optim, optim_kwargs, fixed_noise_size, device, folder, ngpu):
-        """ The AbstractGenerativeModel is the most basic building block of VeGAN. All GAN implementation should
+    def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu):
+        """The AbstractGenerativeModel is the most basic building block of VeGAN. All GAN implementation should
         at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.
 
         Parameters
@@ -37,6 +37,9 @@ class AbstractGenerativeModel(ABC):
         optim_kwargs : dict
             Optimizer keyword arguments used for each network. Must be a dictionary with network
             name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+        feature_layer : torch.nn.*
+            Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+            If `feature_layer` is not None, the original generator loss is replaced by a feature loss.
         fixed_noise_size : int
             Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
             subdirectory, the tensorboard images tab and the samples in get_training_results().
@@ -48,6 +51,13 @@ class AbstractGenerativeModel(ABC):
             already exists a time stamp is appended to make it unique.
         ngpu : int
             Number of gpus used during training if device == "cuda".
+
+        Raises
+        ------
+        NotImplementedError
+            Description
+        ValueError
+            Description
         """
         self.x_dim = tuple([x_dim]) if isinstance(x_dim, int) else tuple(x_dim)
         self.z_dim = tuple([z_dim]) if isinstance(z_dim, int) else tuple(z_dim)
@@ -59,13 +69,22 @@ class AbstractGenerativeModel(ABC):
         elif device not in ["cuda", "cpu"]:
             raise ValueError("device must be cuda or cpu.")
 
-        folder = folder if not folder.endswith("/") else folder[-1]
-        if os.path.exists(folder):
-            now = datetime.now()
-            now = now.strftime("%Y%m%d_%H%M%S")
-            folder += now
-        self.folder = folder + "/"
-        os.makedirs(self.folder)
+        if feature_layer is not None:
+            assert isinstance(feature_layer, torch.nn.Module), (
+                "`feature_layer` must inherit from nn.Module. Is: {}.".format(type(feature_layer))
+            )
+        self.feature_layer = feature_layer
+        if not hasattr(self, "folder"):
+            if folder is None:
+                self.folder = folder
+            else:
+                folder = folder if not folder.endswith("/") else folder[-1]
+                if os.path.exists(folder):
+                    now = datetime.now()
+                    now = now.strftime("%Y%m%d_%H%M%S")
+                    folder += now
+                self.folder = folder + "/"
+                os.makedirs(self.folder)
 
         self._define_loss()
         self._define_optimizers(
@@ -353,6 +372,12 @@ class AbstractGenerativeModel(ABC):
     @abstractmethod
     def calculate_losses(self, X_batch, Z_batch, who=None):
         pass
+
+    def _calculate_feature_loss(self, X_real, X_fake):
+        X_real_features = self.feature_layer(X_real)
+        X_fake_features = self.feature_layer(X_fake)
+        feature_loss = MSELoss()(X_real_features, X_fake_features)
+        return feature_loss
 
     def _zero_grad(self, who=None):
         if who is not None:

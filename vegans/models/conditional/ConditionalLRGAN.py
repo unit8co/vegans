@@ -44,6 +44,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
             optim_kwargs=None,
             lambda_L1=10,
             adv_type="Discriminator",
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CLRGAN",
@@ -51,12 +52,12 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-        adv_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
         AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-        AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=z_dim, y_dim=y_dim, name="Adversariat")
+        AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
         self.adv_type = adv_type
         self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
@@ -66,7 +67,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.lambda_L1 = lambda_L1
@@ -83,7 +84,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":
-            sself.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+            self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
         elif self.adv_type == "Critic":
             self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "L1": L1Loss()}
         else:
@@ -111,12 +112,15 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
         encoded_space = self.encode(x=fake_images, y=y_batch)
 
-        gen_loss_original = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=fake_images, y=y_batch)
+            gen_loss_original = self.loss_functions["Generator"](
+                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+            )
+        else:
+            gen_loss_original = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
         latent_space_regression = self.loss_functions["L1"](
             encoded_space, Z_batch
         )
@@ -129,7 +133,7 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch).detach()
-        encoded_space = self.encoder(fake_images)
+        encoded_space = self.encode(x=fake_images, y=y_batch)
         latent_space_regression = self.loss_functions["L1"](
             encoded_space, Z_batch
         )

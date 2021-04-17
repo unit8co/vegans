@@ -158,6 +158,7 @@ utils.plot_losses(losses)
 All of the GAN objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator as well as discriminator networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`. In addition, you can specify some parameters supported by all GAN implementations:
 * `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
 * `optim_kwargs`:  The optimizer default arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
+* `feature_layer`: If not None, it should be a layer of the discriminator of critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
 * `fixed_noise_size`: The number of samples to save (from fixed noise vectors). These are saved within Tensorboard (if `enable_tensorboard=True` during fitting) and in the `Model/images` subfolder.
 * `device`: "cuda" (GPU) or "cpu" depending on the available resources.
 * `folder`: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.
@@ -214,37 +215,26 @@ Some of the code has been inspired by some existing GAN implementations:
   - Architectures that at least work for mnist
 
     - Images to compare algorithms
-  - Note number params / training time
-  
-  - Update tests / notebooks
-  
+    - Note number params / training time
+
   - Include well defined loaders for
-  
+
     - CelebA
     - Mnist
     - Pix2Pix 
     - Map translation
     - ImageNet
     
-  - Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))
-  
-    - ```python
-      activation = {}
-      def the_hook(model, input, output):
-          activation["This"] = output.detach()
-      
-       adversariat.feature_part.register_forward_hook(the_hook)
-       print(adversariat(torch.from_numpy(X_train[:25]).float()).shape)
-       print(activation["This"].shape)
-      ```
-  
   - Do not save Discriminator
-  
+
     
 
 
 
 - Done
+  - ~~update notebooks~~
+  - ~~Update **tests**~~
+  - ~~Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))~~
   - ~~enable Wasserstein loss for all architectures (when it makes sense)~~
   - ~~Better default folder (probably None or make current subfolder)~~
   - ~~Better number of default steps for critic~~

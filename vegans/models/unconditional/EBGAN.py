@@ -31,9 +31,10 @@ class EBGAN(AbstractGAN1v1):
             adversariat,
             x_dim,
             z_dim,
-            m,
             optim=None,
             optim_kwargs=None,
+            m=0,
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./EBGAN",
@@ -43,6 +44,7 @@ class EBGAN(AbstractGAN1v1):
             generator=generator, adversariat=adversariat,
             z_dim=z_dim, x_dim=x_dim, adv_type="AutoEncoder",
             optim=optim, optim_kwargs=optim_kwargs,
+            feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
         )
@@ -59,12 +61,24 @@ class EBGAN(AbstractGAN1v1):
     def _define_loss(self):
         self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
 
+    def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
+        print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
+        super()._set_up_training(
+            X_train, y_train, X_test, y_test, epochs, batch_size, steps,
+            print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
+        )
+        if self.m is None:
+            self.m = np.mean(X_train)
+
     def _calculate_generator_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch)
-        fake_predictions = self.predict(x=fake_images)
-        gen_loss = self.loss_functions["Generator"](
-            fake_images, fake_predictions
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=fake_images)
+            gen_loss = self.loss_functions["Generator"](
+                fake_images, fake_predictions
+            )
+        else:
+            gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)
         self._losses.update({"Generator": gen_loss})
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch):

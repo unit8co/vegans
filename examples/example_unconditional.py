@@ -40,11 +40,13 @@ if __name__ == '__main__':
     # Training
     #########################################################################
 
-    # gan_model = LSGAN(
-    #     generator=generator, adversariat=adversariat,
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN", optim={"Generator": torch.optim.Adam},
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
-    # )
+    gan_model = VanillaGAN(
+        generator=generator, adversariat=discriminator,
+        z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
+        optim={"Generator": torch.optim.Adam},
+        feature_layer=discriminator.hidden_part,
+        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
+    )
 
     # gan_model = LRGAN(
     #     generator=generator, adversariat=adversariat, encoder=encoder,
@@ -69,11 +71,11 @@ if __name__ == '__main__':
     #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
     # )
 
-    gan_model = AAE(
-        encoder=encoder, generator=generator, adversariat=loading.load_example_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator"),
-        z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/AAE",
-        optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
-    )
+    # gan_model = AAE(
+    #     encoder=encoder, generator=generator, adversariat=loading.load_example_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator"),
+    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/AAE",
+    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
+    # )
 
     gan_model.summary(save=True)
     gan_model.fit(

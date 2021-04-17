@@ -49,7 +49,7 @@ if __name__ == '__main__':
     generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
     discriminator = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
     critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
-    encoder = loading.load_example_encoder(x_dim=x_dim, z_dim=z_dim+10, y_dim=y_dim)
+    encoder = loading.load_example_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
     autoencoder = loading.load_example_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
     decoder = loading.load_example_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
@@ -63,11 +63,11 @@ if __name__ == '__main__':
     #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     # )
 
-    # gan_model = ConditionalLRGAN(
-    #     generator=generator, adversariat=adversariat, encoder=encoder,
-    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
-    # )
+    gan_model = ConditionalLRGAN(
+        generator=generator, adversariat=discriminator, encoder=encoder,
+        x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
+    )
 
     # gan_model = ConditionalEBGAN(
     #     generator=generator, adversariat=autoencoder,
@@ -80,11 +80,11 @@ if __name__ == '__main__':
     #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", optim={"Autoencoder": torch.optim.Adam}
     # )
 
-    gan_model = ConditionalBicycleGAN(
-        encoder=encoder, generator=generator, adversariat=critic,
-        z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", adv_type="Critic",
-        optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
-    )
+    # gan_model = ConditionalBicycleGAN(
+    #     encoder=encoder, generator=generator, adversariat=critic,
+    #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", adv_type="Critic",
+    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
+    # )
 
     # gan_model = ConditionalAAE(
     #     encoder=encoder, generator=generator,

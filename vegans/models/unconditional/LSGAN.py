@@ -33,6 +33,7 @@ class LSGAN(AbstractGAN1v1):
             z_dim,
             optim=None,
             optim_kwargs=None,
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./LSGAN",
@@ -42,6 +43,7 @@ class LSGAN(AbstractGAN1v1):
             generator=generator, adversariat=adversariat,
             z_dim=z_dim, x_dim=x_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs,
+            feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
         )

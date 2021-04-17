@@ -38,6 +38,7 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
             y_dim,
             optim=None,
             optim_kwargs=None,
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CVanillaGAN",
@@ -46,7 +47,7 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
         super().__init__(
             generator=generator, adversariat=adversariat,
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator",
-            optim=optim, optim_kwargs=optim_kwargs,
+            optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
         )

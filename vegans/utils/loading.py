@@ -171,12 +171,13 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
                 nn.LeakyReLU(0.2),
                 nn.Linear(512, 256),
                 nn.LeakyReLU(0.2),
-                nn.Linear(256, 1)
             )
+            self.feature_part = nn.Linear(256, 1)
             self.output = last_layer()
 
         def forward(self, x):
             x = self.hidden_part(x)
+            x = self.feature_part(x)
             return self.output(x)
 
     return MyAdversariat(adv_in_dim=adv_in_dim)

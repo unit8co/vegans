@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import vegans.utils.utils as utils
 
+from torch.nn import MSELoss
 from torchvision.utils import make_grid
 from vegans.utils.utils import get_input_dim
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
@@ -13,8 +14,8 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, fixed_noise_size, device, folder, ngpu):
-        """ The AbstractConditionalGenerativeModel is the most basic building block of VeGAN for conditional models. All conditional GAN
+    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu):
+        """The AbstractConditionalGenerativeModel is the most basic building block of VeGAN for conditional models. All conditional GAN
         implementation should at least inherit from this class.
 
         Parameters
@@ -33,6 +34,9 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         optim_kwargs : dict
             Optimizer keyword arguments used for each network. Must be a dictionary with network
             name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+        feature_layer : torch.nn.*
+            Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+            If `feature_layer` is not None, the original generator loss is replaced by a feature loss.
         fixed_noise_size : int
             Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
             subdirectory, the tensorboard images tab and the samples in get_training_results().
@@ -48,7 +52,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self.adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         self.gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         AbstractGenerativeModel.__init__(
-            self, x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+            self, x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
@@ -298,6 +302,15 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
 
         self.eval()
         self._clean_up(writers=[writer_train, writer_test])
+
+    def _calculate_feature_loss(self, X_real, X_fake, y_batch):
+        X_real = utils.concatenate(tensor1=X_real, tensor2=y_batch).float()
+        X_fake = utils.concatenate(tensor1=X_fake, tensor2=y_batch).float()
+
+        X_real_features = self.feature_layer(X_real)
+        X_fake_features = self.feature_layer(X_fake)
+        feature_loss = MSELoss()(X_real_features, X_fake_features)
+        return feature_loss
 
 
     #########################################################################

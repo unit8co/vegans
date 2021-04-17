@@ -44,6 +44,8 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel):
             optim=None,
             optim_kwargs=None,
             lambda_KL=10,
+            lambda_x=10,
+            feature_layer=None,
             adv_type="Discriminator",
             fixed_noise_size=32,
             device=None,
@@ -68,7 +70,7 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel):
         }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.mu = nn.Sequential(
@@ -81,7 +83,9 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel):
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
+        self.lambda_x = lambda_x
         self.hyperparameters["lambda_KL"] = lambda_KL
+        self.hyperparameters["lambda_x"] = lambda_x
         self.hyperparameters["adv_type"] = adv_type
         if self.encoder.output_size == self.z_dim:
             raise ValueError(
@@ -132,15 +136,19 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel):
         fake_images_x = self.generate(y=y_batch, z=Z_batch_encoded.detach())
         fake_images_z = self.generate(y=y_batch, z=Z_batch)
 
-        fake_predictions_x = self.predict(x=fake_images_x, y=y_batch)
-        fake_predictions_z = self.predict(x=fake_images_z, y=y_batch)
+        if self.feature_layer is None:
+            fake_predictions_x = self.predict(x=fake_images_x, y=y_batch)
+            fake_predictions_z = self.predict(x=fake_images_z, y=y_batch)
 
-        gen_loss_fake_x = self.loss_functions["Generator"](
-            fake_predictions_x, torch.ones_like(fake_predictions_x, requires_grad=False)
-        )
-        gen_loss_fake_z = self.loss_functions["Generator"](
-            fake_predictions_z, torch.ones_like(fake_predictions_z, requires_grad=False)
-        )
+            gen_loss_fake_x = self.loss_functions["Generator"](
+                fake_predictions_x, torch.ones_like(fake_predictions_x, requires_grad=False)
+            )
+            gen_loss_fake_z = self.loss_functions["Generator"](
+                fake_predictions_z, torch.ones_like(fake_predictions_z, requires_grad=False)
+            )
+        else:
+            gen_loss_fake_x = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images_x, y_batch=y_batch)
+            gen_loss_fake_z = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images_z, y_batch=y_batch)
         gen_loss_reconstruction = self.loss_functions["Reconstruction"](
             fake_images_x, X_batch
         )

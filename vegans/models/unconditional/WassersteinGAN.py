@@ -40,8 +40,9 @@ class WassersteinGAN(AbstractGAN1v1):
             z_dim,
             optim=None,
             optim_kwargs=None,
-            fixed_noise_size=32,
             clip_val=0.01,
+            feature_layer=None,
+            fixed_noise_size=32,
             device=None,
             folder="./WassersteinGAN",
             ngpu=None):
@@ -50,6 +51,7 @@ class WassersteinGAN(AbstractGAN1v1):
             generator=generator, adversariat=adversariat,
             z_dim=z_dim, x_dim=x_dim, adv_type="Critic",
             optim=optim, optim_kwargs=optim_kwargs,
+            feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
             device=device,
             folder=folder,

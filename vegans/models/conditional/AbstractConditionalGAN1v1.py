@@ -28,6 +28,7 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
             adv_type,
             optim=None,
             optim_kwargs=None,
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./AbstractGAN1v1",
@@ -44,7 +45,7 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
             _called_from_conditional=True
         )
         AbstractConditionalGenerativeModel.__init__(
-            self, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+            self, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         assert (self.generator.output_size == self.x_dim), (
@@ -66,10 +67,13 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
-        gen_loss = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=fake_images, y=y_batch)
+            gen_loss = self.loss_functions["Generator"](
+                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+            )
+        else:
+            gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
         self._losses.update({"Generator": gen_loss})
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch, y_batch):

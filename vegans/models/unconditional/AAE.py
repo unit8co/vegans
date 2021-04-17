@@ -43,6 +43,7 @@ class AAE(AbstractGenerativeModel):
             optim_kwargs=None,
             lambda_z=10,
             adv_type="Discriminator",
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./AAE",
@@ -60,7 +61,7 @@ class AAE(AbstractGenerativeModel):
         }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
 
@@ -106,27 +107,26 @@ class AAE(AbstractGenerativeModel):
 
     def _calculate_generator_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(x=X_batch).detach()
-
         fake_images = self.generate(encoded_output)
-
-        gen_loss_reconstruction = self.loss_functions["Generator"](
+        gen_loss = self.loss_functions["Generator"](
             fake_images, X_batch
         )
 
-        gen_loss = gen_loss_reconstruction
         self._losses.update({
             "Generator": gen_loss,
         })
 
     def _calculate_encoder_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(x=X_batch)
-
         fake_images = self.generate(z=encoded_output)
-        fake_predictions = self.predict(x=encoded_output)
 
-        enc_loss_fake = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=encoded_output)
+            enc_loss_fake = self.loss_functions["Generator"](
+                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+            )
+        else:
+            enc_loss_fake = self._calculate_feature_loss(X_real=Z_batch, X_fake=encoded_output)
         enc_loss_reconstruction = self.loss_functions["Generator"](
             fake_images, X_batch
         )

@@ -25,6 +25,7 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             adv_type,
             optim=None,
             optim_kwargs=None,
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder=None,
@@ -38,14 +39,13 @@ class AbstractGAN1v1(AbstractGenerativeModel):
         self.neural_nets = {"Generator": self.generator, "Adversariat": self.adversariat}
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         if not _called_from_conditional:
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
-
 
 
     #########################################################################
@@ -62,10 +62,13 @@ class AbstractGAN1v1(AbstractGenerativeModel):
 
     def _calculate_generator_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch)
-        fake_predictions = self.predict(x=fake_images)
-        gen_loss = self.loss_functions["Generator"](
-            fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions = self.predict(x=fake_images)
+            gen_loss = self.loss_functions["Generator"](
+                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
+            )
+        else:
+            gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)
         self._losses.update({"Generator": gen_loss})
 
     def _calculate_adversariat_loss(self, X_batch, Z_batch):

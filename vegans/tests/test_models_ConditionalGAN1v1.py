@@ -14,29 +14,13 @@ from vegans.GAN import (
 from vegans.utils.utils import get_input_dim
 from vegans.utils.layers import LayerReshape
 
-gans = [
-    ConditionalKLGAN,
-    ConditionalLSGAN,
-    ConditionalVanillaGAN,
-    ConditionalWassersteinGAN,
-    ConditionalWassersteinGANGP,
-    ConditionalPix2Pix
-]
-last_layers = [
-    torch.nn.Sigmoid,
-    torch.nn.Sigmoid,
-    torch.nn.Sigmoid,
-    torch.nn.Identity,
-    torch.nn.Identity,
-    torch.nn.Sigmoid,
-]
-optimizers = [
-    torch.optim.Adam,
-    torch.optim.Adam,
-    torch.optim.Adam,
-    torch.optim.RMSprop,
-    torch.optim.RMSprop,
-    torch.optim.Adam,
+networks = [
+    (ConditionalKLGAN, torch.nn.Sigmoid),
+    (ConditionalLSGAN, torch.nn.Sigmoid),
+    (ConditionalVanillaGAN, torch.nn.Sigmoid),
+    (ConditionalWassersteinGAN, torch.nn.Identity),
+    (ConditionalWassersteinGANGP, torch.nn.Identity),
+    (ConditionalPix2Pix, torch.nn.Sigmoid)
 ]
 
 def generate_net(in_dim, last_layer, out_dim):
@@ -49,44 +33,43 @@ def generate_net(in_dim, last_layer, out_dim):
                 torch.nn.Flatten(),
                 torch.nn.Linear(in_dim, 16),
                 torch.nn.LeakyReLU(0.2),
-                torch.nn.Linear(16, np.prod(out_dim)),
-                LayerReshape(out_dim)
 
             )
+            self.feature_part = torch.nn.Linear(16, np.prod(out_dim))
+            self.feature_reshape = LayerReshape(out_dim)
             self.output = last_layer()
 
         def forward(self, x):
             x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
+            x = self.feature_part(x)
+            x = self.feature_reshape(x)
+            return self.output(x)
 
     return MyNetwork(in_dim, last_layer, out_dim)
 
-def test_init():
+
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_init(gan, last_layer):
     z_dim = 10
     y_dim = 5
 
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=16)
+    adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
 
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
-
-        testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
-        names = [key for key, _ in testgan.optimizers.items()]
-        assert ("Generator" in names) and ("Adversariat" in names)
-        with pytest.raises(TypeError):
-            gan(generator=gen, adversariat=adv, x_dim=17, z_dim=z_dim, y_dim=y_dim, folder=None)
-        with pytest.raises(TypeError):
-            gan(generator=gen, adversariat=adv, x_dim=16, z_dim=11, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+    with pytest.raises(TypeError):
+        gan(generator=gen, adversariat=adv, x_dim=17, z_dim=z_dim, y_dim=y_dim, folder=None)
+    with pytest.raises(TypeError):
+        gan(generator=gen, adversariat=adv, x_dim=16, z_dim=11, y_dim=y_dim, folder=None)
 
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=17)
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
+    adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
+    with pytest.raises(AssertionError):
+        gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
 
-        with pytest.raises(AssertionError):
-            gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
 
-def test_fit_vector():
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_vector(gan, last_layer):
     z_dim = 10
     y_dim = 5
     X_train = np.zeros(shape=[100, 16])
@@ -95,20 +78,43 @@ def test_fit_vector():
     y_test = np.zeros(shape=[100, y_dim])
 
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=16)
+    adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
     fit_kwargs = {
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
+    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan.fit(
+        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
+    )
+    assert hasattr(testgan, "logged_losses")
 
-        testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
-        testgan.fit(
-            X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
-        )
-        assert hasattr(testgan, "logged_losses")
 
-def test_fit_error_vector():
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_vector_feature_loss(gan, last_layer):
+    z_dim = 10
+    y_dim = 5
+
+    X_train = np.zeros(shape=[100, 16])
+    y_train = np.zeros(shape=[100, y_dim])
+    X_test = np.zeros(shape=[100, 16])
+    y_test = np.zeros(shape=[100, y_dim])
+
+    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=16)
+    adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
+    fit_kwargs = {
+        "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
+        "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
+    }
+    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
+    testgan.fit(
+        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
+    )
+    assert hasattr(testgan, "logged_losses")
+
+
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_error_vector(gan, last_layer):
     z_dim = 10
     y_dim = 5
     X_train = np.zeros(shape=[100, 16])
@@ -122,70 +128,93 @@ def test_fit_error_vector():
     y_test = np.zeros(shape=[100, y_dim])
 
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=16)
+    adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
     fit_kwargs = {
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
+    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
 
-        testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape1, y_train=y_train, **fit_kwargs
-            )
-
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape2, y_train=y_train, **fit_kwargs
-            )
-
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape3, y_train=y_train, **fit_kwargs
-            )
-
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape4, y_train=y_train, **fit_kwargs
-            )
-
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train, y_train=y_train, X_test=X_test_wrong_shape, y_test=y_test, **fit_kwargs
-            )
-
-def test_fit_image():
-    z_dim = 10
-    y_dim = 5
-    im_shape = [3, 16, 16]
-    X_train = np.zeros(shape=[100, *im_shape])
-    y_train = np.zeros(shape=[100, y_dim])
-    X_test = np.zeros(shape=[100, *im_shape])
-    y_test = np.zeros(shape=[100, y_dim])
-
-    y_train = np.zeros(shape=[100, y_dim])
-    y_test = np.zeros(shape=[100, y_dim])
-
-    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=im_shape)
-    fit_kwargs = {
-        "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
-        "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
-    }
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=get_input_dim(im_shape, y_dim), last_layer=last_layer, out_dim=1)
-
-        testgan = gan(generator=gen, adversariat=adv, x_dim=im_shape, z_dim=z_dim, y_dim=y_dim, folder=None)
+    with pytest.raises(AssertionError):
         testgan.fit(
-            X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
+            X_train=X_train_wrong_shape1, y_train=y_train, **fit_kwargs
         )
-        assert hasattr(testgan, "logged_losses")
 
-def test_fit_error_image():
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape2, y_train=y_train, **fit_kwargs
+        )
+
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape3, y_train=y_train, **fit_kwargs
+        )
+
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape4, y_train=y_train, **fit_kwargs
+        )
+
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train, y_train=y_train, X_test=X_test_wrong_shape, y_test=y_test, **fit_kwargs
+        )
+
+
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_image(gan, last_layer):
     z_dim = 10
     y_dim = 5
-    im_shape = [3, 16, 16]
-    X_train = np.zeros(shape=[100, *im_shape])
+    x_dim = [3, 16, 16]
+
+    X_train = np.zeros(shape=[100, *x_dim])
+    y_train = np.zeros(shape=[100, y_dim])
+    X_test = np.zeros(shape=[100, *x_dim])
+    y_test = np.zeros(shape=[100, y_dim])
+
+    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=x_dim)
+    adv = generate_net(in_dim=get_input_dim(x_dim, y_dim), last_layer=last_layer, out_dim=1)
+    fit_kwargs = {
+        "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
+        "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
+    }
+    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan.fit(
+        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
+    )
+    assert hasattr(testgan, "logged_losses")
+
+
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_image_feature_loss(gan, last_layer):
+    z_dim = 10
+    y_dim = 5
+    x_dim = [3, 16, 16]
+
+    X_train = np.zeros(shape=[100, *x_dim])
+    y_train = np.zeros(shape=[100, y_dim])
+    X_test = np.zeros(shape=[100, *x_dim])
+    y_test = np.zeros(shape=[100, y_dim])
+
+    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=x_dim)
+    adv = generate_net(in_dim=get_input_dim(x_dim, y_dim), last_layer=last_layer, out_dim=1)
+    fit_kwargs = {
+        "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
+        "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
+    }
+    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
+    testgan.fit(
+        X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
+    )
+    assert hasattr(testgan, "logged_losses")
+
+
+@pytest.mark.parametrize("gan, last_layer", networks)
+def test_fit_error_image(gan, last_layer):
+    z_dim = 10
+    y_dim = 5
+    x_dim = [3, 16, 16]
+    X_train = np.zeros(shape=[100, *x_dim])
     X_train_wrong_shape1 = np.zeros(shape=[100])
     X_train_wrong_shape2 = np.zeros(shape=[100, 17])
     X_train_wrong_shape3 = np.zeros(shape=[100, 17, 14])
@@ -195,41 +224,52 @@ def test_fit_error_image():
     y_train = np.zeros(shape=[100, y_dim])
     y_test = np.zeros(shape=[100, y_dim])
 
-    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=im_shape)
+    gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=x_dim)
+    adv = generate_net(in_dim=get_input_dim(x_dim, y_dim), last_layer=last_layer, out_dim=1)
     fit_kwargs = {
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    for (gan, last_layer) in zip(gans, last_layers):
-        adv = generate_net(in_dim=get_input_dim(im_shape, y_dim), last_layer=last_layer, out_dim=1)
+    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
 
-        testgan = gan(generator=gen, adversariat=adv, x_dim=im_shape, z_dim=z_dim, y_dim=y_dim, folder=None)
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape1, y_train=y_train, **fit_kwargs
-            )
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape1, y_train=y_train, **fit_kwargs
+        )
 
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape2, y_train=y_train, **fit_kwargs
-            )
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape2, y_train=y_train, **fit_kwargs
+        )
 
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape3, y_train=y_train, **fit_kwargs
-            )
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape3, y_train=y_train, **fit_kwargs
+        )
 
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train_wrong_shape4, y_train=y_train, **fit_kwargs
-            )
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train_wrong_shape4, y_train=y_train, **fit_kwargs
+        )
 
-        with pytest.raises(AssertionError):
-            testgan.fit(
-                X_train=X_train, y_train=y_train, X_test=X_test_wrong_shape, y_test=y_test, **fit_kwargs
-            )
+    with pytest.raises(AssertionError):
+        testgan.fit(
+            X_train=X_train, y_train=y_train, X_test=X_test_wrong_shape, y_test=y_test, **fit_kwargs
+        )
+
+    with pytest.raises(AssertionError):
+        testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer="hidden_part")
 
 
-def test_default_optimizers():
-    for gan, optim in zip(gans, optimizers):
-        assert gan._default_optimizer(gan) == optim
+@pytest.mark.parametrize("gan, optim",
+    [
+        (ConditionalKLGAN, torch.optim.Adam),
+        (ConditionalLSGAN, torch.optim.Adam),
+        (ConditionalVanillaGAN, torch.optim.Adam),
+        (ConditionalWassersteinGAN, torch.optim.RMSprop),
+        (ConditionalWassersteinGANGP, torch.optim.RMSprop),
+        (ConditionalPix2Pix, torch.optim.Adam)
+    ]
+)
+def test_default_optimizers(gan, optim):
+    assert gan._default_optimizer(gan) == optim

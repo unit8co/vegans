@@ -49,6 +49,7 @@ class ConditionalBicycleGAN(AbstractConditionalGenerativeModel):
             lambda_x=10,
             lambda_z=10,
             adv_type="Discriminator",
+            feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CBicycleGAN",
@@ -71,7 +72,7 @@ class ConditionalBicycleGAN(AbstractConditionalGenerativeModel):
         }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.mu = nn.Sequential(
@@ -137,18 +138,22 @@ class ConditionalBicycleGAN(AbstractConditionalGenerativeModel):
 
         fake_images_x = self.generate(z=Z_batch_encoded.detach(), y=y_batch)
         fake_images_z = self.generate(z=Z_batch, y=y_batch)
-
-        fake_predictions_x = self.predict(x=fake_images_x, y=y_batch)
-        fake_predictions_z = self.predict(x=fake_images_z, y=y_batch)
         encoded_output_fake = self.encode(x=fake_images_x, y=y_batch)
         fake_Z = self.mu(encoded_output_fake)
 
-        gen_loss_fake_x = self.loss_functions["Generator"](
-            fake_predictions_x, torch.ones_like(fake_predictions_x, requires_grad=False)
-        )
-        gen_loss_fake_z = self.loss_functions["Generator"](
-            fake_predictions_z, torch.ones_like(fake_predictions_z, requires_grad=False)
-        )
+        if self.feature_layer is None:
+            fake_predictions_x = self.predict(x=fake_images_x, y=y_batch)
+            fake_predictions_z = self.predict(x=fake_images_z, y=y_batch)
+
+            gen_loss_fake_x = self.loss_functions["Generator"](
+                fake_predictions_x, torch.ones_like(fake_predictions_x, requires_grad=False)
+            )
+            gen_loss_fake_z = self.loss_functions["Generator"](
+                fake_predictions_z, torch.ones_like(fake_predictions_z, requires_grad=False)
+            )
+        else:
+            gen_loss_fake_x = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images_x, y_batch=y_batch)
+            gen_loss_fake_z = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images_z, y_batch=y_batch)
         gen_loss_reconstruction_x = self.loss_functions["Reconstruction"](
             fake_images_x, X_batch
         )
