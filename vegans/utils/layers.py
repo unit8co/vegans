@@ -31,3 +31,7 @@ class LayerReshape(Module):
 
     def __str__(self):
         return "LayerReshape(shape="+str(self.shape)+")"
+
+    def __repr__(self):
+        return "LayerReshape(shape="+str(self.shape)+")"
+

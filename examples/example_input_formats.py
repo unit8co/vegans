@@ -1,18 +1,16 @@
-import torch
-
 import numpy as np
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
 from torch import nn
-from vegans.utils.layers import LayerReshape, LayerPrintSize
-from vegans.GAN import VanillaGAN, WassersteinGAN, WassersteinGANGP
+from vegans.GAN import WassersteinGAN
+from vegans.utils.layers import LayerReshape
 
 
 def call_gan_training(generator, adversariat):
-    gan_model = VanillaGAN(
+    gan_model = WassersteinGAN(
         generator=generator, adversariat=adversariat,
-        z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN", optim=torch.optim.RMSprop,
+        z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN",
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     )
     # gan_model.summary(save=True)
@@ -23,7 +21,7 @@ def call_gan_training(generator, adversariat):
         epochs=epochs,
         steps={"Adversariat": 5},
         print_every="0.5e",
-        save_model_every="3e",
+        save_model_every=None,
         save_images_every="0.5",
         save_losses_every=1,
         enable_tensorboard=True,
@@ -217,6 +215,3 @@ if __name__ == '__main__':
     generator = MyGenerator(z_dim=z_dim)
     adversariat = MyAdversariat(x_dim=im_dim)
     call_gan_training(generator, adversariat)
-
-
-

@@ -1,118 +1,100 @@
-import torch
-
 import numpy as np
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
-from torch import nn
-from vegans.utils.layers import LayerReshape, LayerPrintSize
-from vegans.GAN import ConditionalVanillaGAN, ConditionalWassersteinGAN, ConditionalWassersteinGANGP, ConditionalPix2Pix
+from vegans.GAN import (
+    ConditionalAAE,
+    ConditionalLRGAN,
+    ConditionalEBGAN,
+    ConditionalKLGAN,
+    ConditionalVAEGAN,
+    ConditionalBicycleGAN,
+    ConditionalVanillaGAN,
+    ConditionalWassersteinGAN,
+    ConditionalWassersteinGANGP,
+)
+from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVAE
 
 
 if __name__ == '__main__':
 
-    datapath = "../data/mnist_rotate/"
-    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=0, return_datasets=False)
+    datapath = "./data/mnist/"
+    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    y_train = np.array([np.rot90(im) for im in X_train])
+    y_test = np.array([np.rot90(im) for im in X_test])
 
     lr_gen = 0.0001
     lr_adv = 0.00005
-    epochs = 20
-    batch_size = 32
+    epochs = 5
+    batch_size = 16
+    optim_kwargs = {"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
 
     X_train = X_train.reshape((-1, 1, 32, 32))
     X_test = X_test.reshape((-1, 1, 32, 32))
     y_train = y_train.reshape((-1, 1, 32, 32))
     y_test = y_test.reshape((-1, 1, 32, 32))
-    im_dim = X_train.shape[1:]
-    label_dim = y_train.shape[1:]
+    x_dim = X_train.shape[1:]
+    y_dim = y_train.shape[1:]
+    z_dim = 32
+    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
+    adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
+    ######################################C###################################
+    # Architecture
     #########################################################################
-    # Flat network
-    #########################################################################
-    z_dim = 64
-    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=label_dim)
-    adv_in_dim = utils.get_input_dim(dim1=im_dim, dim2=label_dim)
-
-    class MyGenerator(nn.Module):
-        def __init__(self, z_dim):
-            super().__init__()
-            self.encoding = nn.Sequential(
-                nn.Conv2d(in_channels=gen_in_dim[0], out_channels=32, kernel_size=5, stride=2, padding=2),
-                nn.LeakyReLU(0.2),
-                nn.Conv2d(in_channels=32, out_channels=64, kernel_size=5, stride=2, padding=2),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=64),
-                nn.Conv2d(in_channels=64, out_channels=128, kernel_size=5, stride=2, padding=2),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=128),
-                nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, stride=1, padding=1),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=64)
-            )
-            self.decoding = nn.Sequential(
-                nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-                nn.ConvTranspose2d(in_channels=32, out_channels=16, kernel_size=4, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=16),
-                nn.ConvTranspose2d(in_channels=16, out_channels=8, kernel_size=4, stride=2, padding=1),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm2d(num_features=8),
-                nn.ConvTranspose2d(in_channels=8, out_channels=1, kernel_size=3, stride=1, padding=1),
-            )
-            self.output = nn.Sigmoid()
-
-        def forward(self, x):
-            x = self.encoding(x)
-            x = self.decoding(x)
-            y_pred = self.output(x)
-            return y_pred
-
-    class MyAdversariat(nn.Module):
-        def __init__(self, x_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Conv2d(in_channels=adv_in_dim[0], out_channels=16, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=5, stride=2, padding=2),
-                nn.BatchNorm2d(num_features=32),
-                nn.Conv2d(in_channels=32, out_channels=40, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.Conv2d(in_channels=40, out_channels=40, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=5, stride=2, padding=2),
-                nn.BatchNorm2d(num_features=40),
-                nn.Conv2d(in_channels=40, out_channels=20, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.Conv2d(in_channels=20, out_channels=20, kernel_size=3, stride=1, padding=1),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=5, stride=2, padding=2),
-                nn.BatchNorm2d(num_features=20),
-                nn.Conv2d(in_channels=20, out_channels=1, kernel_size=3, stride=1, padding=1),
-            )
-            self.output = nn.Sigmoid()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            y_pred = self.output(x)
-            return y_pred
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
+    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", method="example")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", method="example")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
 
     #########################################################################
     # Training
     #########################################################################
 
-    generator = MyGenerator(z_dim=z_dim)
-    adversariat = MyAdversariat(x_dim=im_dim)
+    # gan_model = ConditionalKLGAN(
+    #     generator=generator, adversariat=discriminator,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
+    # )
 
-    optim_kwargs = {"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
-
-    gan_model = ConditionalPix2Pix(
-        generator=generator, adversariat=adversariat,
-        x_dim=im_dim, z_dim=z_dim, y_dim=label_dim, folder="TrainedModels/Im2Im", optim=torch.optim.RMSprop,
-        optim_kwargs=optim_kwargs, fixed_noise_size=16
+    gan_model = ConditionalLRGAN(
+        generator=generator, adversariat=discriminator, encoder=encoder,
+        x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     )
+
+    # gan_model = ConditionalEBGAN(
+    #     generator=generator, adversariat=autoencoder,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/EBGAN", optim=None,
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16, m=np.mean(X_train)
+    # )
+
+    # gan_model = ConditionalVanillaVAE(
+    #     encoder=encoder, decoder=decoder,
+    #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN",}
+    # )
+
+    # gan_model = ConditionalBicycleGAN(
+    #     encoder=encoder, generator=generator, adversariat=critic,
+    #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/VAEGAN", adv_type="Critic",
+    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
+    # )
+
+    # gan_model = ConditionalAAE(
+    #     encoder=encoder, generator=generator,
+    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Critic", method="example"),
+    #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/cAAE", adv_type="Critic",
+    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
+    # )
+
+    # gan_model = ConditionalPix2Pix(
+    #     generator=generator, adversariat=adversariat,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/Im2Im",
+    #     optim_kwargs=optim_kwargs, fixed_noise_size=16
+    # )
+
     gan_model.summary(save=True)
     gan_model.fit(
         X_train=X_train,
@@ -123,8 +105,8 @@ if __name__ == '__main__':
         epochs=epochs,
         steps={"Adversariat": 5},
         print_every=200,
-        save_model_every="3e",
-        save_images_every="0.5",
+        save_model_every=None,
+        save_images_every="0.5e",
         save_losses_every=10,
         enable_tensorboard=True,
     )

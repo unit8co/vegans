@@ -217,16 +217,20 @@ Some of the code has been inspired by some existing GAN implementations:
     - Images to compare algorithms
     - Note number params / training time
 
-  - Include well defined loaders for
+  - Interpolationieren
 
-    - CelebA
+  - Turn off secure mode
+  
+  - Include well defined loaders for
+  
     - Mnist
+    - CelebA
     - Pix2Pix 
-    - Map translation
+  - Map translation
     - ImageNet
     
   - Do not save Discriminator
-
+  
     
 
 

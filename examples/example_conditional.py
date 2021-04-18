@@ -4,9 +4,7 @@ import numpy as np
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
-from torch import nn
 from sklearn.preprocessing import OneHotEncoder
-from vegans.utils.layers import LayerReshape, LayerPrintSize
 from vegans.GAN import (
     ConditionalAAE,
     ConditionalLRGAN,
@@ -39,35 +37,35 @@ if __name__ == '__main__':
 
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
-    z_dim = 128
+    z_dim = 64
     gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
     adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
-    discriminator = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
-    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
-    encoder = loading.load_example_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
-    autoencoder = loading.load_example_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
-    decoder = loading.load_example_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="mnist")
+    # discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", method="mnist")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", method="mnist")
+    # encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="mnist")
+    # autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="mnist")
+    # decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="mnist")
 
     #########################################################################
     # Training
     #########################################################################
 
-    # gan_model = ConditionalKLGAN(
-    #     generator=generator, adversariat=discriminator,
-    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
-    # )
-
-    gan_model = ConditionalLRGAN(
-        generator=generator, adversariat=discriminator, encoder=encoder,
+    gan_model = ConditionalWassersteinGAN(
+        generator=generator, adversariat=critic,
         x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
     )
+
+    # gan_model = ConditionalLRGAN(
+    #     generator=generator, adversariat=discriminator, encoder=encoder,
+    #     x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder="TrainedModels/CGAN", optim=None,
+    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, fixed_noise_size=16
+    # )
 
     # gan_model = ConditionalEBGAN(
     #     generator=generator, adversariat=autoencoder,
@@ -88,7 +86,7 @@ if __name__ == '__main__':
 
     # gan_model = ConditionalAAE(
     #     encoder=encoder, generator=generator,
-    #     adversariat=loading.load_example_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Critic"),
+    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Critic", method="mnist"),
     #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/cAAE", adv_type="Critic",
     #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
     # )
@@ -103,8 +101,8 @@ if __name__ == '__main__':
         epochs=epochs,
         # steps={"Adversariat": 5},
         print_every=200,
-        save_model_every="3e",
-        save_images_every="0.25e",
+        save_model_every=None,
+        save_images_every="0.2e",
         save_losses_every=10,
         enable_tensorboard=True
     )
