@@ -182,6 +182,35 @@ The fit function takes the following optional arguments:
 - `save_losses_every`: Determines after how many batches the losses should be calculated and saved. Figure is shown after `save_images_every` . String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: "1e"
 - `enable_tensorboard`: Determines after how many batches a message should be printed to the console informing about the current state of training. Tensorboard information will be saved in subdirectory `save.folder`+"/tensorboard".  Default: True
 
+Useful methods of all models are:
+
+- `generate(z=None, n=None)`: Generate samples from noise vector or generate "n" samples.
+- `get_hyperparameters()`: Get dictionary containing important hyperparameters.
+- `get_losses(by_epoch=False, agg=None)`: Return a dictionary of logged losses. Number of elements determined by the `save_losses_every` parameter passed to the `fit` method.
+- `get_number_params()`: Get the number of parameters per network.
+- `get_training_results(by_epoch=False, agg=None)`: Returns the samples generated from the `fixed_noise` attribute and the logged losses.
+- `load(path)`: Load a trained model.
+- `predict(x)`: Use the adversariat to predict the realness of an image.
+- `sample(n)`: Sample a noise vector of size n.
+- `save(name=None)`: Save the model.
+- `summary(save=False)`: Print a summary of the model containing the number of parameters and general structure.
+- `to(device)`: Map all networks to a common device. Should be done before training.
+
+Useful attributes of all models are:
+
+- `feature_layer`: Function to calculate feature loss with. If None no feature loss is computed. If not None the feature loss overwrites the "normal" generator loss.
+- `fixed_noise`, (`fixed_noise_labels`): Noise vector sampled before training and used to generate the images in the created subdirectory (if `save_images_every` in the `fit` mehtod is not None). Also used to produce the results from `get_training_results()`.
+- `folder`: Folder where all information belonging to GAN is stored. This includes
+  - Models in the `folder/models` subdirectory if `save_model_every` is not None in  the`fit()` method.
+  - Images in the `folder/images` subdirectory if `save_images_every` is not None in the `fit()` method.
+  - Tensorboard data in the `folder/tensorboard` subdirectory if `enable_tensorboard` is True in the `fit()` method.
+  - Loss in the `folder/losses.png` if `save_losses_every` is not None in `fit()` method.
+  - Loss in the `folder/summary.txt` if `summary(save=True)`called.
+- `images_produced`: Flag (True / False) if images are the target of the generator.
+- `total_training_time`, `batch_training_times`: Time needed for training.
+- `x_dim`, `z_dim`, (`y_dim`): Input dimensions.
+- `_is_training`: Flag (True / False) if model is in training or evaluation mode. Normally the flag is False and is automatically set to True in the main training loop.
+
 
 
 If you are researching new GAN training algorithms, you may find it useful to inherit from the `AbstractGenerativeModel` or  `AbstractConditionalGenerativeModel` base class.
@@ -258,8 +287,8 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
-  - Include well defined loaders for
-  
+  - ~~Update README file~~
+  - ~~Include well defined loaders for~~
     - ~~Mnist~~
     - ~~Fashion-MNIST~~
   - ~~DataLoader from torchvision.datasets~~
