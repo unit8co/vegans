@@ -48,7 +48,7 @@ def onclick(event):
     plt.show()
 
 if __name__ == '__main__':
-    root = "./Data/mnist/"
+    datapath = "./Data/mnist/"
     model_path = "./TrainedModels/GAN/model.torch"
     model = torch.load(model_path)
     model.eval()

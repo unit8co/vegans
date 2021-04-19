@@ -12,18 +12,18 @@ def test_Dataset():
 
 
 def test_load_mnist():
-    root = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_data(root, which="example")
+    datapath = "./data/mnist/"
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="example")
     assert X_train.shape == (60000, 28, 28)
     assert np.max(X_train) == 1
     assert X_test.shape == (10000, 28, 28)
     assert np.max(X_test) == 1
 
-    X_train, y_train, X_test, y_test = loading.load_mnist_data(root, normalize=False)
+    X_train, y_train, X_test, y_test = loading.load_mnist_data(datapath, normalize=False)
     assert np.max(X_train) == 255
     assert np.max(X_test) == 255
 
-    X_train, y_train, X_test, y_test = loading.load_mnist_data(root, pad=2)
+    X_train, y_train, X_test, y_test = loading.load_mnist_data(datapath, pad=2)
     assert X_train.shape == (60000, 32, 32)
     assert X_test.shape == (10000, 32, 32)
 

@@ -1,23 +1,18 @@
-# VeGANs (will be merged with the current pip package vegan in the near future)
+# VeGANs (might be merged with the current pip package vegan in the near future)
 
 A library to easily train various existing GANs (Generative Adversarial Networks) in PyTorch.
 
 This library targets mainly GAN users, who want to use existing GAN training techniques with their own generators/discriminators.
-However researchers may also find the GenerativeModel base class useful for quicker implementation of new GAN training techniques.
+However researchers may also find the GAN base class useful for quicker implementation of new GAN training techniques.
 
 The focus is on simplicity and providing reasonable defaults.
 
 ## How to install
-You need python 3.6 or above. Then:
-~~`pip install vegans`~~ (Not yet, currently only with this github repo.)
+You need python 3.5 or above. Then:
+~~`pip install vegans`~~ (Not yet)
 
 ## How to use
-The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
-
-- Read through this README.md file
-- Check out the notebooks (00 to 04)
-- If you want to create your own GAN algorithms, check out the notebooks 05 to 07
-- Look at the example code
+The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. Several different use cases are shown below.
 
 #### Unsupervised Learning
 
@@ -27,8 +22,8 @@ import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
 # Data preparation
-root =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
-X_train, y_train, X_test, y_test = loading.load_data(root, which="mnist")
+datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
 x_dim = X_train.shape[1:] # [nr_channels, height, width]
@@ -36,8 +31,8 @@ z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
-generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="mnist")
-critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="mnist")
+generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
+critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
 
 gan = WassersteinGAN(
     generator=generator, adversariat=critic,
@@ -83,7 +78,7 @@ You can currently use the following GANs:
 
 * `WassersteinGANGP`: [Wasserstein GAN with gradient penalty](https://arxiv.org/abs/1704.00028)
 
-
+  
 
 All current GAN implementations come with a conditional variant to allow for the usage of training labels to produce specific outputs:
 
@@ -109,8 +104,8 @@ from vegans.GAN import ConditionalWassersteinGAN
 from sklearn.preprocessing import OneHotEncoder # Download sklearn
 
 # Data preparation
-root =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
-X_train, y_train, X_test, y_test = loading.load_data(root, which="mnist")
+datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
 one_hot_encoder = OneHotEncoder(sparse=False)
@@ -129,7 +124,7 @@ critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_typ
 gan = ConditionalWassersteinGAN(
     generator=generator, adversariat=critic,
     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim,
-    folder=None, # optional, needed if results should be saved
+    folder=None, # optional
     optim={"Generator": torch.optim.RMSprop, "Adversariat": torch.optim.Adam}, # optional
     optim_kwargs={"Generator": {"lr": 0.0001}, "Adversariat": {"lr": 0.0001}}, # optional
     fixed_noise_size=32, # optional
@@ -146,17 +141,17 @@ gan.fit(
     epochs=5, # optional
     batch_size=32, # optional
     steps={"Generator": 1, "Adversariat": 5}, # optional
-    print_every="0.1e", # optional, print 10 times per eoch
+    print_every="0.1e", # optional
     save_model_every=None, # optional
     save_images_every=None, # optional
-    save_losses_every="0.1e", # optional, saved 10 times per eoch
+    save_losses_every="0.1e", # optional
     enable_tensorboard=False # optional
 )
 
 # Vizualise results
 images, losses = gan.get_training_results()
 images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
-utils.plot_images(images, labels=np.argmax(gan.get_fixed_labels(), axis=1))
+utils.plot_images(images, labels=np.argmax(gan.fixed_labels.cpu().numpy(), axis=1))
 utils.plot_losses(losses)
 ```
 
@@ -203,25 +198,6 @@ Some of the code has been inspired by some existing GAN implementations:
 
 
 
-### Some Results
-
-All this results should be taken with a grain of salt. They were not extensively fine tuned in any way, so better results for individual networks are possible for sure. More time training as well as more regularization could most certainly improve results. All of these results were generated by running the example_conditional.py program in the examples folder. Especially the Variational Autoencoder would perform better if we increased it's number of parameters to a comparable level.
-
-| Network                |                         MNIST Result                         |
-| :--------------------- | :----------------------------------------------------------: |
-| Cond. BicycleGAN       | ![MNIST](./TrainedModels/cBicycleGAN/generated_images.png "MNIST") |
-| Cond. EBGAN            | ![MNIST](./TrainedModels/cEBGAN/generated_images.png "MNIST") |
-| Cond. KLGAN            | ![MNIST](./TrainedModels/cKLGAN/generated_images.png "MNIST") |
-| Cond. LRGAN            | ![MNIST](./TrainedModels/cLRGAN/generated_images.png "MNIST") |
-| Cond. Pix2Pix          | ![MNIST](./TrainedModels/cPix2Pix/generated_images.png "MNIST") |
-| Cond. VAEGAN           | ![MNIST](./TrainedModels/cVAEGAN/generated_images.png "MNIST") |
-| Cond. VanillaGAN       | ![MNIST](./TrainedModels/cVanillaGAN/generated_images.png "MNIST") |
-| Cond. WassersteinGAN   | ![MNIST](./TrainedModels/cWassersteinGAN/generated_images.png "MNIST") |
-| Cond. WassersteinGANGP | ![MNIST](./TrainedModels/cWassersteinGANGP/generated_images.png "MNIST") |
-| Cond. VAE              | ![MNIST](./TrainedModels/cVanillaVAE/generated_images.png "MNIST") |
-
-
-
 ## TODO
 
 - GAN Implementations (sorted by priority)
@@ -230,7 +206,7 @@ All this results should be taken with a grain of salt. They were not extensively
   - BEGAN
   - WassersteinGAN SpectralNorm
   - DiscoGAN
-- Layers
+- Layers 
   - Inception
   - Residual Block
   - Minibatch discrimination
@@ -238,23 +214,21 @@ All this results should be taken with a grain of salt. They were not extensively
 
   - New links to correct github files
 
-  - DataLoader from torchvision.datasets
+  - Interpolation
 
   - Turn off secure mode
-
-  - Interpolation
 
   - Include well defined loaders for
 
     - Mnist
     - CelebA
-    - Pix2Pix
+    - Pix2Pix 
     - Map translation
     - ImageNet
-
+    
   - Do not save Discriminator
 
-
+    
 
 
 
