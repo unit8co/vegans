@@ -35,9 +35,12 @@ class NeuralNetwork(Module):
         self.network = network.to(self.device)
         self._validate_input()
 
-        if self.device=="cuda" and self.ngpu is not None:
+        if ngpu is not None and ngpu < 0:
+            self.ngpu = len([torch.cuda.device(i) for i in range(torch.cuda.device_count())])
+        if self.ngpu is not None and self.device=="cuda":
             if self.ngpu > 1:
                 self.network = torch.nn.DataParallel(self.network)
+                self.network = network.to(self.device)
 
         self.output_size = self._get_output_shape()[1:]
 
@@ -124,9 +127,9 @@ class Adversariat(NeuralNetwork):
     """
     def __init__(self, network, input_size, adv_type, device, ngpu):
         try:
-            last_layer_type = type(network[-1])
+            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
         except TypeError:
-            last_layer_type = type(network.__dict__["_modules"]["output"])
+            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
 
         valid_types = ["Discriminator", "Critic", "AutoEncoder"]
         if adv_type == "Discriminator":
@@ -154,9 +157,9 @@ class Encoder(NeuralNetwork):
     def __init__(self, network, input_size, device, ngpu):
         valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
         try:
-            last_layer_type = type(network[-1])
+            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
         except TypeError:
-            last_layer_type = type(network.__dict__["_modules"]["output"])
+            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
         assert last_layer_type in valid_last_layer, (
             "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer)
         )
@@ -171,6 +174,7 @@ class Decoder(NeuralNetwork):
 class Autoencoder(nn.Module):
     def __init__(self, encoder, decoder):
         super(Autoencoder, self).__init__()
+        self.name = "Autoencoder"
         self.encoder = encoder
         self.decoder = decoder
 
@@ -182,3 +186,17 @@ class Autoencoder(nn.Module):
         self.encoder.summary()
         print("\n\n")
         self.decoder.summary()
+
+    def get_number_params(self):
+        """ Returns the number of parameters in the model.
+
+        Returns
+        -------
+        dict
+            Dictionary containing the number of parameters per network.
+        """
+        nr_params_dict = {
+            "Encoder": self.encoder.get_number_params(),
+            "Decoder": self.decoder.get_number_params()
+        }
+        return nr_params_dict

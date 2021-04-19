@@ -60,7 +60,7 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
 
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=None,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
         )
         self.mu = nn.Sequential(

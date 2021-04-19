@@ -74,6 +74,8 @@ class AbstractGenerativeModel(ABC):
                 "`feature_layer` must inherit from nn.Module. Is: {}.".format(type(feature_layer))
             )
         self.feature_layer = feature_layer
+        if self.feature_layer is not None:
+            self.feature_layer.to(self.device)
         if not hasattr(self, "folder"):
             if folder is None:
                 self.folder = folder
@@ -148,7 +150,7 @@ class AbstractGenerativeModel(ABC):
         for name, _ in param_dict.items():
             if name not in self.neural_nets:
                 available_nets = [name for name, _ in self.neural_nets.items()]
-                raise KeyError("Error in {}: {} not in self.neural_nets. Must be one of: {}.".format(
+                raise KeyError("Error in {}: `{}` not in self.neural_nets. Must be one of: {}.".format(
                     where, name, available_nets)
                 )
         for name, _ in self.neural_nets.items():
@@ -414,6 +416,7 @@ class AbstractGenerativeModel(ABC):
             print("{}: {}".format(name, loss.item()))
 
         self.batch_training_times.append(time.perf_counter() - self.current_timer)
+        print(self.batch_training_times)
         self.total_training_time = np.sum(self.batch_training_times)
         time_per_batch = np.mean(self.batch_training_times) / print_every
 
@@ -655,6 +658,9 @@ class AbstractGenerativeModel(ABC):
             If true summary is saved in model folder, printed to console otherwise.
         """
         if save:
+            assert self.folder is not None, (
+                "`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified."
+            )
             sys_stdout_temp = sys.stdout
             sys.stdout = open(self.folder+'summary.txt', 'w')
         for name, neural_net in self.neural_nets.items():

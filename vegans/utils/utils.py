@@ -133,6 +133,15 @@ def plot_losses(losses, show=True, share=False):
     ----------
     losses : dict
         Dictionary containing the losses for some networks.
+    show : bool, optional
+        If True, `plt.show` is called to visualise the images directly.
+    share : bool, optional
+        If true, axis ticks are shared between plots.
+
+    Returns
+    -------
+    TYPE
+        Description
     """
     if share:
         fig, ax = plt.subplots(1, 1, figsize=(8, 8))
@@ -145,15 +154,16 @@ def plot_losses(losses, show=True, share=False):
         n = len(losses["Train"])
         nrows = int(np.sqrt(n))
         ncols = n // nrows
-        fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(12, 8))
+        fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(12, 9))
         axs = np.ravel(axs)
         for mode, loss_dict in losses.items():
             for ax, (loss_type, loss) in zip(axs, loss_dict.items()):
                 ax.plot(loss, lw=2, label=mode)
                 ax.set_xlabel('Iterations')
                 ax.set_title(loss_type)
+                ax.set_facecolor("#ecffe7")
                 ax.legend()
-        fig.tight_layout()
+    fig.tight_layout()
     if show:
         plt.show()
     return fig, ax
@@ -184,7 +194,7 @@ def plot_images(images, labels=None, show=True, n=None):
         n = 36
     nrows = int(np.sqrt(n))
     ncols = n // nrows
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 6))
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(8, 8))
     axs = np.ravel(axs)
 
     for i, ax in enumerate(axs):
@@ -192,6 +202,8 @@ def plot_images(images, labels=None, show=True, n=None):
         ax.axis("off")
         if labels is not None:
             ax.set_title("Label: {}".format(labels[i]))
+
+    fig.tight_layout()
     if show:
         plt.show()
     return fig, axs

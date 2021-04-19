@@ -19,7 +19,7 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
     y_train = np.array([np.rot90(im) for im in X_train])
     y_test = np.array([np.rot90(im) for im in X_test])
 
@@ -42,12 +42,12 @@ if __name__ == '__main__':
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
-    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", method="example")
-    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", method="example")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, method="example")
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="example")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="example")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
 
     #########################################################################
     # Training
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     # gan_model = ConditionalAAE(
     #     encoder=encoder, generator=generator,
-    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Critic", method="example"),
+    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Critic", which="example"),
     #     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, folder="TrainedModels/cAAE", adv_type="Critic",
     #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
     # )

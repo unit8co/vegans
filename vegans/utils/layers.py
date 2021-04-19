@@ -11,8 +11,7 @@ class LayerPrintSize(Module):
 
     def forward(self, x):
         print("\n")
-        print(x.shape)
-        print("\n")
+        print("Layer shape:", x.shape)
         return x
 
 

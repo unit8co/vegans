@@ -22,7 +22,7 @@ def call_gan_training(generator, adversariat):
         steps={"Adversariat": 5},
         print_every="0.5e",
         save_model_every=None,
-        save_images_every="0.5",
+        save_images_every="0.5e",
         save_losses_every=1,
         enable_tensorboard=True,
     )
@@ -33,7 +33,7 @@ def call_gan_training(generator, adversariat):
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
     lr_gen = 0.0001
     lr_adv = 0.00005
     epochs = 1
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         nn.Linear(in_features=128, out_features=16),
         nn.ReLU(),
         nn.Linear(in_features=16, out_features=1),
-        nn.Sigmoid()
+        nn.Identity()
     )
     z_dim = [1, 8, 8]
     call_gan_training(generator, adversariat)
@@ -119,7 +119,7 @@ if __name__ == '__main__':
                 nn.ReLU(),
                 nn.Linear(in_features=16, out_features=1)
             )
-            self.output = nn.Sigmoid()
+            self.output = nn.Identity()
 
         def forward(self, x):
             x = self.hidden_part(x)
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         nn.Linear(512, 256),
         nn.LeakyReLU(0.2),
         nn.Linear(256, 1),
-        nn.Sigmoid()
+        nn.Identity()
     )
     call_gan_training(generator, adversariat)
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
                 nn.LeakyReLU(0.2),
                 nn.Linear(256, 1)
             )
-            self.output = nn.Sigmoid()
+            self.output = nn.Identity()
 
         def forward(self, x):
             x = self.hidden_part(x)

@@ -18,7 +18,7 @@ from vegans.models.unconditional.VanillaVAE import VanillaVAE
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
     lr_gen = 0.0001
     lr_adv = 0.0001
     epochs = 2
@@ -32,26 +32,26 @@ if __name__ == '__main__':
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, method="example")
-    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", method="example")
-    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", method="example")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, method="example")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, method="example")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, method="example")
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
+    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="example")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, which="example")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, which="example")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, which="example")
 
     #########################################################################
     # Training
     #########################################################################
 
     gan_model = WassersteinGAN(
-        generator=generator, adversariat=discriminator,
+        generator=generator, adversariat=critic,
         z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
         feature_layer=discriminator.hidden_part,
         optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     )
 
     # gan_model = LRGAN(
-    #     generator=generator, adversariat=adversariat, encoder=encoder,
+    #     generator=generator, adversariat=discriminator, encoder=encoder,
     #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
     #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
     # )
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     # gan_model = AAE(
     #     encoder=encoder, generator=generator,
-    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", method="example"),
+    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example"),
     #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/AAE",
     #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
     # )

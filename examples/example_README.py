@@ -1,29 +1,30 @@
-mode = "unsupervised"
+mode = "supervised"
 
 if mode == "unsupervised":
     from vegans.GAN import WassersteinGAN
     import vegans.utils.utils as utils
     import vegans.utils.loading as loading
 
-    datapath =  "./data/mnist/"
-    X_train, y_train, X_test, y_test = (
-        loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
-    )
+    # Data preparation
+    datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
     x_dim = X_train.shape[1:] # [nr_channels, height, width]
     z_dim = 64
 
     # Define your own architectures here. You can use a Sequential model or an object
-    # inheriting from torch.nn.Module.
-    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim)
-    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic")
+    # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
 
     gan = WassersteinGAN(
         generator=generator, adversariat=critic,
         z_dim=z_dim, x_dim=x_dim, folder=None
     )
     gan.summary() # optional, shows architecture
+
+    # Training
     gan.fit(X_train, enable_tensorboard=False)
 
     # Vizualise results
@@ -45,10 +46,9 @@ elif mode == "supervised":
     from vegans.GAN import ConditionalWassersteinGAN
     from sklearn.preprocessing import OneHotEncoder # Download sklearn
 
-    datapath =  "./data/mnist/"
-    X_train, y_train, X_test, y_test = (
-        loading.load_mnist(datapath, normalize=True, pad=2, return_datasets=False)
-    )
+    # Data preparation
+    datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
     one_hot_encoder = OneHotEncoder(sparse=False)
@@ -60,9 +60,9 @@ elif mode == "supervised":
     z_dim = 64
 
     # Define your own architectures here. You can use a Sequential model or an object
-    # inheriting from torch.nn.Module.
-    generator = loading.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
-    critic = loading.load_example_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic")
+    # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
+    generator = loading.loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="mnist")
 
     gan = ConditionalWassersteinGAN(
         generator=generator, adversariat=critic,
@@ -77,6 +77,8 @@ elif mode == "supervised":
 
     )
     gan.summary() # optional, shows architecture
+
+    # Training
     gan.fit(
         X_train, y_train, X_test, y_test,
         epochs=5, # optional

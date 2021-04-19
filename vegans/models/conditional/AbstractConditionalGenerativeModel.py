@@ -366,6 +366,9 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         losses = self.get_losses(by_epoch=by_epoch, agg=agg)
         return samples, losses
 
+    def get_fixed_labels(self):
+        return self.fixed_labels.cpu().numpy()
+
 
     #########################################################################
     # Utility functions
