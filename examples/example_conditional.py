@@ -25,8 +25,8 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
+    root = "./data/"
+    X_train, y_train, X_test, y_test = loading.load_data(root, which="mnist", download=True)
 
     epochs = 3
     batch_size = 32
@@ -57,10 +57,11 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
-        ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
+        # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
+        # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
