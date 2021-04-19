@@ -238,27 +238,31 @@ All this results should be taken with a grain of salt. They were not extensively
 
   - New links to correct github files
 
-  - DataLoader from torchvision.datasets
-
   - Turn off secure mode
 
   - Interpolation
 
-  - Include well defined loaders for
+  - Download
 
-    - Mnist
-    - CelebA
-    - Pix2Pix
-    - Map translation
+    - ~~Mnist~~
+  - CelebA
+    - CIFAR
+    - ~~Fashion-MNIST~~
     - ImageNet
-
-  - Do not save Discriminator
+    - LSUN
+  
+- Do not save Discriminator
 
 
 
 
 
 - Done
+  - Include well defined loaders for
+  
+    - ~~Mnist~~
+    - ~~Fashion-MNIST~~
+  - ~~DataLoader from torchvision.datasets~~
   - ~~Architectures that at least work for mnist~~
     - I~~mages to compare algorithms~~
     - ~~Note number params / training time~~

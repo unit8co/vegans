@@ -7,7 +7,7 @@ if mode == "unsupervised":
 
     # Data preparation
     datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
     x_dim = X_train.shape[1:] # [nr_channels, height, width]
@@ -48,7 +48,7 @@ elif mode == "supervised":
 
     # Data preparation
     datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
     X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
     X_test = X_test.reshape((-1, 1, 32, 32))
     one_hot_encoder = OneHotEncoder(sparse=False)

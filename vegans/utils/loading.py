@@ -36,7 +36,7 @@ def load_data(root, which=None, **kwargs):
     if which.lower() in capitalize:
         which = which.upper()
     loader = eval("torchvision.datasets." + which)
-    torch_data_train = loader(root=root, **kwargs)
+    torch_data = loader(root=root, **kwargs)
 
     if which.lower() == "mnist":
         torch_data_train = loader(root=root, train=True, **kwargs)
@@ -44,7 +44,13 @@ def load_data(root, which=None, **kwargs):
         X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
-    return torch_data_train, torch_data_test
+    elif which.lower() == "fashionmnist":
+        torch_data_train = loader(root=root, train=True, **kwargs)
+        torch_data_test = loader(root=root, train=False, **kwargs)
+        X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
+        X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
+        return X_train, y_train, X_test, y_test
+    return torch_data
 
 def load_generator(x_dim, z_dim, y_dim=None, which="example"):
     available = ["example", "mnist"]

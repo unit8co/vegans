@@ -18,7 +18,7 @@ from vegans.models.unconditional.VanillaVAE import VanillaVAE
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
     lr_gen = 0.0001
     lr_adv = 0.0001
     epochs = 2

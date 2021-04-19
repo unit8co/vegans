@@ -416,7 +416,6 @@ class AbstractGenerativeModel(ABC):
             print("{}: {}".format(name, loss.item()))
 
         self.batch_training_times.append(time.perf_counter() - self.current_timer)
-        print(self.batch_training_times)
         self.total_training_time = np.sum(self.batch_training_times)
         time_per_batch = np.mean(self.batch_training_times) / print_every
 

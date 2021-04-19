@@ -19,7 +19,7 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 if __name__ == '__main__':
 
     datapath = "./data/mnist/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist")
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
     y_train = np.array([np.rot90(im) for im in X_train])
     y_test = np.array([np.rot90(im) for im in X_test])
 
