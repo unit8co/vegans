@@ -15,4 +15,5 @@
 # Sublime project files
 *.sublime*
 TrainedModels
+data
 .token
