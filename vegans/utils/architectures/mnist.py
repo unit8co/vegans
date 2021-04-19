@@ -7,46 +7,35 @@ from vegans.utils.utils import get_input_dim
 from vegans.utils.layers import LayerReshape, LayerPrintSize
 
 
-def load_mnist_data(datapath, normalize=True, pad=None, return_datasets=False):
-    """ Load the mnist data from datapath.
+def preprocess_mnist(torch_data, normalize=True, pad=None):
+    """Load the mnist data from root.
 
     Parameters
     ----------
-    datapath : TYPE
-        Path to the train and test image pickle files.
+    torch_data : TYPE
+        Original data loaded by `tochvision.datasets`
     normalize : bool, optional
         If True, data will be scaled to the interval [0, 1]
     pad : None, optional
         Integer indicating the padding applied to each side of the input images.
-    return_datasets : bool, optional
-        If True, a vegans.utils.DataSet is returned which can be passed to a torch.DataLoader
 
     Returns
     -------
-    numpy.array, vegans.utils.DataSet
-        train and test images as well as labels.
+    numpy.array
+        train and test data as well as labels.
     """
-    datapath = datapath if datapath.endswith("/") else datapath+"/"
-    with open(datapath+"train_images.pickle", "rb") as f:
-        X_train, y_train = pickle.load(f)
-    with open(datapath+"test_images.pickle", "rb") as f:
-        X_test, y_test = pickle.load(f)
+    X = torch_data.data.numpy()
+    y = torch_data.targets.numpy()
 
     if normalize:
-        max_number = X_train.max()
-        X_train = X_train / max_number
-        X_test = X_test / max_number
+        max_number = X.max()
+        X = X / max_number
+        y = y / max_number
 
     if pad:
-        X_train = np.pad(X_train, [(0, 0), (pad, pad), (pad, pad)], mode='constant')
-        X_test = np.pad(X_test, [(0, 0), (pad, pad), (pad, pad)], mode='constant')
+        X = np.pad(X, [(0, 0), (pad, pad), (pad, pad)], mode='constant')
 
-    if return_datasets:
-        train = DataSet(X_train, y_train)
-        test = DataSet(X_test, y_test)
-        return(train, test)
-    return X_train, y_train, X_test, y_test
-
+    return X, y
 
 def load_mnist_generator(x_dim, z_dim, y_dim=None):
     """ Load some mnist architecture for the generator.
