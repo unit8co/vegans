@@ -270,7 +270,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 batch += 1
                 step = epoch*max_batches + batch
                 X = X.to(self.device).float()
-                y = y.to(self.device)
+                y = y.to(self.device).float()
                 Z = self.sample(n=len(X))
                 for name, _ in self.neural_nets.items():
                     for _ in range(self.steps[name]):
@@ -456,10 +456,9 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     def __call__(self, y, z=None):
         if z is None:
             z = self.sample(n=len(y))
-
         if not isinstance(y, torch.Tensor):
             y = torch.from_numpy(y).to(self.device)
-        inpt = self.concatenate(z, y).float()
+        inpt = self.concatenate(z, y).float().to(self.device)
         sample = self._Z_transformer(inpt)
         if self._is_training:
             return sample

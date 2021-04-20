@@ -17,6 +17,7 @@ from vegans.models.conditional.ConditionalEBGAN import ConditionalEBGAN
 from vegans.models.conditional.ConditionalKLGAN import ConditionalKLGAN
 from vegans.models.conditional.ConditionalVAEGAN import ConditionalVAEGAN
 from vegans.models.conditional.ConditionalPix2Pix import ConditionalPix2Pix
+from vegans.models.conditional.ConditionalCycleGAN import ConditionalCycleGAN
 from vegans.models.conditional.ConditionalBicycleGAN import ConditionalBicycleGAN
 from vegans.models.conditional.ConditionalVanillaGAN import ConditionalVanillaGAN
 from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVAE

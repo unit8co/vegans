@@ -277,18 +277,22 @@ All this results should be taken with a grain of salt. They were not extensively
 
 - GAN Implementations (sorted by priority)
   - InfoGAN
-  - CycleGAN
   - BEGAN
   - WassersteinGAN SpectralNorm
   - DiscoGAN
+  - Stacked GAN [here](https://arxiv.org/abs/1612.03242)
+  - Progressive Gowing GAN [here](https://arxiv.org/abs/1710.10196)
 - Layers
-  - Inception
+  - Inception Block
   - Residual Block
   - Minibatch discrimination
+  - Instance normalization
 - Other
 
-  - New links to correct github files	
+  - New links to correct github files
+  - Train on CIFAR10	
   - Interpolation
+  - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
   - Do not save Discriminator
 
 
@@ -296,6 +300,7 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
+  - ~~CycleGAN~~
   - ~~Turn off secure mode~~
   - ~~Describe custom parameters~~
   - ~~plot images for 3d channels if possible else make it work for only one channel~~

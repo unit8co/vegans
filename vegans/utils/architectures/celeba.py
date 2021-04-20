@@ -6,9 +6,9 @@ import pandas as pd
 import torch.nn as nn
 
 from PIL import Image
-from vegans.utils.utils import get_input_dim
 from torch.utils.data import DataLoader, Dataset
 from vegans.utils.layers import LayerReshape, LayerPrintSize
+from vegans.utils.utils import get_input_dim, invert_channel_order
 
 def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
     """ Loader for the CelebA dataset.
@@ -69,6 +69,7 @@ def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
             return targets[:, :10]
 
         def _transform_data(self, data):
+            data = invert_channel_order(images=data)
             return data.reshape((-1, *self.image_shape)) / 255
 
     train_dataloader = DataLoader(DataSet(root=root, max_loaded_images=max_loaded_images), batch_size=batch_size, **kwargs)

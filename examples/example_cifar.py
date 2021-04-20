@@ -26,10 +26,7 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 if __name__ == '__main__':
 
     datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
-    # X_train, y_train, X_test, y_test = loading.load_data(datapath, which="CelebA", batch_size=2)
-    # print(X_train.shape, y_train.shape, y_test.shape, y_test.shape)
-    # raise
+    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="cifar", download=True)
 
     epochs = 3
     batch_size = 32

@@ -30,7 +30,6 @@ def preprocess_mnist(torch_data, normalize=True, pad=None):
     if normalize:
         max_number = X.max()
         X = X / max_number
-        y = y / max_number
 
     if pad:
         X = np.pad(X, [(0, 0), (pad, pad), (pad, pad)], mode='constant')

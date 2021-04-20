@@ -15,7 +15,9 @@ from vegans.utils.architectures.example import (
 from vegans.utils.architectures.celeba import (
     preprocess_celeba
 )
-
+from vegans.utils.architectures.cifar import (
+    preprocess_cifar
+)
 
 def load_data(root, which=None, **kwargs):
     """ Wrapper around torchvision.datasets with certain preprocessing steps
@@ -34,27 +36,30 @@ def load_data(root, which=None, **kwargs):
     np.array
         Numpy array or torch dataset with train and test data.
     """
-    available = ["MNIST", "FashionMNIST", "CelebA"]
+    available = ["MNIST", "FashionMNIST", "CelebA", "CIFAR"]
     root = root if root.endswith("/") else root+"/"
     which = which.replace("mnist", "MNIST")
 
-    if which == "MNIST":
+    if which.lower() == "mnist":
         loader = eval("torchvision.datasets." + which)
         torch_data_train = loader(root=root, train=True, **kwargs)
         torch_data_test = loader(root=root, train=False, **kwargs)
         X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
-    elif which == "FashionMNIST":
+    elif which.lower() == "fashionmnist":
         loader = eval("torchvision.datasets." + which)
         torch_data_train = loader(root=root, train=True, **kwargs)
         torch_data_test = loader(root=root, train=False, **kwargs)
         X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
-    elif which == "CelebA":
+    elif which.lower() == "celeba":
         train_dataloader = preprocess_celeba(root=root, **kwargs)
         return train_dataloader
+    elif which.lower() == "cifar":
+        X_train, y_train, X_test, y_test = preprocess_cifar(root=root, normalize=True, pad=0)
+        return X_train, y_train, X_test, y_test
     else:
         raise ValueError("`which` must be one of {}.".format(available))
 

@@ -230,3 +230,31 @@ def create_gif(source_path, target_path=None):
     if target_path is None:
         target_path = source_path+"movie.gif"
     imageio.mimsave(target_path, images)
+
+
+def invert_channel_order(images):
+    assert len(images.shape) == 4, "`images` must be of shape [batch_size, nr_channels, height, width]. Given: {}.".format(images.shape)
+    assert images.shape[1] == 3 or images.shape[3] == 3, (
+        "`images` must have 3 colour channels at second or fourth shape position. Given: {}.".format(images.shape)
+    )
+    inverted_images = []
+
+    if images.shape[1] == 3:
+        image_y = images.shape[2]
+        image_x = images.shape[3]
+        for i, image in enumerate(images):
+            red_channel = image[0].reshape(image_y, image_x)
+            green_channel = image[1].reshape(image_y, image_x)
+            blue_channel = image[2].reshape(image_y, image_x)
+            image = np.stack((red_channel, green_channel, blue_channel), axis=-1)
+            inverted_images.append(image)
+    elif images.shape[3] == 3:
+        image_y = images.shape[1]
+        image_x = images.shape[2]
+        for i, image in enumerate(images):
+            red_channel = image[:, :, 0].reshape(image_y, image_x)
+            green_channel = image[:, :, 1].reshape(image_y, image_x)
+            blue_channel = image[:, :, 2].reshape(image_y, image_x)
+            image = np.stack((red_channel, green_channel, blue_channel), axis=0)
+            inverted_images.append(image)
+    return np.array(inverted_images)
