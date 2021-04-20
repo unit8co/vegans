@@ -256,7 +256,7 @@ class AbstractGenerativeModel(ABC):
                     x_test_batch = iter(X_test).next()
                     y_test_batch = None
         else:
-            x_test_batch = X_test[:batch_size]
+            x_test_batch = X_test[:batch_size] if X_test is not None else None
             y_test_batch = y_test[:batch_size] if y_test is not None else None
 
         return x_train_batch, y_train_batch, x_test_batch, y_test_batch
@@ -372,7 +372,6 @@ class AbstractGenerativeModel(ABC):
                 "Return value from train_dataloader has wrong shape. Should return object of size batch_size. " +
                 "Did you pass a dataloader to `X_train` containing labels as well?"
             )
-        raise
         self.train()
         if save_images_every is not None:
             self._log_images(images=self.generate(z=self.fixed_noise), step=0, writer=writer_train)

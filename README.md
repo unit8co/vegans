@@ -27,17 +27,17 @@ import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
 # Data preparation
-root =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
-X_train, y_train, X_test, y_test = loading.load_data(root, which="mnist")
-X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
-X_test = X_test.reshape((-1, 1, 32, 32))
-x_dim = X_train.shape[1:] # [nr_channels, height, width]
+datapath =  "./data/mnist/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
+X_train = X_train.reshape((-1, 32, 32, 1)) # required shape
+X_test = X_test.reshape((-1, 32, 32, 1))
+x_dim = X_train.shape[1:] # [height, width, nr_channels]
 z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
-generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="mnist")
-critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="mnist")
+generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
+critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
 
 gan = WassersteinGAN(
     generator=generator, adversariat=critic,
@@ -129,7 +129,7 @@ critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_typ
 gan = ConditionalWassersteinGAN(
     generator=generator, adversariat=critic,
     z_dim=z_dim, x_dim=x_dim, y_dim=y_dim,
-    folder=None, # optional, needed if results should be saved
+    folder=None, # optional
     optim={"Generator": torch.optim.RMSprop, "Adversariat": torch.optim.Adam}, # optional
     optim_kwargs={"Generator": {"lr": 0.0001}, "Adversariat": {"lr": 0.0001}}, # optional
     fixed_noise_size=32, # optional
@@ -146,23 +146,26 @@ gan.fit(
     epochs=5, # optional
     batch_size=32, # optional
     steps={"Generator": 1, "Adversariat": 5}, # optional
-    print_every="0.1e", # optional, print 10 times per eoch
+    print_every="0.1e", # optional
     save_model_every=None, # optional
     save_images_every=None, # optional
-    save_losses_every="0.1e", # optional, saved 10 times per eoch
+    save_losses_every="0.1e", # optional
     enable_tensorboard=False # optional
 )
 
 # Vizualise results
 images, losses = gan.get_training_results()
-images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
-utils.plot_images(images, labels=np.argmax(gan.get_fixed_labels(), axis=1))
+images = images.reshape(-1, 32, 32) # remove nr_channels for plotting
+utils.plot_images(images, labels=np.argmax(gan.fixed_labels.cpu().numpy(), axis=1))
 utils.plot_losses(losses)
 ```
 
 ### Slightly More Details:
 
+#### Constructor arguments
+
 All of the GAN objects inherit from a `AbstractGenerativeModel` base class. and allow for the following input in the constructor.
+
 * `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
 * `optim_kwargs`:  The optimizer default arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
 * `feature_layer`: If not None, it should be a layer of the discriminator of critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
@@ -170,6 +173,8 @@ All of the GAN objects inherit from a `AbstractGenerativeModel` base class. and 
 * `device`: "cuda" (GPU) or "cpu" depending on the available resources.
 * `folder`: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.
 * `ngpu`: Number of gpus used during training
+
+#### fit() arguments
 
 The fit function takes the following optional arguments:
 
@@ -182,23 +187,37 @@ The fit function takes the following optional arguments:
 - `save_losses_every`: Determines after how many batches the losses should be calculated and saved. Figure is shown after `save_images_every` . String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: "1e"
 - `enable_tensorboard`: Determines after how many batches a message should be printed to the console informing about the current state of training. Tensorboard information will be saved in subdirectory `save.folder`+"/tensorboard".  Default: True
 
-All of the GAN objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`.  
+All of the GAN objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`.
 
-Useful methods of all models are:
+
+
+#### GAN methods:
 
 - `generate(z=None, n=None)`: Generate samples from noise vector or generate "n" samples.
+
 - `get_hyperparameters()`: Get dictionary containing important hyperparameters.
+
 - `get_losses(by_epoch=False, agg=None)`: Return a dictionary of logged losses. Number of elements determined by the `save_losses_every` parameter passed to the `fit` method.
+
 - `get_number_params()`: Get the number of parameters per network.
+
 - `get_training_results(by_epoch=False, agg=None)`: Returns the samples generated from the `fixed_noise` attribute and the logged losses.
+
 - `load(path)`: Load a trained model.
+
 - `predict(x)`: Use the adversariat to predict the realness of an image.
+
 - `sample(n)`: Sample a noise vector of size n.
+
 - `save(name=None)`: Save the model.
+
 - `summary(save=False)`: Print a summary of the model containing the number of parameters and general structure.
+
 - `to(device)`: Map all networks to a common device. Should be done before training.
 
-Useful attributes of all models are:
+
+
+#### GAN attributes
 
 - `feature_layer`: Function to calculate feature loss with. If None no feature loss is computed. If not None the feature loss overwrites the "normal" generator loss.
 - `fixed_noise`, (`fixed_noise_labels`): Noise vector sampled before training and used to generate the images in the created subdirectory (if `save_images_every` in the `fit` mehtod is not None). Also used to produce the results from `get_training_results()`.
@@ -268,6 +287,7 @@ All this results should be taken with a grain of salt. They were not extensively
 - Other
 
   - New links to correct github files
+  - plot images for 3d channels if possible else make it work for only one channel
   - Turn off secure mode
   - Interpolation
   - Do not save Discriminator
