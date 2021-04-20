@@ -26,21 +26,14 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 if __name__ == '__main__':
 
     datapath = "./data/"
-    train_dataloader = loading.load_data(datapath, which="CelebA", batch_size=32)
-    # import matplotlib.pyplot as plt
-    # for X, y in train_dataloader:
-    #     plt.imshow(X[0, :, :, 0])
-    #     plt.show()
-    # raise
-
-    X_train, y_train = iter(train_dataloader).next()
+    train_dataloader = loading.load_data(datapath, which="CelebA", batch_size=8)
 
     epochs = 3
-    batch_size = 32
 
+    X_train, y_train = iter(train_dataloader).next()
     x_dim = X_train.numpy().shape[1:]
     y_dim = y_train.numpy().shape[1:]
-    z_dim = 64
+    z_dim = 16
     gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
     adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
@@ -118,7 +111,7 @@ if __name__ == '__main__':
             y_train=None,
             X_test=None,
             y_test=None,
-            batch_size=batch_size,
+            batch_size=None,
             epochs=epochs,
             steps=None,
             print_every="0.2e",

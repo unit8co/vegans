@@ -287,7 +287,6 @@ All this results should be taken with a grain of salt. They were not extensively
 - Other
 
   - New links to correct github files
-  - plot images for 3d channels if possible else make it work for only one channel
   - Turn off secure mode
   - Interpolation
   - Do not save Discriminator
@@ -297,6 +296,7 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
+  - ~~plot images for 3d channels if possible else make it work for only one channel~~
   - ~~DataLoader~~
   - ~~Download~~
     - ~~Mnist~~

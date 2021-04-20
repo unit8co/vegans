@@ -115,7 +115,7 @@ class AbstractGenerativeModel(ABC):
                 "Model should either have self.generator and self.adversariat (self.TYPE = 'GAN') or \n"+
                 "self.decoder and self.encoder (self.TYPE = 'VAE')."
             )
-        self.images_produced = True if len(self._Z_transformer.output_size) > 1 else False
+        self.images_produced = True if len(self._Z_transformer.output_size) == 3 else False
         self.eval()
 
     def _define_optimizers(self, optim, optim_kwargs):
@@ -222,7 +222,7 @@ class AbstractGenerativeModel(ABC):
             train_data = utils.DataSet(X=X_train, y=y_train)
             train_dataloader = DataLoader(train_data, batch_size=batch_size)
 
-        test_dataloader = None
+        test_dataloader = X_test
         if X_test is not None and not isinstance(X_test, DataLoader):
             test_data = utils.DataSet(X=X_test, y=y_test)
             test_dataloader = DataLoader(test_data, batch_size=batch_size)
@@ -372,6 +372,7 @@ class AbstractGenerativeModel(ABC):
                 "Return value from train_dataloader has wrong shape. Should return object of size batch_size. " +
                 "Did you pass a dataloader to `X_train` containing labels as well?"
             )
+
         self.train()
         if save_images_every is not None:
             self._log_images(images=self.generate(z=self.fixed_noise), step=0, writer=writer_train)
@@ -477,23 +478,26 @@ class AbstractGenerativeModel(ABC):
         self.current_timer = time.perf_counter()
 
     def _log_images(self, images, step, writer):
-        assert len(self.x_dim) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self._X_transformer.input_size)
-        )
-        if writer is not None:
-            grid = make_grid(images)
-            writer.add_image('images', grid, step)
+        if self.images_produced:
+            if writer is not None:
+                grid = make_grid(images)
+                writer.add_image('images', grid, step)
 
-        fig, axs = self._build_images(images)
-        plt.savefig(self.folder+"images/image_{}.png".format(step))
-        plt.close()
-        print("Images logged.")
+            fig, axs = self._build_images(images)
+            if fig is not None:
+                plt.savefig(self.folder+"images/image_{}.png".format(step))
+                plt.close()
+            print("Images logged.")
 
     @staticmethod
     def _build_images(images):
         images = images.detach().cpu().numpy()
-        if len(images.shape) == 4:
-            images = images.reshape((-1, *images.shape[-2:]))
+        if images.shape[1] == 1:
+            images = images[:, 0, :, :]
+        elif images.shape[1] == 3:
+            images = images.reshape((-1, images.shape[2], images.shape[3], 3))
+        else:
+            return None, None
         nrows = int(np.sqrt(len(images)))
         ncols = len(images) // nrows
         fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 10))
