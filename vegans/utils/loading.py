@@ -53,7 +53,8 @@ def load_data(root, which=None, **kwargs):
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
     elif which == "CelebA":
-        X_train, y_train = preprocess_celeba(root=root, **kwargs)
+        train_dataloader = preprocess_celeba(root=root, **kwargs)
+        return train_dataloader
     else:
         raise ValueError("`which` must be one of {}.".format(available))
 
