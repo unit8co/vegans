@@ -12,6 +12,10 @@ from vegans.utils.architectures.example import (
     load_example_generator, load_example_adversariat, load_example_encoder,
     load_example_decoder, load_example_autoencoder
 )
+from vegans.utils.architectures.celeba import (
+    preprocess_celeba
+)
+
 
 def load_data(root, which=None, **kwargs):
     """ Wrapper around torchvision.datasets with certain preprocessing steps
@@ -30,27 +34,28 @@ def load_data(root, which=None, **kwargs):
     np.array
         Numpy array or torch dataset with train and test data.
     """
-    if which is None:
-        raise ValueError("`which` must be not None. See: https://pytorch.org/vision/0.8/datasets.html for available dataset names.")
-    capitalize = ["cifar", "emnist", "kmnist", "lsun", "mnist"]
-    if which.lower() in capitalize:
-        which = which.upper()
-    loader = eval("torchvision.datasets." + which)
-    torch_data = loader(root=root, **kwargs)
+    available = ["MNIST", "FashionMNIST", "CelebA"]
+    root = root if root.endswith("/") else root+"/"
+    which = which.replace("mnist", "MNIST")
 
-    if which.lower() == "mnist":
+    if which == "MNIST":
+        loader = eval("torchvision.datasets." + which)
         torch_data_train = loader(root=root, train=True, **kwargs)
         torch_data_test = loader(root=root, train=False, **kwargs)
         X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
-    elif which.lower() == "fashionmnist":
+    elif which == "FashionMNIST":
+        loader = eval("torchvision.datasets." + which)
         torch_data_train = loader(root=root, train=True, **kwargs)
         torch_data_test = loader(root=root, train=False, **kwargs)
         X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
         X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
         return X_train, y_train, X_test, y_test
-    return torch_data
+    elif which == "CelebA":
+        X_train, y_train = preprocess_celeba(root=root, **kwargs)
+    else:
+        raise ValueError("`which` must be one of {}.".format(available))
 
 def load_generator(x_dim, z_dim, y_dim=None, which="example"):
     available = ["example", "mnist"]

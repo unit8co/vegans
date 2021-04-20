@@ -162,7 +162,7 @@ utils.plot_losses(losses)
 
 ### Slightly More Details:
 
-All of the GAN objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator as well as discriminator networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`. In addition, you can specify some parameters supported by all GAN implementations:
+All of the GAN objects inherit from a `AbstractGenerativeModel` base class. and allow for the following input in the constructor.
 * `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
 * `optim_kwargs`:  The optimizer default arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
 * `feature_layer`: If not None, it should be a layer of the discriminator of critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
@@ -181,6 +181,8 @@ The fit function takes the following optional arguments:
 - `save_images_every`: Determines after how many batches sample images and loss curves should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Images will be saved in subdirectory `save.folder`+"/images".  Default: None
 - `save_losses_every`: Determines after how many batches the losses should be calculated and saved. Figure is shown after `save_images_every` . String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: "1e"
 - `enable_tensorboard`: Determines after how many batches a message should be printed to the console informing about the current state of training. Tensorboard information will be saved in subdirectory `save.folder`+"/tensorboard".  Default: True
+
+All of the GAN objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`.  
 
 Useful methods of all models are:
 
@@ -266,27 +268,21 @@ All this results should be taken with a grain of salt. They were not extensively
 - Other
 
   - New links to correct github files
-
   - Turn off secure mode
-
   - Interpolation
-
-  - Download
-
-    - ~~Mnist~~
-  - CelebA
-    - CIFAR
-    - ~~Fashion-MNIST~~
-    - ImageNet
-    - LSUN
-  
-- Do not save Discriminator
+  - Do not save Discriminator
 
 
 
 
 
 - Done
+  - ~~DataLoader~~
+  - ~~Download~~
+    - ~~Mnist~~
+    - ~~CelebA~~
+    - ~~CIFAR~~
+    - ~~Fashion-MNIST~~
   - ~~Update README file~~
   - ~~Include well defined loaders for~~
     - ~~Mnist~~

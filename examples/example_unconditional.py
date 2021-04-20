@@ -17,7 +17,7 @@ from vegans.models.unconditional.VanillaVAE import VanillaVAE
 
 if __name__ == '__main__':
 
-    datapath = "./data/mnist/"
+    datapath = "./data/"
     X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
     lr_gen = 0.0001
     lr_adv = 0.0001
@@ -42,59 +42,91 @@ if __name__ == '__main__':
     #########################################################################
     # Training
     #########################################################################
+    models = [
+        AAE, #BicycleGAN, EBGAN,
+        # KLGAN, LRGAN, LSGAN,
+        # Pix2Pix, VAEGAN, VanillaGAN,
+        # VanillaVAE , WassersteinGAN, WassersteinGANGP,
+    ]
 
-    gan_model = WassersteinGAN(
-        generator=generator, adversariat=critic,
-        z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
-        feature_layer=discriminator.hidden_part,
-        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
-    )
+    for model in models:
+        folder = "MyModels/{}".format(model.__name__.replace("", "c"))
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "folder": folder}
 
-    # gan_model = LRGAN(
-    #     generator=generator, adversariat=discriminator, encoder=encoder,
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
-    # )
+        if model.__name__ in ["AAE"]:
+            discriminator_aee = loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example")
+            gan_model = model(
+                generator=generator, adversariat=discriminator_aee, encoder=encoder, **kwargs
+            )
 
-    # gan_model = EBGAN(
-    #     generator=generator, decoder=autoencoder,
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/GAN",
-    #     optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}, m=np.mean(X_train)
-    # )
+        elif model.__name__ in ["BicycleGAN", "VAEGAN"]:
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="mnist")
+            gan_model = model(
+                generator=generator, adversariat=discriminator, encoder=encoder_reduced, **kwargs
+            )
 
-    # gan_model = VanillaVAE(
-    #     encoder=encoder, decoder=decoder,
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/VAEGAN"
-    # )
+        elif model.__name__ in ["EBGAN"]:
+            m = np.mean(X_train)
+            gan_model = model(
+                generator=generator, adversariat=autoencoder, m=m, **kwargs
+            )
 
-    # gan_model = BicycleGAN(
-    #     encoder=encoder, generator=generator, adversariat=discriminator,
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/VAEGAN",
-    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
-    # )
+        elif model.__name__ in ["KLGAN", "LSGAN", "Pix2Pix", "VanillaGAN"]:
+            gan_model = model(
+                generator=generator, adversariat=discriminator, **kwargs
+            )
 
-    # gan_model = AAE(
-    #     encoder=encoder, generator=generator,
-    #     adversariat=loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example"),
-    #     z_dim=z_dim, x_dim=x_dim, folder="TrainedModels/AAE",
-    #     optim_kwargs={"Generator": {"lr": 0.001}, "Adversariat": {"lr": 0.0005}}
-    # )
+        elif model.__name__ in ["LRGAN"]:
+            gan_model = model(
+                generator=generator, adversariat=discriminator, encoder=encoder, **kwargs
+            )
 
-    gan_model.summary(save=True)
-    gan_model.fit(
-        X_train=X_train,
-        X_test=X_test,
-        batch_size=batch_size,
-        epochs=epochs,
-        steps={"Generator": 1, "Adversariat": 3},
-        print_every=100,
-        save_model_every=None,
-        save_images_every="0.25e",
-        save_losses_every=1,
-        enable_tensorboard=True
-    )
-    samples, losses = gan_model.get_training_results(by_epoch=False)
-    utils.plot_images(images=samples.reshape(-1, 32, 32))
-    utils.plot_losses(losses=losses)
-    # gan_model.save()
+        elif model.__name__ in ["VanillaVAE"]:
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="mnist")
+            gan_model = model(
+                encoder=encoder_reduced, decoder=decoder, **kwargs
+            )
 
+        elif model.__name__ in ["WassersteinGAN", "WassersteinGANGP"]:
+            gan_model = model(
+                generator=generator, adversariat=critic, **kwargs
+            )
+
+        else:
+            raise NotImplementedError("{} no yet implemented in logical gate.".format(model.__name__))
+
+        gan_model.summary(save=True)
+        gan_model.fit(
+            X_train=X_train,
+            X_test=X_test,
+            batch_size=batch_size,
+            epochs=epochs,
+            steps=None,
+            print_every="0.2e",
+            save_model_every=None,
+            save_images_every="0.2e",
+            save_losses_every=10,
+            enable_tensorboard=False
+        )
+        samples, losses = gan_model.get_training_results(by_epoch=False)
+
+        training_time = np.round(gan_model.total_training_time/60, 2)
+        title = "Epochs: {}, z_dim: {}, Time trained: {} minutes\nParams: {}\n\n".format(
+            epochs, z_dim, training_time, gan_model.get_number_params()
+        )
+        fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
+        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
+        fig.suptitle(
+            title,
+            fontsize=12
+        )
+        fig.tight_layout()
+        plt.savefig(gan_model.folder+"generated_images.png")
+        fig, axs = utils.plot_losses(losses=losses, show=False)
+        fig.suptitle(
+            title,
+            fontsize=12
+        )
+        fig.tight_layout()
+        plt.savefig(gan_model.folder+"losses.png")
+        # gan_model.save()

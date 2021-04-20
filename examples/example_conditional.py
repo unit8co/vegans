@@ -27,6 +27,9 @@ if __name__ == '__main__':
 
     datapath = "./data/"
     X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
+    # X_train, y_train, X_test, y_test = loading.load_data(datapath, which="CelebA", batch_size=2)
+    # print(X_train.shape, y_train.shape, y_test.shape, y_test.shape)
+    # raise
 
     epochs = 3
     batch_size = 32
@@ -61,11 +64,11 @@ if __name__ == '__main__':
         # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
         # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalEBGAN, ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
-        folder = "TrainedModels/{}".format(model.__name__.replace("Conditional", "c"))
+        folder = "MyModels/{}".format(model.__name__.replace("Conditional", "c"))
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim, "folder": folder}
 
         if model.__name__ in ["ConditionalAAE"]:

@@ -65,7 +65,12 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             X_train, y_train, X_test, y_test, epochs, batch_size, steps,
             print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
         )
-        self.fixed_labels = y_train[:self.fixed_noise_size]
+        iter_dataloader = iter(train_dataloader)
+        _, y_train = iter_dataloader.next()
+        while y_train.shape[0] < self.fixed_noise_size:
+            _, y_train2 = iter_dataloader.next()
+            y_train = torch.cat((y_train, y_train2), axis=0)
+        self.fixed_labels = y_train[:self.fixed_noise_size].cpu().numpy()
         self.fixed_labels = torch.from_numpy(self.fixed_labels).to(self.device)
         return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
 

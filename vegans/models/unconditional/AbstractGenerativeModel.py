@@ -184,7 +184,9 @@ class AbstractGenerativeModel(ABC):
     def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
         print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
 
-        self._assert_shapes(X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test)
+        train_dataloader, test_dataloader = self._set_up_data(
+            X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, batch_size=batch_size
+        )
         nr_test = 0 if X_test is None else len(X_test)
 
         writer_train = writer_test = None
@@ -193,16 +195,7 @@ class AbstractGenerativeModel(ABC):
                 "`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified."
             )
             writer_train = SummaryWriter(self.folder+"tensorboard/train/")
-
-        if not isinstance(X_train, DataLoader):
-            train_data = utils.DataSet(X=X_train, y=y_train)
-            train_dataloader = DataLoader(train_data, batch_size=batch_size)
-
-        test_dataloader = None
-        if X_test is not None:
-            test_data = utils.DataSet(X=X_test, y=y_test)
-            test_dataloader = DataLoader(test_data, batch_size=batch_size)
-            if enable_tensorboard:
+            if X_test is not None:
                 writer_test = SummaryWriter(self.folder+"tensorboard/test/")
 
         self._create_steps(steps=steps)
@@ -216,6 +209,57 @@ class AbstractGenerativeModel(ABC):
             "enable_tensorboard": enable_tensorboard, "nr_train": len(X_train), "nr_test": nr_test
         })
         return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
+
+    def _set_up_data(self, X_train, y_train, X_test, y_test, batch_size):
+        x_train_batch, y_train_batch, x_test_batch, y_test_batch = self._get_batch(
+            X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, batch_size=batch_size
+        )
+
+        self._assert_shapes(X_train=x_train_batch, y_train=y_train_batch, X_test=x_test_batch, y_test=y_test_batch)
+
+        train_dataloader = X_train
+        if not isinstance(X_train, DataLoader):
+            train_data = utils.DataSet(X=X_train, y=y_train)
+            train_dataloader = DataLoader(train_data, batch_size=batch_size)
+
+        test_dataloader = None
+        if X_test is not None and not isinstance(X_test, DataLoader):
+            test_data = utils.DataSet(X=X_test, y=y_test)
+            test_dataloader = DataLoader(test_data, batch_size=batch_size)
+
+        return train_dataloader, test_dataloader
+
+    def _get_batch(self, X_train, y_train, X_test, y_test, batch_size):
+        if isinstance(X_train, DataLoader):
+            assert y_train is None, (
+                "If `X_train` is of type torch.utils.data.DataLoader, `y_train` must be None. The dataloader must " +
+                "return values for X and y when iterating."
+            )
+            try:
+                x_train_batch, y_train_batch = iter(X_train).next()
+            except ValueError:
+                x_train_batch = iter(X_train).next()
+                y_train_batch = None
+        else:
+            x_train_batch = X_train[:batch_size]
+            y_train_batch = y_train[:batch_size] if y_train is not None else None
+
+        if isinstance(X_test, DataLoader):
+            assert y_test is None, (
+                "If `X_test` is of type torch.utils.data.DataLoader, `y_test` must be None. The dataloader must " +
+                "return values for X and y when iterating."
+            )
+            if X_test is not None:
+                try:
+                    x_test_batch, y_test_batch = iter(X_test).next()
+                except ValueError:
+                    x_test_batch = iter(X_test).next()
+                    y_test_batch = None
+        else:
+            x_test_batch = X_test[:batch_size]
+            y_test_batch = y_test[:batch_size] if y_test is not None else None
+
+        return x_train_batch, y_train_batch, x_test_batch, y_test_batch
 
     def _assert_shapes(self, X_train, y_train, X_test, y_test):
         assert len(X_train.shape) == 2 or len(X_train.shape) == 4, (
@@ -322,7 +366,13 @@ class AbstractGenerativeModel(ABC):
         max_batches = len(train_dataloader)
         test_x_batch = iter(test_dataloader).next().to(self.device).float() if X_test is not None else None
         print_every, save_model_every, save_images_every, save_losses_every = save_periods
-
+        train_x_batch = iter(train_dataloader).next()
+        if len(train_x_batch) != batch_size:
+            raise ValueError(
+                "Return value from train_dataloader has wrong shape. Should return object of size batch_size. " +
+                "Did you pass a dataloader to `X_train` containing labels as well?"
+            )
+        raise
         self.train()
         if save_images_every is not None:
             self._log_images(images=self.generate(z=self.fixed_noise), step=0, writer=writer_train)
