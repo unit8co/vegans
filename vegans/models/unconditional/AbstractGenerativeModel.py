@@ -119,6 +119,21 @@ class AbstractGenerativeModel(ABC):
         self.eval()
 
     def _define_optimizers(self, optim, optim_kwargs):
+        """ Define the optimizers dictionary.
+
+        After this step self.optimizers must exist and be of the form
+        {"Network1": optimizer1, "Network2": optimizer2, ...}
+
+        Parameters
+        ----------
+        optim : torch.optim or dict
+            If dict, must be of form {"Network1": torch.optim1, "Network2": torch.optim2, ...}. If one network is
+            not specified as a key of the dictionary the default optimizer (self._default_optimizer()) will be
+            fetched.
+        optim_kwargs : dict
+            If dict, must be of form {"Network1": optim_kwargs1, "Network2": optim_kwargs1, ...}. If one network is
+            not specified as a key of the dictionary no arguments = {} are passed.
+        """
         self._opt_kwargs = {}
         for name, _ in self.neural_nets.items():
             self._opt_kwargs[name] = {}
@@ -147,6 +162,24 @@ class AbstractGenerativeModel(ABC):
             self.optimizers[name] = self._opt[name](params=network.parameters(), **self._opt_kwargs[name])
 
     def _check_dict_keys(self, param_dict, where):
+        """ Checks if `param_dict` has the correct form.
+
+        The correct form is {"Network1": value1, "Network2": value2, ...} for every network.
+        This utility function checks if every network in `self.neural_nets` has an entry in `param_dict`
+        and if every entry in `param_dict` exits in `self.neural_nets`.
+
+        Parameters
+        ----------
+        param_dict : TYPE
+            Parameter dictionary
+        where : TYPE
+            Specifies the location from which the function is called for meaningful `KeyError`.
+
+        Raises
+        ------
+        KeyError
+            If `param_dict` is not of the specified form.
+        """
         for name, _ in param_dict.items():
             if name not in self.neural_nets:
                 available_nets = [name for name, _ in self.neural_nets.items()]
@@ -312,6 +345,8 @@ class AbstractGenerativeModel(ABC):
         return print_every, save_model_every, save_images_every, save_losses_every
 
     def _string_to_batchnr(self, log_string, nr_batches, name):
+        """ Transforms string of the form "0.2e" into 0.2 and performs basic sanity checks.
+        """
         if isinstance(log_string, str):
             assert log_string.endswith("e"), "If `{}` is string, must end with 'e' (for epoch), e.g. 0.25e.".format(name)
             save_epochs = float(log_string.split("e")[0])
@@ -426,6 +461,20 @@ class AbstractGenerativeModel(ABC):
         pass
 
     def _calculate_feature_loss(self, X_real, X_fake):
+        """ Calculates feature loss if `self.feature_layer` is not None.
+
+        Every network takes the `feature_layer` argument in its constructor.
+        If it is not None, a layer of the discriminator / critic should be specified.
+        A feature loss will be calculated which is the MSE between the output for real
+        and fake samples of the specified `self.feature_layer`.
+
+        Parameters
+        ----------
+        X_real : TYPE
+            Real samples.
+        X_fake : TYPE
+            Fake samples.
+        """
         X_real_features = self.feature_layer(X_real)
         X_fake_features = self.feature_layer(X_fake)
         feature_loss = MSELoss()(X_real_features, X_fake_features)
@@ -455,6 +504,21 @@ class AbstractGenerativeModel(ABC):
     # Logging during training
     #########################################################################
     def _summarise_batch(self, batch, max_batches, epoch, max_epochs, print_every):
+        """ Print summary statistics after a specified amount of batches.
+
+        Parameters
+        ----------
+        batch : int
+            Current batch.
+        max_batches : int
+            Maximum number of total batches.
+        epoch : int
+            Current epoch.
+        max_epochs : int
+            Maximum number of total epochs.
+        print_every : int
+            After how many batches the summary should be printed.
+        """
         step = epoch*max_batches + batch
         max_steps = max_epochs*max_batches
         remaining_batches = max_epochs*max_batches - step
