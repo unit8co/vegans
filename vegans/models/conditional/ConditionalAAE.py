@@ -12,6 +12,8 @@ Losses:
     - Adversariat: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - lambda_z: Weight for the discriminator loss computing the realness of the latent z dimension.
 
 References
 ----------
@@ -49,39 +51,43 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
             fixed_noise_size=32,
             device=None,
             folder="./CAAE",
-            ngpu=0):
+            ngpu=0,
+            secure=True):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         adv_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
-        AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-        AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=z_dim, y_dim=y_dim, name="Adversariat")
+        if secure:
+            AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
+            AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
+            AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=z_dim, y_dim=y_dim, name="Adversariat")
         self.adv_type = adv_type
-        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
-        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
+        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu, secure=secure)
+        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
         self.autoencoder = Autoencoder(self.encoder, self.generator)
-        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, device=device, ngpu=ngpu, adv_type=adv_type)
+        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
         self.neural_nets = {
             "Generator": self.generator, "Encoder": self.encoder, "Adversariat": self.adversariat
         }
 
         super().__init__(
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
 
         self.lambda_z = lambda_z
         self.hyperparameters["lambda_z"] = lambda_z
         self.hyperparameters["adv_type"] = adv_type
-        assert (self.encoder.output_size == self.z_dim), (
-            "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
-        )
-        assert (self.generator.output_size == self.x_dim), (
-            "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-        )
+
+        if self.secure:
+            assert (self.encoder.output_size == self.z_dim), (
+                "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
+            )
+            assert (self.generator.output_size == self.x_dim), (
+                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
+            )
 
     def _default_optimizer(self):
         return torch.optim.Adam

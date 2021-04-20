@@ -10,6 +10,8 @@ Losses:
     - Autoencoder: L2 (Mean Squared Error)
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - m: Cut off for the hinge loss. Look at reference for more information.
 
 References
 ----------
@@ -33,12 +35,13 @@ class EBGAN(AbstractGAN1v1):
             z_dim,
             optim=None,
             optim_kwargs=None,
-            m=0,
+            m=None,
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./EBGAN",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -46,12 +49,14 @@ class EBGAN(AbstractGAN1v1):
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
-            device=device, folder=folder, ngpu=ngpu
+            device=device, folder=folder, ngpu=ngpu, secure=secure
         )
-        assert self.adversariat.output_size == x_dim, (
-            "AutoEncoder structure used for adversariat. Output dimensions must equal x_dim. " +
-            "Output: {}. x_dim: {}.".format(self.adversariat.output_size, x_dim)
-        )
+
+        if self.secure:
+            assert self.adversariat.output_size == x_dim, (
+                "AutoEncoder structure used for adversariat. Output dimensions must equal x_dim. " +
+                "Output: {}. x_dim: {}.".format(self.adversariat.output_size, x_dim)
+            )
         self.m = m
         self.hyperparameters["m"] = m
 

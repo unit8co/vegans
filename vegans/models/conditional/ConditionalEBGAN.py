@@ -10,6 +10,8 @@ Losses:
     - Autoencoder: L2 (Mean Squared Error)
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - m: Cut off for the hinge loss. Look at reference for more information.
 
 References
 ----------
@@ -32,34 +34,46 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1):
             x_dim,
             z_dim,
             y_dim,
-            m,
             optim=None,
             optim_kwargs=None,
+            m=None,
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CEBGAN",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
             z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, adv_type="AutoEncoder",
             optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
-            device=device, folder=folder, ngpu=ngpu
-        )
-        assert self.adversariat.output_size == x_dim, (
-            "AutoEncoder structure used for adversariat. Output dimensions must equal x_dim. " +
-            "Output: {}. x_dim: {}.".format(self.adversariat.output_size, x_dim)
+            device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.m = m
         self.hyperparameters["m"] = m
+
+        if self.secure:
+            assert self.adversariat.output_size == x_dim, (
+                "AutoEncoder structure used for adversariat. Output dimensions must equal x_dim. " +
+                "Output: {}. x_dim: {}.".format(self.adversariat.output_size, x_dim)
+            )
 
     def _default_optimizer(self):
         return torch.optim.Adam
 
     def _define_loss(self):
         self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
+
+    def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
+        print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
+        super()._set_up_training(
+            X_train, y_train, X_test, y_test, epochs, batch_size, steps,
+            print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
+        )
+        if self.m is None:
+            self.m = np.mean(X_train)
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)

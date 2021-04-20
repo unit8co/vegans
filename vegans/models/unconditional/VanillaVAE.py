@@ -10,6 +10,8 @@ Losses:
     - Decoder: L2 (Mean Squared Error)
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
 
 References
 ----------
@@ -41,12 +43,13 @@ class VanillaVAE(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             folder="./VanillaVAE",
-            ngpu=0):
+            ngpu=0,
+            secure=True):
 
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu)
-        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu)
+        self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
+        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
         self.autoencoder = Autoencoder(self.encoder, self.decoder)
         self.neural_nets = {
             "Autoencoder": self.autoencoder
@@ -55,7 +58,7 @@ class VanillaVAE(AbstractGenerativeModel):
 
         super().__init__(
             x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
@@ -68,14 +71,16 @@ class VanillaVAE(AbstractGenerativeModel):
 
         self.lambda_KL = lambda_KL
         self.hyperparameters["lambda_KL"] = lambda_KL
-        if self.encoder.output_size == self.z_dim:
-            raise ValueError(
-                "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+
+        if self.secure:
+            if self.encoder.output_size == self.z_dim:
+                raise ValueError(
+                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+                )
+            assert (self.decoder.output_size == self.x_dim), (
+                "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
             )
-        assert (self.decoder.output_size == self.x_dim), (
-            "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
-        )
 
     def _default_optimizer(self):
         return torch.optim.Adam

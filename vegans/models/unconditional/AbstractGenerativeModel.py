@@ -20,7 +20,7 @@ class AbstractGenerativeModel(ABC):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu):
+    def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu, secure):
         """The AbstractGenerativeModel is the most basic building block of VeGAN. All GAN implementation should
         at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.
 
@@ -62,6 +62,7 @@ class AbstractGenerativeModel(ABC):
         self.x_dim = tuple([x_dim]) if isinstance(x_dim, int) else tuple(x_dim)
         self.z_dim = tuple([z_dim]) if isinstance(z_dim, int) else tuple(z_dim)
         self.ngpu = ngpu if ngpu is not None else 0
+        self.secure = secure
         self.fixed_noise_size = fixed_noise_size
         self.device = device
         if self.device is None:
@@ -216,7 +217,11 @@ class AbstractGenerativeModel(ABC):
 
     def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
         print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
+        """ Create the dataloaders, SummaryWriters for tensorboard and transform the saving indicators.
 
+        This function creates all data needed during training like the data loaders and save steps.
+        It also creates the hyperparameter dictionary and the `steps` dictionary.
+        """
         train_dataloader, test_dataloader = self._set_up_data(
             X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, batch_size=batch_size
         )
@@ -244,11 +249,16 @@ class AbstractGenerativeModel(ABC):
         return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
 
     def _set_up_data(self, X_train, y_train, X_test, y_test, batch_size):
+        """ If `X_train` / `X_test` are not data loaders, create them.
+
+        Also asserts their input shapes for consistency.
+        """
         x_train_batch, y_train_batch, x_test_batch, y_test_batch = self._get_batch(
             X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, batch_size=batch_size
         )
 
-        self._assert_shapes(X_train=x_train_batch, y_train=y_train_batch, X_test=x_test_batch, y_test=y_test_batch)
+        if self.secure:
+            self._assert_shapes(X_train=x_train_batch, y_train=y_train_batch, X_test=x_test_batch, y_test=y_test_batch)
 
         train_dataloader = X_train
         if not isinstance(X_train, DataLoader):
@@ -263,6 +273,8 @@ class AbstractGenerativeModel(ABC):
         return train_dataloader, test_dataloader
 
     def _get_batch(self, X_train, y_train, X_test, y_test, batch_size):
+        """ Returns the first batch of the training and testing data for the consistency checks.
+        """
         if isinstance(X_train, DataLoader):
             assert y_train is None, (
                 "If `X_train` is of type torch.utils.data.DataLoader, `y_train` must be None. The dataloader must " +
@@ -309,6 +321,18 @@ class AbstractGenerativeModel(ABC):
             )
 
     def _create_steps(self, steps):
+        """ Creates the `self.steps` dictionary.
+
+        The created dictionary must be of the form {"Network1": steps1, "Network2": steps2, ...}. During training
+        "Network1" will be trained for `steps1` steps, and so on.
+        Functionality similar to `self_define_optimizers()`.
+
+        Parameters
+        ----------
+        steps : None, dict
+            If not None a dictionary of the form {"Network1": steps1, "Network2": steps2, ...} is expected.
+            This dictionary might also be partially filled.
+        """
         self.steps = {}
         for name, neural_net in self.neural_nets.items():
             self.steps[name] = 1
@@ -324,6 +348,13 @@ class AbstractGenerativeModel(ABC):
             self._check_dict_keys(self.steps, where="_create_steps")
 
     def _set_up_saver(self, print_every, save_model_every, save_images_every, save_losses_every, nr_batches):
+        """ Calculates saving indicators if strings are passed. Additionally corresponding folders are created
+        in `self.folder`.
+
+        Returns
+        -------
+        Returns all saving indicators as integers.
+        """
         print_every = self._string_to_batchnr(log_string=print_every, nr_batches=nr_batches, name="print_every")
         if save_model_every is not None:
             save_model_every = self._string_to_batchnr(log_string=save_model_every, nr_batches=nr_batches, name="save_model_every")
@@ -470,9 +501,9 @@ class AbstractGenerativeModel(ABC):
 
         Parameters
         ----------
-        X_real : TYPE
+        X_real : torch.Tensor
             Real samples.
-        X_fake : TYPE
+        X_fake : torch.Tensor
             Fake samples.
         """
         X_real_features = self.feature_layer(X_real)
@@ -555,6 +586,18 @@ class AbstractGenerativeModel(ABC):
 
     @staticmethod
     def _build_images(images):
+        """ Build matplotlib figure containing all images.
+
+        Parameters
+        ----------
+        images : torch.Tensor()
+            A torch Tensor containing the images to be plotted by matplotlib.
+
+        Returns
+        -------
+        fig, axs: plt.Figure, np.array
+            Objects containing the figure as well as all separate axis objects.
+        """
         images = images.detach().cpu().numpy()
         if images.shape[1] == 1:
             images = images[:, 0, :, :]
@@ -593,12 +636,16 @@ class AbstractGenerativeModel(ABC):
                 self.logged_losses["Test"][name] = []
 
     def _save_losses_plot(self):
+        """ Creates the `losses.png` plot in the `self.folder` path.
+        """
         if hasattr(self, "logged_losses"):
             fig, axs = plot_losses(self.logged_losses, show=False, share=False)
             plt.savefig(self.folder+"losses.png")
             plt.close()
 
     def _log_scalars(self, step, writer):
+        """ Log all scalars with tensorboard.
+        """
         if writer is not None:
             for name, loss in self._losses.items():
                 writer.add_scalar("Loss/{}".format(name), loss.item(), step)

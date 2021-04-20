@@ -173,6 +173,7 @@ All of the GAN objects inherit from a `AbstractGenerativeModel` base class. and 
 * `device`: "cuda" (GPU) or "cpu" depending on the available resources.
 * `folder`: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.
 * `ngpu`: Number of gpus used during training
+* `secure`: By default, VeGANs performs plenty of checks on inputs and outputs for all networks (For example `encoder.output_size==z_dim`, `generator.output_size==x_dim`  or `Discriminator.last_layer==torch.nn.Sigmoid`). For some use cases these checks might be to restrictive. If `secure=False` VeGANs will perform only the most basic checks to run. Of course, if there are shape mismatches torch itself will still complain.
 
 #### fit() arguments
 
@@ -286,8 +287,7 @@ All this results should be taken with a grain of salt. They were not extensively
   - Minibatch discrimination
 - Other
 
-  - New links to correct github files
-  - Turn off secure mode
+  - New links to correct github files	
   - Interpolation
   - Do not save Discriminator
 
@@ -296,6 +296,8 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
+  - ~~Turn off secure mode~~
+  - ~~Describe custom parameters~~
   - ~~plot images for 3d channels if possible else make it work for only one channel~~
   - ~~DataLoader~~
   - ~~Download~~

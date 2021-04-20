@@ -14,6 +14,8 @@ Losses:
     - Critic: Wasserstein + Gradient penalization
 Default optimizer:
     - torch.optim.RMSprop
+Custom parameter:
+    - lambda_grad: Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.
 
 References
 ----------
@@ -46,7 +48,8 @@ class ConditionalWassersteinGANGP(AbstractConditionalGAN1v1):
             lmbda_grad=10,
             device=None,
             folder="./CWassersteinGANGP",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -55,7 +58,7 @@ class ConditionalWassersteinGANGP(AbstractConditionalGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device,
             folder=folder,
-            ngpu=ngpu
+            ngpu=ngpu, secure=secure
         )
         self.lmbda_grad = lmbda_grad
         self.hyperparameters["lmbda_grad"] = lmbda_grad

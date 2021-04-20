@@ -12,6 +12,8 @@ Losses:
     - Encoder: L1-latent-loss (Mean Absolute Error)
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
 
 References
 ----------
@@ -42,42 +44,46 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
             y_dim,
             optim=None,
             optim_kwargs=None,
-            lambda_L1=10,
+            lambda_z=10,
             adv_type="Discriminator",
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CLRGAN",
-            ngpu=0):
+            ngpu=0,
+            secure=True):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
-        AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-        AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
+        if secure:
+            AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
+            AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
+            AbstractConditionalGenerativeModel._check_conditional_network_input(adversariat, in_dim=x_dim, y_dim=y_dim, name="Adversariat")
         self.adv_type = adv_type
-        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu)
-        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu)
-        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type=adv_type, device=device, ngpu=ngpu)
+        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu, secure=secure)
+        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
+        self.adversariat = Adversariat(adversariat, input_size=adv_in_dim, adv_type=adv_type, device=device, ngpu=ngpu, secure=secure)
         self.neural_nets = {
             "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
         }
 
         super().__init__(
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
-        self.lambda_L1 = lambda_L1
-        self.hyperparameters["lambda_L1"] = lambda_L1
-        assert (self.generator.output_size == self.x_dim), (
-            "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-        )
-        assert (self.encoder.output_size == self.z_dim), (
-            "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
-        )
+        self.lambda_z = lambda_z
+        self.hyperparameters["lambda_z"] = lambda_z
+
+        if self.secure:
+            assert (self.generator.output_size == self.x_dim), (
+                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
+            )
+            assert (self.encoder.output_size == self.z_dim), (
+                "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
+            )
 
     def _default_optimizer(self):
         return torch.optim.Adam
@@ -124,11 +130,11 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel):
         latent_space_regression = self.loss_functions["L1"](
             encoded_space, Z_batch
         )
-        gen_loss = gen_loss_original + self.lambda_L1*latent_space_regression
+        gen_loss = gen_loss_original + self.lambda_z*latent_space_regression
         self._losses.update({
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
-            "Generator_L1": self.lambda_L1*latent_space_regression
+            "Generator_L1": self.lambda_z*latent_space_regression
         })
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):

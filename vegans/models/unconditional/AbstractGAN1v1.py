@@ -8,7 +8,7 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 
 class AbstractGAN1v1(AbstractGenerativeModel):
-    """ Special half abstract class for GAN with structure of one generator and
+    """ Abstract class for GAN with structure of one generator and
     one discriminator / critic. Examples are the original `VanillaGAN`, `WassersteinGAN`
     and `WassersteinGANGP`.
     """
@@ -30,19 +30,20 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             device=None,
             folder=None,
             ngpu=0,
+            secure=True,
             _called_from_conditional=False):
 
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu)
-        self.adversariat = Adversariat(adversariat, input_size=x_dim, adv_type=adv_type, device=device, ngpu=ngpu)
+        self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
+        self.adversariat = Adversariat(adversariat, input_size=x_dim, adv_type=adv_type, device=device, ngpu=ngpu, secure=secure)
         self.neural_nets = {"Generator": self.generator, "Adversariat": self.adversariat}
 
         super().__init__(
             x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
-        if not _called_from_conditional:
+        if not _called_from_conditional and self.secure:
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
@@ -52,6 +53,19 @@ class AbstractGAN1v1(AbstractGenerativeModel):
     # Actions during training
     #########################################################################
     def calculate_losses(self, X_batch, Z_batch, who=None):
+        """ Calculates the losses for GANs using a 1v1 architecture.
+
+        This method is called within the `AbstractGenerativeModel` main `fit()` loop.
+
+        Parameters
+        ----------
+        X_batch : TYPE
+            Current x batch.
+        Z_batch : TYPE
+            Current z batch.
+        who : None, optional
+            Name of the network that should be trained.
+        """
         if who == "Generator":
             self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
         elif who == "Adversariat":

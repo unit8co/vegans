@@ -11,7 +11,8 @@ Losses:
     - Discriminator: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
-
+Custom parameter:
+    - lambda_x: Weight for the reconstruction loss for the real x dimensions.
 References
 ----------
 .. [1] https://arxiv.org/abs/1611.07004
@@ -35,12 +36,13 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             y_dim,
             optim=None,
             optim_kwargs=None,
-            lambda_l1=10,
+            lambda_x=10,
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
             folder="./CPix2Pix",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -49,8 +51,8 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu
         )
-        self.lambda_l1 = 10
-        self.hyperparameters["lambda_l1"] = self.lambda_l1
+        self.lambda_x = 10
+        self.hyperparameters["lambda_x"] = self.lambda_x
 
     def _default_optimizer(self):
         return torch.optim.Adam
@@ -70,7 +72,7 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
         gen_loss_pixel_wise = self.loss_functions["L1"](
             X_batch, fake_images
         )
-        gen_loss = gen_loss_original + self.lambda_l1*gen_loss_pixel_wise
+        gen_loss = gen_loss_original + self.lambda_x*gen_loss_pixel_wise
         self._losses.update({
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,

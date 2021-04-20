@@ -14,7 +14,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu):
+    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu, secure):
         """The AbstractConditionalGenerativeModel is the most basic building block of VeGAN for conditional models. All conditional GAN
         implementation should at least inherit from this class.
 
@@ -53,7 +53,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self.gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         AbstractGenerativeModel.__init__(
             self, x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu
+            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
         self.hyperparameters["y_dim"] = self.y_dim
@@ -61,6 +61,11 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
 
     def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
         print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
+        """ Create the dataloaders, SummaryWriters for tensorboard and transform the saving indicators.
+
+        This function creates all data needed during training like the data loaders and save steps.
+        It also creates the hyperparameter dictionary and the `steps` dictionary.
+        """
         train_dataloader, test_dataloader, writer_train, writer_test, save_periods = super()._set_up_training(
             X_train, y_train, X_test, y_test, epochs, batch_size, steps,
             print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
@@ -309,6 +314,22 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self._clean_up(writers=[writer_train, writer_test])
 
     def _calculate_feature_loss(self, X_real, X_fake, y_batch):
+        """Calculates feature loss if `self.feature_layer` is not None.
+
+        Every network takes the `feature_layer` argument in its constructor.
+        If it is not None, a layer of the discriminator / critic should be specified.
+        A feature loss will be calculated which is the MSE between the output for real
+        and fake samples of the specified `self.feature_layer`.
+
+        Parameters
+        ----------
+        X_real : torch.Tensor
+            Real samples.
+        X_fake : torch.Tensor
+            Fake samples.
+        y_batch : torch.Tensor
+            Labels of the X_real.
+        """
         X_real = utils.concatenate(tensor1=X_real, tensor2=y_batch).float()
         X_fake = utils.concatenate(tensor1=X_fake, tensor2=y_batch).float()
 
@@ -379,6 +400,22 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Utility functions
     #########################################################################
     def concatenate(self, tensor1, tensor2):
+        """ Concatenates two tensors appropriately depending on their shape.
+
+        Tensor1 and Tensor2 can either have 2 or 4 dimensions.
+
+        Parameters
+        ----------
+        tensor1 : torch.Tensor
+            First tensor.
+        tensor2 : torch.Tensor
+            Second tensor.
+
+        Returns
+        -------
+        torch.Tensor
+            Concatenated tensor.
+        """
         return utils.concatenate(tensor1=tensor1, tensor2=tensor2)
 
     def generate(self, y, z=None):

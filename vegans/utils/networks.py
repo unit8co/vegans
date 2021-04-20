@@ -15,12 +15,13 @@ class NeuralNetwork(Module):
     These networks form the building blocks for the generative adversarial networks.
     Mainly responsible for consistency checks.
     """
-    def __init__(self, network, name, input_size, device, ngpu):
+    def __init__(self, network, name, input_size, device, ngpu, secure):
         super(NeuralNetwork, self).__init__()
         self.name = name
         self.input_size = input_size
         self.device = device
         self.ngpu = ngpu
+        self.secure = secure
         if isinstance(input_size, int):
             self.input_size = tuple([input_size])
         elif isinstance(input_size, list):
@@ -33,7 +34,9 @@ class NeuralNetwork(Module):
         except TypeError:
             self.input_type = "Object"
         self.network = network.to(self.device)
-        self._validate_input()
+
+        if self.secure:
+            self._validate_input()
 
         if ngpu is not None and ngpu < 0:
             self.ngpu = len([torch.cuda.device(i) for i in range(torch.cuda.device_count())])
@@ -116,8 +119,8 @@ class NeuralNetwork(Module):
 
 
 class Generator(NeuralNetwork):
-    def __init__(self, network, input_size, device, ngpu):
-        super().__init__(network, input_size=input_size, name="Generator", device=device, ngpu=ngpu)
+    def __init__(self, network, input_size, device, ngpu, secure=True):
+        super().__init__(network, input_size=input_size, name="Generator", device=device, ngpu=ngpu, secure=secure)
 
 
 class Adversariat(NeuralNetwork):
@@ -125,50 +128,53 @@ class Adversariat(NeuralNetwork):
 
     Might either be a discriminator (output [0, 1]) or critic (output [-Inf, Inf]).
     """
-    def __init__(self, network, input_size, adv_type, device, ngpu):
-        try:
-            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
-        except TypeError:
-            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
+    def __init__(self, network, input_size, adv_type, device, ngpu, secure=True):
 
-        valid_types = ["Discriminator", "Critic", "AutoEncoder"]
-        if adv_type == "Discriminator":
-            valid_last_layer = [torch.nn.Sigmoid]
-        elif adv_type == "Critic":
-            valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
-        elif adv_type == "AutoEncoder":
-            valid_last_layer = []
-        else:
-            raise TypeError("adv_type must be one of {}.".format(valid_types))
-        self._type = adv_type
+        if secure:
+            try:
+                last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
+            except TypeError:
+                last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
 
-        if len(valid_last_layer) > 0:
-            assert last_layer_type in valid_last_layer, (
-                "Last layer activation function of {} needs to be one of '{}'.".format(adv_type, valid_last_layer)
-            )
+            valid_types = ["Discriminator", "Critic", "AutoEncoder"]
+            if adv_type == "Discriminator":
+                valid_last_layer = [torch.nn.Sigmoid]
+            elif adv_type == "Critic":
+                valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
+            elif adv_type == "AutoEncoder":
+                valid_last_layer = []
+            else:
+                raise TypeError("adv_type must be one of {}.".format(valid_types))
+            self._type = adv_type
 
-        super().__init__(network, input_size=input_size, name="Adversariat", device=device, ngpu=ngpu)
+            if len(valid_last_layer) > 0:
+                assert last_layer_type in valid_last_layer, (
+                    "Last layer activation function of {} needs to be one of '{}'.".format(adv_type, valid_last_layer)
+                )
+
+        super().__init__(network, input_size=input_size, name="Adversariat", device=device, ngpu=ngpu, secure=secure)
 
     def predict(self, x):
         return self(x)
 
 
 class Encoder(NeuralNetwork):
-    def __init__(self, network, input_size, device, ngpu):
-        valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
-        try:
-            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
-        except TypeError:
-            last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
-        assert last_layer_type in valid_last_layer, (
-            "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer)
-        )
-        super().__init__(network, input_size=input_size, name="Encoder", device=device, ngpu=ngpu)
+    def __init__(self, network, input_size, device, ngpu, secure=True):
+        if secure:
+            valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
+            try:
+                last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Sequential")[-1])
+            except TypeError:
+                last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
+            assert last_layer_type in valid_last_layer, (
+                "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer)
+            )
+        super().__init__(network, input_size=input_size, name="Encoder", device=device, ngpu=ngpu, secure=secure)
 
 
 class Decoder(NeuralNetwork):
-    def __init__(self, network, input_size, device, ngpu):
-        super().__init__(network, input_size=input_size, name="Decoder", device=device, ngpu=ngpu)
+    def __init__(self, network, input_size, device, ngpu, secure=True):
+        super().__init__(network, input_size=input_size, name="Decoder", device=device, ngpu=ngpu, secure=secure)
 
 
 class Autoencoder(nn.Module):

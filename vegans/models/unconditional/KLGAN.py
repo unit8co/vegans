@@ -10,6 +10,8 @@ Losses:
     - Autoencoder: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
+Custom parameter:
+    - eps: Small value preventing overflow and nans when calculating the Kullback-Leibler divergence.
 """
 
 import torch
@@ -34,7 +36,8 @@ class KLGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             folder="./KLGAN",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -42,7 +45,7 @@ class KLGAN(AbstractGAN1v1):
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
-            device=device, folder=folder, ngpu=ngpu
+            device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.eps = eps
         self.hyperparameters["eps"] = eps

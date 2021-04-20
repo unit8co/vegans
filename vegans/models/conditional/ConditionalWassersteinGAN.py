@@ -14,6 +14,8 @@ Losses:
     - Critic: Wasserstein
 Default optimizer:
     - torch.optim.RMSprop
+Custom parameter:
+    - clip_val: Clip value for the critic to maintain Lipschitz continuity.
 
 References
 ----------
@@ -46,7 +48,8 @@ class ConditionalWassersteinGAN(AbstractConditionalGAN1v1):
             fixed_noise_size=32,
             device=None,
             folder="./CWassersteinGAN",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -55,7 +58,7 @@ class ConditionalWassersteinGAN(AbstractConditionalGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device,
             folder=folder,
-            ngpu=ngpu
+            ngpu=ngpu, secure=secure
         )
         self._clip_val = clip_val
         self.hyperparameters["clip_val"] = clip_val

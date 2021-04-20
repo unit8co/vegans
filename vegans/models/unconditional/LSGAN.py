@@ -37,7 +37,8 @@ class LSGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             folder="./LSGAN",
-            ngpu=None):
+            ngpu=None,
+            secure=True):
 
         super().__init__(
             generator=generator, adversariat=adversariat,
@@ -45,7 +46,7 @@ class LSGAN(AbstractGAN1v1):
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
-            device=device, folder=folder, ngpu=ngpu
+            device=device, folder=folder, ngpu=ngpu, secure=secure
         )
 
     def _default_optimizer(self):
