@@ -62,25 +62,16 @@ utils.plot_images(samples)
 
 You can currently use the following GANs:
 * `AAE`: [Adversarial Auto-Encoder](https://arxiv.org/pdf/1511.05644.pdf)
-
 * `BicycleGAN`: [BicycleGAN](https://arxiv.org/pdf/1711.11586.pdf)
-
 * `EBGAN`: [Energy-Based GAN](https://arxiv.org/pdf/1609.03126.pdf)
-
+* `InfoGAN`: [Information-Based GAN](https://dl.acm.org/doi/10.5555/3157096.3157340)
 * `KLGAN`: Kullback-Leib GAN
-
 * `LRGAN`: [Latent-Regressor GAN](https://arxiv.org/pdf/1711.11586.pdf)
-
 * `LSGAN`: [Least-Squares GAN](https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf)
-
 * `VAEGAN`: [Variational Auto-Encoder GAN](https://arxiv.org/pdf/1512.09300.pdf)
-
 * `VanillaGAN`: [Classic minimax GAN](https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf), in its non-saturated version
-
 * `VanillaVAE`: [Variational Auto-Encoder](https://arxiv.org/pdf/1512.09300.pdf)
-
 * `WassersteinGAN`: [Wasserstein GAN](https://arxiv.org/abs/1701.07875)
-
 * `WassersteinGANGP`: [Wasserstein GAN with gradient penalty](https://arxiv.org/abs/1704.00028)
 
 
@@ -90,6 +81,7 @@ All current GAN implementations come with a conditional variant to allow for the
 - `ConditionalVanillaGAN`
 - `ConditionalWassersteinGAN`
 - ...
+- `ConditionalCycleGAN`
 - `ConditionalPix2Pix`
 
 This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: [example_conditional.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_conditional.py)  or [03_mnist-conditional.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/03_mnist-conditional.ipynb)) or it can also be a full image (when for example trying to rotate an image: [example_image_to_image.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_image_to_image.py)  or [04_mnist-image-to-image.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/04_mnist-image-to-image.ipynb)).
@@ -262,6 +254,7 @@ All this results should be taken with a grain of salt. They were not extensively
 | :--------------------- | :----------------------------------------------------------: |
 | Cond. BicycleGAN       | ![MNIST](./TrainedModels/cBicycleGAN/generated_images.png "MNIST") |
 | Cond. EBGAN            | ![MNIST](./TrainedModels/cEBGAN/generated_images.png "MNIST") |
+| Cond. InfoGAN          | ![MNIST](./TrainedModels/cInfoGAN/generated_images.png "MNIST") |
 | Cond. KLGAN            | ![MNIST](./TrainedModels/cKLGAN/generated_images.png "MNIST") |
 | Cond. LRGAN            | ![MNIST](./TrainedModels/cLRGAN/generated_images.png "MNIST") |
 | Cond. Pix2Pix          | ![MNIST](./TrainedModels/cPix2Pix/generated_images.png "MNIST") |
@@ -276,7 +269,6 @@ All this results should be taken with a grain of salt. They were not extensively
 ## TODO
 
 - GAN Implementations (sorted by priority)
-  - InfoGAN
   - BEGAN
   - WassersteinGAN SpectralNorm
   - DiscoGAN
@@ -298,6 +290,7 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
+  - ~~InfoGAN~~
   - ~~WassersteinLoss as object~~
   - ~~Train on CIFAR10~~
   - ~~CycleGAN~~

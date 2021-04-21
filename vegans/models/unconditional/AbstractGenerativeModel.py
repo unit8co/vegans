@@ -336,9 +336,6 @@ class AbstractGenerativeModel(ABC):
         self.steps = {}
         for name, neural_net in self.neural_nets.items():
             self.steps[name] = 1
-            if neural_net.name == "Adversariat":
-                if neural_net._type == "Critic":
-                    self.steps[name] = 5
         if steps is not None:
             assert isinstance(steps, dict), "steps parameter must be of type dict. Given: {}.".format(type(steps))
             self.steps = steps
