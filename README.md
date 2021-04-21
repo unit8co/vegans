@@ -271,12 +271,9 @@ All this results should be taken with a grain of salt. They were not extensively
 - GAN Implementations (sorted by priority)
   - BEGAN
   - WassersteinGAN SpectralNorm
-  - DiscoGAN
   - Stacked GAN [here](https://arxiv.org/abs/1612.03242)
   - Progressive Growing GAN [here](https://arxiv.org/abs/1710.10196)
 - Layers
-  - Inception Block
-  - Residual Block
   - Minibatch discrimination
   - Instance normalization
 - Other
@@ -290,6 +287,8 @@ All this results should be taken with a grain of salt. They were not extensively
 
 
 - Done
+  - ~~Residual Block~~
+  - ~~Inception Block~~
   - ~~InfoGAN~~
   - ~~WassersteinLoss as object~~
   - ~~Train on CIFAR10~~

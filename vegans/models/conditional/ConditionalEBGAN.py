@@ -68,12 +68,13 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1):
 
     def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
         print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
-        super()._set_up_training(
+        train_dataloader, test_dataloader, writer_train, writer_test, save_periods = super()._set_up_training(
             X_train, y_train, X_test, y_test, epochs, batch_size, steps,
             print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
         )
         if self.m is None:
             self.m = np.mean(X_train)
+        return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)

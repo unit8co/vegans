@@ -58,11 +58,13 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
+        # ConditionalAAE, ConditionalBicycleGAN,
+        # ConditionalEBGAN,
+        ConditionalInfoGAN,
         # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalInfoGAN
+        # ConditionalVanillaVAE ,
+        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
@@ -88,8 +90,8 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalInfoGAN"]:
-            c_dim_discrete = [10]
-            c_dim_continuous = 0
+            c_dim_discrete = [5]
+            c_dim_continuous = 5
             c_dim = sum(c_dim_discrete) + c_dim_continuous
             generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=sum(y_dim)+c_dim, which="mnist")
             encoder_helper = loading.load_encoder(x_dim=(x_dim[0]+sum(y_dim), *x_dim[1:]), z_dim=32, which="mnist")
