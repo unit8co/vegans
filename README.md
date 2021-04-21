@@ -281,7 +281,7 @@ All this results should be taken with a grain of salt. They were not extensively
   - WassersteinGAN SpectralNorm
   - DiscoGAN
   - Stacked GAN [here](https://arxiv.org/abs/1612.03242)
-  - Progressive Gowing GAN [here](https://arxiv.org/abs/1710.10196)
+  - Progressive Growing GAN [here](https://arxiv.org/abs/1710.10196)
 - Layers
   - Inception Block
   - Residual Block
@@ -290,16 +290,16 @@ All this results should be taken with a grain of salt. They were not extensively
 - Other
 
   - New links to correct github files
-  - Train on CIFAR10	
   - Interpolation
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
-  - Do not save Discriminator
 
 
 
 
 
 - Done
+  - ~~WassersteinLoss as object~~
+  - ~~Train on CIFAR10~~
   - ~~CycleGAN~~
   - ~~Turn off secure mode~~
   - ~~Describe custom parameters~~

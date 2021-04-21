@@ -26,7 +26,7 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import MSELoss, BCELoss, L1Loss
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversariat
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
@@ -87,7 +87,7 @@ class AAE(AbstractGenerativeModel):
         if self.adv_type == "Discriminator":
             self.loss_functions = {"Generator": MSELoss(), "Adversariat": BCELoss()}
         elif self.adv_type == "Critic":
-            self.loss_functions = {"Generator": MSELoss(), "Adversariat": wasserstein_loss}
+            self.loss_functions = {"Generator": MSELoss(), "Adversariat": WassersteinLoss()}
         else:
             raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
 

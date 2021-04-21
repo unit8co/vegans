@@ -27,7 +27,7 @@ from torch.nn import MSELoss
 from torch.nn import BCELoss, L1Loss
 
 from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversariat, Autoencoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
@@ -101,7 +101,7 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
         if self.adv_type == "Discriminator":
             self.loss_functions = {"Reconstruction": MSELoss(), "Adversariat": MSELoss()}
         elif self.adv_type == "Critic":
-            self.loss_functions = {"Reconstruction": MSELoss(), "Adversariat": wasserstein_loss}
+            self.loss_functions = {"Reconstruction": MSELoss(), "Adversariat": WassersteinLoss()}
         else:
             raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
 

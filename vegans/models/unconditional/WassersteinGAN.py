@@ -27,7 +27,7 @@ import torch
 import numpy as np
 
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 
 
 class WassersteinGAN(AbstractGAN1v1):
@@ -70,7 +70,7 @@ class WassersteinGAN(AbstractGAN1v1):
         return torch.optim.RMSprop
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss}
+        self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss()}
 
 
     #########################################################################

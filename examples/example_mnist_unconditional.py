@@ -6,6 +6,7 @@ from vegans.GAN import (
     AAE,
     BicycleGAN,
     EBGAN,
+    InfoGAN,
     LSGAN,
     LRGAN,
     VanillaGAN,
@@ -27,34 +28,35 @@ if __name__ == '__main__':
     X_train = X_train.reshape((-1, 1, 32, 32))
     X_test = X_test.reshape((-1, 1, 32, 32))
     x_dim = X_train.shape[1:]
-    z_dim = 128
+    z_dim = 32
 
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
-    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="example")
-    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, which="example")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, which="example")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, which="example")
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="mnist")
+    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="mnist")
+    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="mnist")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
 
     #########################################################################
     # Training
     #########################################################################
     models = [
-        AAE, #BicycleGAN, EBGAN,
+        # AAE, BicycleGAN, EBGAN,
         # KLGAN, LRGAN, LSGAN,
         # Pix2Pix, VAEGAN, VanillaGAN,
         # VanillaVAE , WassersteinGAN, WassersteinGANGP,
+        InfoGAN
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__.replace("", "c"))
+        folder = "MyModels/{}".format(model.__name__)
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "folder": folder}
 
         if model.__name__ in ["AAE"]:
-            discriminator_aee = loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example")
+            discriminator_aee = loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="mnist")
             gan_model = model(
                 generator=generator, adversariat=discriminator_aee, encoder=encoder, **kwargs
             )
@@ -69,6 +71,17 @@ if __name__ == '__main__':
             m = np.mean(X_train)
             gan_model = model(
                 generator=generator, adversariat=autoencoder, m=m, **kwargs
+            )
+
+        elif model.__name__ in ["InfoGAN"]:
+            c_dim_discrete = [10]
+            c_dim_continuous = 0
+            y_dim = sum(c_dim_discrete) + c_dim_continuous
+            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
+            encoder_helper = loading.load_encoder(x_dim=x_dim, z_dim=32, which="mnist")
+            gan_model = model(
+                generator=generator_conditional, adversariat=discriminator, encoder=encoder_helper,
+                c_dim_discrete=c_dim_discrete, c_dim_continuous=c_dim_continuous, **kwargs
             )
 
         elif model.__name__ in ["KLGAN", "LSGAN", "Pix2Pix", "VanillaGAN"]:
@@ -114,8 +127,7 @@ if __name__ == '__main__':
         title = "Epochs: {}, z_dim: {}, Time trained: {} minutes\nParams: {}\n\n".format(
             epochs, z_dim, training_time, gan_model.get_number_params()
         )
-        fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
-        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
+        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), show=False)
         fig.suptitle(
             title,
             fontsize=12

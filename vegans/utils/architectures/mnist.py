@@ -54,6 +54,7 @@ def load_mnist_generator(x_dim, z_dim, y_dim=None):
         Architectures for generator,.
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
+    y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
     assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
     if len(z_dim) > 1:
         assert (z_dim[1] <= 16) and (z_dim[1] % 2 == 0), "z_dim[1] must be smaller 16 and divisible by 2. Given: {}.".format(z_dim[1])

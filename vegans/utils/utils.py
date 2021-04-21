@@ -21,27 +21,34 @@ class DataSet(Dataset):
             return self.X[index], self.y[index]
         return self.X[index]
 
-def wasserstein_loss(input, target):
-    """ Computes the Wasserstein loss / divergence.
+class WassersteinLoss():
+    def __call__(self, input, target):
+        """ Computes the Wasserstein loss / divergence.
 
-    Also known as earthmover distance.
+        Also known as earthmover distance.
 
-    Parameters
-    ----------
-    input : torch.Tensor
-        Input tensor. Output of a critic.
-    target : TYPE
-        Label, either 1 or -1. Zeros are translated to -1.
+        Parameters
+        ----------
+        input : torch.Tensor
+            Input tensor. Output of a critic.
+        target : TYPE
+            Label, either 1 or -1. Zeros are translated to -1.
 
-    Returns
-    -------
-    torch.Tensor
-        Wasserstein divergence
-    """
-    assert torch.unique(target).shape[0] <= 2, "Only two different values for target allowed."
-    target[target==0] = -1
+        Returns
+        -------
+        torch.Tensor
+            Wasserstein divergence
+        """
+        assert torch.unique(target).shape[0] <= 2, "Only two different values for target allowed."
+        target[target==0] = -1
 
-    return torch.mean(target*input)
+        return torch.mean(target*input)
+
+class NormalNegativeLogLikelihood():
+    def __call__(self, x, mu, variance, eps=1e-6):
+        negative_log_likelihood = 1/(2*variance + eps)*(x-mu)**2 + 0.5*torch.log(variance + eps)
+        negative_log_likelihood = negative_log_likelihood.sum(axis=1).mean()
+        return negative_log_likelihood
 
 def concatenate(tensor1, tensor2):
     """ Concatenates two 2D or 4D tensors.

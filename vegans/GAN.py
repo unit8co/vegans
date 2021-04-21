@@ -4,6 +4,7 @@ from vegans.models.unconditional.LRGAN import LRGAN
 from vegans.models.unconditional.EBGAN import EBGAN
 from vegans.models.unconditional.KLGAN import KLGAN
 from vegans.models.unconditional.VAEGAN import VAEGAN
+from vegans.models.unconditional.InfoGAN import InfoGAN
 from vegans.models.unconditional.BicycleGAN import BicycleGAN
 from vegans.models.unconditional.VanillaGAN import VanillaGAN
 from vegans.models.unconditional.VanillaVAE import VanillaVAE

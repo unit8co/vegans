@@ -26,7 +26,7 @@ import torch
 
 import numpy as np
 
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
 
@@ -67,7 +67,7 @@ class ConditionalWassersteinGAN(AbstractConditionalGAN1v1):
         return torch.optim.RMSprop
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss}
+        self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss()}
 
 
     #########################################################################

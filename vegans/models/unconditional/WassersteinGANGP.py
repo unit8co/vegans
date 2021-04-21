@@ -27,7 +27,7 @@ import torch
 import numpy as np
 
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 
 
 class WassersteinGANGP(AbstractGAN1v1):
@@ -67,7 +67,7 @@ class WassersteinGANGP(AbstractGAN1v1):
         return torch.optim.RMSprop
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "GP": self._gradient_penalty}
+        self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss(), "GP": self._gradient_penalty}
 
     def _gradient_penalty(self, real_samples, fake_samples):
         if len(real_samples.shape) == 2:

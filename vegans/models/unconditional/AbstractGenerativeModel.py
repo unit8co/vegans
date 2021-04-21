@@ -678,7 +678,7 @@ class AbstractGenerativeModel(ABC):
         losses_dict : dict
             Dictionary containing all loss types logged during training
         """
-        samples = self.generate(self.fixed_noise)
+        samples = self.generate(z=self.fixed_noise)
         losses = self.get_losses(by_epoch=by_epoch, agg=agg)
         return samples, losses
 
@@ -765,7 +765,7 @@ class AbstractGenerativeModel(ABC):
         torch.tensor
             Random numbers with shape of [n, *z_dim]
         """
-        return torch.randn(n, *self.z_dim, requires_grad=True, device=self.device)
+        return torch.randn(size=(n, *self.z_dim), requires_grad=True, device=self.device)
 
     def generate(self, z=None, n=None):
         """ Generate output with generator / decoder.

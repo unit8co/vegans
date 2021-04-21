@@ -30,7 +30,7 @@ import torch.nn as nn
 from torch.nn import BCELoss, L1Loss
 from torch.nn import MSELoss as L2Loss
 
-from vegans.utils.utils import wasserstein_loss
+from vegans.utils.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversariat, Encoder
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
@@ -108,7 +108,7 @@ class BicycleGAN(AbstractGenerativeModel):
         if self.adv_type == "Discriminator":
             self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss(), "Reconstruction": L1Loss()}
         elif self.adv_type == "Critic":
-            self.loss_functions = {"Generator": wasserstein_loss, "Adversariat": wasserstein_loss, "L1": L1Loss(), "Reconstruction": L1Loss()}
+            self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss(), "L1": L1Loss(), "Reconstruction": L1Loss()}
         else:
             raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
 

@@ -72,8 +72,9 @@ class NeuralNetwork(Module):
         else:
             raise TypeError(
                 "\n\tInput mismatch for {}:\n".format(self.name) +
-                "\t\tFirst input layer 'in_features' or 'in_channels': {}. self.input_size: {}.\n".format(
+                "\t\tFirst input layer 'in_features' or 'in_channels': {}. self.input_size: {}.\n\n".format(
                     first_input, self.input_size) +
+                "\t\tONLY RELEVANT IF CONDITIONAL NETWORK IS USED:\n" +
                 "\t\tIf you are trying to use a conditional model please make sure you adjusted the input size\n" +
                 "\t\tof the first layer in this architecture for the label vector / image.\n"
                 "\t\tIn this case, use vegans.utils.utils.get_input_dim(in_dim, y_dim) and adjust this architecture's\n" +

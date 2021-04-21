@@ -19,18 +19,18 @@ def test_load_mnist():
     assert X_test.shape == (10000, 32, 32)
     assert np.max(X_test) == 1
 
-def test_wasserstein_loss():
+def test_WassersteinLoss():
     labels = torch.from_numpy(np.array([1, 1, 0, 0, 1, 0])).float()
     predictions = torch.from_numpy(np.array([5, 3, -2, 3, 8, -2])).float()
 
-    w_loss = utils.wasserstein_loss(input=predictions, target=labels).cpu().numpy()
+    w_loss = utils.WassersteinLoss()(input=predictions, target=labels).cpu().numpy()
     labels[labels==0] = -1
     result = torch.mean(predictions*labels).cpu().numpy()
     assert w_loss == result
 
     labels = torch.from_numpy(np.array([1, 1, 2, 0, 1, 0])).float()
     with pytest.raises(AssertionError) as e_info:
-        utils.wasserstein_loss(input=predictions, target=labels)
+        utils.WassersteinLoss()(input=predictions, target=labels)
 
 def test_concatenate():
     tensor1 = torch.randn(20, 5, requires_grad=False, device="cpu")
