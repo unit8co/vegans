@@ -76,8 +76,8 @@ if __name__ == '__main__':
         elif model.__name__ in ["InfoGAN"]:
             c_dim_discrete = [10]
             c_dim_continuous = 0
-            y_dim = sum(c_dim_discrete) + c_dim_continuous
-            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
+            c_dim = sum(c_dim_discrete) + c_dim_continuous
+            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=c_dim, which="mnist")
             encoder_helper = loading.load_encoder(x_dim=x_dim, z_dim=32, which="mnist")
             gan_model = model(
                 generator=generator_conditional, adversariat=discriminator, encoder=encoder_helper,

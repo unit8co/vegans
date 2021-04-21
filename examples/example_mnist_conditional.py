@@ -10,6 +10,7 @@ from vegans.GAN import (
     ConditionalAAE,
     ConditionalBicycleGAN,
     ConditionalEBGAN,
+    ConditionalInfoGAN,
     ConditionalKLGAN,
     ConditionalLRGAN,
     ConditionalLSGAN,
@@ -61,7 +62,7 @@ if __name__ == '__main__':
         # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
         # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalInfoGAN
     ]
 
     for model in models:
@@ -86,6 +87,17 @@ if __name__ == '__main__':
                 generator=generator, adversariat=autoencoder, m=m, **kwargs
             )
 
+        elif model.__name__ in ["ConditionalInfoGAN"]:
+            c_dim_discrete = [10]
+            c_dim_continuous = 0
+            c_dim = sum(c_dim_discrete) + c_dim_continuous
+            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=sum(y_dim)+c_dim, which="mnist")
+            encoder_helper = loading.load_encoder(x_dim=(x_dim[0]+sum(y_dim), *x_dim[1:]), z_dim=32, which="mnist")
+            gan_model = model(
+                generator=generator_conditional, adversariat=discriminator, encoder=encoder_helper,
+                c_dim_discrete=c_dim_discrete, c_dim_continuous=c_dim_continuous, **kwargs
+            )
+
         elif model.__name__ in ["ConditionalKLGAN", "ConditionalLSGAN", "ConditionalPix2Pix", "ConditionalVanillaGAN"]:
             gan_model = model(
                 generator=generator, adversariat=discriminator, **kwargs
@@ -108,7 +120,7 @@ if __name__ == '__main__':
             )
 
         else:
-            raise NotImplementedError("{} no yet implemented in logical gate.".format(model.__name__))
+            raise NotImplementedError("{} no yet implemented.".format(model.__name__))
 
         gan_model.summary(save=True)
         gan_model.fit(

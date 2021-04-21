@@ -55,7 +55,7 @@ def load_mnist_generator(x_dim, z_dim, y_dim=None):
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
     y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
-    assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
+    assert y_dim is None or y_dim == (10, ) or y_dim == (20, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
     if len(z_dim) > 1:
         assert (z_dim[1] <= 16) and (z_dim[1] % 2 == 0), "z_dim[1] must be smaller 16 and divisible by 2. Given: {}.".format(z_dim[1])
         assert z_dim[1] == z_dim[2], "z_dim[1] must be equal to z_dim[2]. Given: {} and {}.".format(z_dim[1], z_dim[2])
@@ -206,7 +206,7 @@ def load_mnist_encoder(x_dim, z_dim, y_dim=None):
         Architectures for encoder.
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
-    assert x_dim == (1, 32, 32), "x_dim must be (1, 32, 32). Given: {}.".format(x_dim)
+    assert x_dim == (1, 32, 32) or x_dim == (11, 32, 32), "x_dim must be (1, 32, 32). Given: {}.".format(x_dim)
     assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
     assert len(z_dim) == 1, "z_dim must be of length one. Given: {}.".format(z_dim)
 
