@@ -19,7 +19,10 @@ class NeuralNetwork(Module):
         super(NeuralNetwork, self).__init__()
         self.name = name
         self.input_size = input_size
-        self.device = device
+        if device is None:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self.device = device
         self.ngpu = ngpu
         self.secure = secure
         if isinstance(input_size, int):
@@ -27,7 +30,7 @@ class NeuralNetwork(Module):
         elif isinstance(input_size, list):
             self.input_size = tuple(input_size)
 
-        assert isinstance(network, torch.nn.Module), "network must inherit from nn.Module."
+        assert isinstance(network, torch.nn.Module), "`network` must be instance of nn.Module."
         try:
             type(network[-1])
             self.input_type = "Sequential"
@@ -64,6 +67,8 @@ class NeuralNetwork(Module):
             elif "num_features" in layer.__dict__:
                 first_input = layer.__dict__["num_features"]
                 break
+        else:
+            raise ValueError("No layer with `in_features`, `in_channels` or `num_features` found.")
 
         if np.prod([first_input]) == np.prod(self.input_size):
             pass
@@ -100,7 +105,7 @@ class NeuralNetwork(Module):
 
     def _get_output_shape(self):
         sample_input = torch.rand([2, *self.input_size]).to(self.device)
-        return self.network(sample_input).data.cpu().numpy().shape
+        return tuple(self.network(sample_input).shape)
 
 
     #########################################################################
@@ -124,8 +129,8 @@ class Generator(NeuralNetwork):
         super().__init__(network, input_size=input_size, name="Generator", device=device, ngpu=ngpu, secure=secure)
 
 
-class Adversariat(NeuralNetwork):
-    """ Implements adversariat architecture.
+class Adversary(NeuralNetwork):
+    """ Implements adversary architecture.
 
     Might either be a discriminator (output [0, 1]) or critic (output [-Inf, Inf]).
     """
@@ -137,23 +142,23 @@ class Adversariat(NeuralNetwork):
             except TypeError:
                 last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
 
+            valid_last_layer = None
             valid_types = ["Discriminator", "Critic", "AutoEncoder"]
             if adv_type == "Discriminator":
                 valid_last_layer = [torch.nn.Sigmoid]
             elif adv_type == "Critic":
                 valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
-            elif adv_type == "AutoEncoder":
-                valid_last_layer = []
             else:
-                raise TypeError("adv_type must be one of {}.".format(valid_types))
+                raise TypeError("`adv_type` must be one of {}.".format(valid_types))
             self._type = adv_type
 
-            if len(valid_last_layer) > 0:
+            if valid_last_layer is not None:
                 assert last_layer_type in valid_last_layer, (
-                    "Last layer activation function of {} needs to be one of '{}'.".format(adv_type, valid_last_layer)
+                    "Last layer activation function of {} needs to be one of '{}'. Given: {}."
+                    .format(adv_type, valid_last_layer, last_layer_type)
                 )
 
-        super().__init__(network, input_size=input_size, name="Adversariat", device=device, ngpu=ngpu, secure=secure)
+        super().__init__(network, input_size=input_size, name="Adversary", device=device, ngpu=ngpu, secure=secure)
 
     def predict(self, x):
         return self(x)

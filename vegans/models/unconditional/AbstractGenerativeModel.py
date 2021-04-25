@@ -20,17 +20,17 @@ class AbstractGenerativeModel(ABC):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu, secure):
-        """The AbstractGenerativeModel is the most basic building block of VeGAN. All GAN implementation should
+    def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, ngpu, folder, secure):
+        """The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should
         at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.
 
         Parameters
         ----------
         x_dim : list, tuple
-            Number of the output dimension of the generator and input dimension of the discriminator / critic.
+            Number of the output dimensions of the generator and input dimension of the discriminator / critic.
             In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
         z_dim : int, list, tuple
-            Number of the latent dimension for the generator input. Might have dimensions of an image.
+            Number of the latent dimensions for the generator input. Might have dimensions of an image.
         optim : dict or torch.optim
             Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
             name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
@@ -39,18 +39,19 @@ class AbstractGenerativeModel(ABC):
             name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
         feature_layer : torch.nn.*
             Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-            If `feature_layer` is not None, the original generator loss is replaced by a feature loss.
+            If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
+            [here](https://arxiv.org/abs/1606.03498v1).
         fixed_noise_size : int
             Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
             subdirectory, the tensorboard images tab and the samples in get_training_results().
         device : string
             Device used while training the model. Either "cpu" or "cuda".
+        ngpu : int
+            Number of gpus used during training if device == "cuda".
         folder : string
             Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
             tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
             already exists a time stamp is appended to make it unique.
-        ngpu : int
-            Number of gpus used during training if device == "cuda".
 
         Raises
         ------
@@ -81,18 +82,15 @@ class AbstractGenerativeModel(ABC):
             if folder is None:
                 self.folder = folder
             else:
-                folder = folder if not folder.endswith("/") else folder[-1]
+                self.folder = folder
                 if os.path.exists(folder):
                     now = datetime.now()
                     now = now.strftime("%Y%m%d_%H%M%S")
-                    folder += now
-                self.folder = folder + "/"
+                    self.folder = folder + "_" + now
                 os.makedirs(self.folder)
 
-        self._define_loss()
-        self._define_optimizers(
-            optim=optim, optim_kwargs=optim_kwargs,
-        )
+        self.loss_functions = self._define_loss()
+        self.optimizers = self._define_optimizers(optim=optim, optim_kwargs=optim_kwargs)
         self.to(self.device)
 
         self.fixed_noise = self.sample(n=fixed_noise_size)
@@ -103,17 +101,17 @@ class AbstractGenerativeModel(ABC):
         }
         self._init_run = True
 
-        if hasattr(self, "generator") and hasattr(self, "adversariat"):
+        if hasattr(self, "generator") and hasattr(self, "adversary"):
             self.TYPE = "GAN"
             self._Z_transformer = self.generator
-            self._X_transformer = self.adversariat
+            self._X_transformer = self.adversary
         elif hasattr(self, "encoder") and hasattr(self, "decoder"):
             self.TYPE = "VAE"
             self._Z_transformer = self.decoder
             self._X_transformer = self.encoder
         else:
             raise NotImplementedError(
-                "Model should either have self.generator and self.adversariat (self.TYPE = 'GAN') or \n"+
+                "Model should either have self.generator and self.adversary (self.TYPE = 'GAN') or \n"+
                 "self.decoder and self.encoder (self.TYPE = 'VAE')."
             )
         self.images_produced = True if len(self._Z_transformer.output_size) == 3 else False
@@ -135,32 +133,33 @@ class AbstractGenerativeModel(ABC):
             If dict, must be of form {"Network1": optim_kwargs1, "Network2": optim_kwargs1, ...}. If one network is
             not specified as a key of the dictionary no arguments = {} are passed.
         """
-        self._opt_kwargs = {}
+        dict_optim_kwargs = {}
         for name, _ in self.neural_nets.items():
-            self._opt_kwargs[name] = {}
+            dict_optim_kwargs[name] = {}
         if isinstance(optim_kwargs, dict):
             for name, opt_kwargs in optim_kwargs.items():
-                self._opt_kwargs[name] = opt_kwargs
-        self._check_dict_keys(param_dict=self._opt_kwargs, where="_define_optimizers_kwargs")
+                dict_optim_kwargs[name] = opt_kwargs
+        self._check_dict_keys(param_dict=dict_optim_kwargs, where="_define_optimizers_kwargs")
 
-        self._opt = {}
+        dict_optim = {}
         if optim is None:
             for name, _ in self.neural_nets.items():
-                self._opt[name] = self._default_optimizer()
+                dict_optim[name] = self._default_optimizer()
         elif isinstance(optim, dict):
             for name, opt in optim.items():
-                self._opt[name] = opt
+                dict_optim[name] = opt
             for name, _ in self.neural_nets.items():
-                if name not in self._opt:
-                    self._opt[name] = self._default_optimizer()
+                if name not in dict_optim:
+                    dict_optim[name] = self._default_optimizer()
         else:
             for name, _ in self.neural_nets.items():
-                self._opt[name] = optim
-        self._check_dict_keys(param_dict=self._opt, where="_define_optimizers")
+                dict_optim[name] = optim
+        self._check_dict_keys(param_dict=dict_optim, where="_define_optimizers")
 
-        self.optimizers = {}
+        optimizers = {}
         for name, network in self.neural_nets.items():
-            self.optimizers[name] = self._opt[name](params=network.parameters(), **self._opt_kwargs[name])
+            optimizers[name] = dict_optim[name](params=network.parameters(), **dict_optim_kwargs[name])
+        return optimizers
 
     def _check_dict_keys(self, param_dict, where):
         """ Checks if `param_dict` has the correct form.
@@ -232,11 +231,11 @@ class AbstractGenerativeModel(ABC):
             assert self.folder is not None, (
                 "`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified."
             )
-            writer_train = SummaryWriter(self.folder+"tensorboard/train/")
+            writer_train = SummaryWriter(os.path.join(self.folder, "tensorboard/train/"))
             if X_test is not None:
-                writer_test = SummaryWriter(self.folder+"tensorboard/test/")
+                writer_test = SummaryWriter(os.path.join(self.folder, "tensorboard/test/"))
 
-        self._create_steps(steps=steps)
+        self.steps = self._create_steps(steps=steps)
         save_periods = self._set_up_saver(
             print_every=print_every, save_model_every=save_model_every, save_images_every=save_images_every,
             save_losses_every=save_losses_every, nr_batches=len(train_dataloader)
@@ -312,7 +311,7 @@ class AbstractGenerativeModel(ABC):
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
         assert X_train.shape[1:] == self.x_dim, (
-            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
+            "Wrong input shape for adversary / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
         )
 
         if X_test is not None:
@@ -333,16 +332,17 @@ class AbstractGenerativeModel(ABC):
             If not None a dictionary of the form {"Network1": steps1, "Network2": steps2, ...} is expected.
             This dictionary might also be partially filled.
         """
-        self.steps = {}
+        steps = {}
         for name, neural_net in self.neural_nets.items():
-            self.steps[name] = 1
+            steps[name] = 1
         if steps is not None:
             assert isinstance(steps, dict), "steps parameter must be of type dict. Given: {}.".format(type(steps))
-            self.steps = steps
+            steps = steps
             for name, _ in self.neural_nets.items():
-                if name not in self.steps:
-                    self.steps[name] = 1
-            self._check_dict_keys(self.steps, where="_create_steps")
+                if name not in steps:
+                    steps[name] = 1
+            self._check_dict_keys(steps, where="_create_steps")
+        return steps
 
     def _set_up_saver(self, print_every, save_model_every, save_images_every, save_losses_every, nr_batches):
         """ Calculates saving indicators if strings are passed. Additionally corresponding folders are created
@@ -358,13 +358,13 @@ class AbstractGenerativeModel(ABC):
             assert self.folder is not None, (
                 "`folder` argument in constructor was set to `None`. `save_model_every` must be None or `folder` needs to be specified."
             )
-            os.mkdir(self.folder+"models/")
+            os.mkdir(os.path.join(self.folder, "models/"))
         if save_images_every is not None:
             save_images_every = self._string_to_batchnr(log_string=save_images_every, nr_batches=nr_batches, name="save_images_every")
             assert self.folder is not None, (
                 "`folder` argument in constructor was set to `None`. `save_images_every` must be None or `folder` needs to be specified."
             )
-            os.mkdir(self.folder+"images/")
+            os.mkdir(os.path.join(self.folder, "images/"))
         save_losses_every = self._string_to_batchnr(log_string=save_losses_every, nr_batches=nr_batches, name="save_losses_every")
         self.total_training_time = 0
         self.current_timer = time.perf_counter()
@@ -388,7 +388,7 @@ class AbstractGenerativeModel(ABC):
     #########################################################################
     def fit(self, X_train, X_test=None, epochs=5, batch_size=32, steps=None,
         print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
-        """ Method to call when the generative network should be trained.
+        """ Trains the model, iterating over all contained networks.
 
         Parameters
         ----------
@@ -450,15 +450,13 @@ class AbstractGenerativeModel(ABC):
                 Z = self.sample(n=len(X))
                 for name, _ in self.neural_nets.items():
                     for _ in range(self.steps[name]):
-                        self._losses = {}
-                        self.calculate_losses(X_batch=X, Z_batch=Z, who=name)
+                        self._losses = self.calculate_losses(X_batch=X, Z_batch=Z, who=name)
                         self._zero_grad(who=name)
                         self._backward(who=name)
                         self._step(who=name)
 
                 if print_every is not None and step % print_every == 0:
-                    self._losses = {}
-                    self.calculate_losses(X_batch=X, Z_batch=Z)
+                    self._losses = self.calculate_losses(X_batch=X, Z_batch=Z)
                     self._summarise_batch(
                         batch=batch, max_batches=max_batches, epoch=epoch,
                         max_epochs=epochs, print_every=print_every
@@ -577,7 +575,7 @@ class AbstractGenerativeModel(ABC):
 
             fig, axs = self._build_images(images)
             if fig is not None:
-                plt.savefig(self.folder+"images/image_{}.png".format(step))
+                plt.savefig(os.path.join(self.folder, "images/image_{}.png".format(step)))
                 plt.close()
             print("Images logged.")
 
@@ -637,7 +635,7 @@ class AbstractGenerativeModel(ABC):
         """
         if hasattr(self, "logged_losses"):
             fig, axs = plot_losses(self.logged_losses, show=False, share=False)
-            plt.savefig(self.folder+"losses.png")
+            plt.savefig(os.path.join(self.folder, "losses.png"))
             plt.close()
 
     def _log_scalars(self, step, writer):
@@ -726,8 +724,13 @@ class AbstractGenerativeModel(ABC):
         """
         if name is None:
             name = "model.torch"
-        torch.save(self, self.folder+name)
-        print("Model saved to {}.".format(self.folder+name))
+        print(self.__dict__)
+        for key, value in self.__dict__.items():
+            print(key, type(value))
+        for name, net in self.neural_nets.items():
+            print(net.state_dict())
+        torch.save(self, os.path.join(self.folder, name))
+        print("Model saved to {}.".format(os.path.join(self.folder, name)))
 
     @staticmethod
     def load(path):
@@ -822,7 +825,7 @@ class AbstractGenerativeModel(ABC):
                 "`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified."
             )
             sys_stdout_temp = sys.stdout
-            sys.stdout = open(self.folder+'summary.txt', 'w')
+            sys.stdout = open(os.path.join(self.folder, 'summary.txt'), 'w')
         for name, neural_net in self.neural_nets.items():
             neural_net.summary()
             print("\n\n")
@@ -850,13 +853,13 @@ class AbstractGenerativeModel(ABC):
     def eval(self):
         """ Set all networks to evaluation mode.
         """
-        self._is_training = False
+        self.training = False
         [network.eval() for name, network in self.neural_nets.items()]
 
     def train(self):
         """ Set all networks to training mode.
         """
-        self._is_training = True
+        self.training = True
         [network.train() for name, network in self.neural_nets.items()]
 
     def to(self, device):
@@ -872,7 +875,7 @@ class AbstractGenerativeModel(ABC):
         elif n is not None:
             z = self.sample(n=n)
         sample = self._Z_transformer(z)
-        if self._is_training:
+        if self.training:
             return sample
         return sample.detach().cpu().numpy()
 

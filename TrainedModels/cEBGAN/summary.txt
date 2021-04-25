@@ -40,7 +40,7 @@ Estimated Total Size (MB): 6.19
 
 
 
-Adversariat
+Adversary
 -----------
 Input shape:  (11, 32, 32)
 ----------------------------------------------------------------
@@ -95,7 +95,7 @@ Parameter Group 0
     eps: 1e-08
     lr: 0.001
     weight_decay: 0
-), 'Adversariat': Adam (
+), 'Adversary': Adam (
 Parameter Group 0
     amsgrad: False
     betas: (0.9, 0.999)
@@ -104,6 +104,6 @@ Parameter Group 0
     weight_decay: 0
 )}
 device: ---> cuda
-loss_functions: ---> {'Generator': MSELoss(), 'Adversariat': MSELoss()}
+loss_functions: ---> {'Generator': MSELoss(), 'Adversary': MSELoss()}
 y_dim: ---> (10,)
 m: ---> 0.10003692714716116

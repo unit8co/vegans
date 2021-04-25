@@ -3,7 +3,7 @@ EBGAN
 -----
 Implements the Energy based GAN[1].
 
-Uses an auto-encoder as the adversariat structure.
+Uses an auto-encoder as the adversary structure.
 
 Losses:
     - Generator: L2 (Mean Squared Error)
@@ -30,7 +30,7 @@ class EBGAN(AbstractGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             optim=None,
@@ -39,12 +39,12 @@ class EBGAN(AbstractGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./EBGAN",
             ngpu=None,
+            folder="./EBGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             z_dim=z_dim, x_dim=x_dim, adv_type="AutoEncoder",
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
@@ -53,9 +53,9 @@ class EBGAN(AbstractGAN1v1):
         )
 
         if self.secure:
-            assert self.adversariat.output_size == x_dim, (
-                "AutoEncoder structure used for adversariat. Output dimensions must equal x_dim. " +
-                "Output: {}. x_dim: {}.".format(self.adversariat.output_size, x_dim)
+            assert self.adversary.output_size == x_dim, (
+                "AutoEncoder structure used for adversary. Output dimensions must equal x_dim. " +
+                "Output: {}. x_dim: {}.".format(self.adversary.output_size, x_dim)
             )
         self.m = m
         self.hyperparameters["m"] = m
@@ -64,7 +64,8 @@ class EBGAN(AbstractGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
+        loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
+        return loss_functions
 
     def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
         print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
@@ -85,27 +86,27 @@ class EBGAN(AbstractGAN1v1):
             )
         else:
             gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)
-        self._losses.update({"Generator": gen_loss})
+        return {"Generator": gen_loss}
 
-    def _calculate_adversariat_loss(self, X_batch, Z_batch):
+    def _calculate_adversary_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 
-        adv_loss_fake = self.loss_functions["Adversariat"](
+        adv_loss_fake = self.loss_functions["Adversary"](
             fake_predictions, fake_images
         )
         if adv_loss_fake < self.m:
             adv_loss_fake = self.m - adv_loss_fake
         else:
             adv_loss_fake = torch.Tensor([0]).to(self.device)
-        adv_loss_real = self.loss_functions["Adversariat"](
+        adv_loss_real = self.loss_functions["Adversary"](
             real_predictions, X_batch
         )
         adv_loss = 0.5*(adv_loss_fake + adv_loss_real).float()
-        self._losses.update({
-            "Adversariat": adv_loss,
-            "Adversariat_fake": adv_loss_fake,
-            "Adversariat_real": adv_loss_real,
+        return {
+            "Adversary": adv_loss,
+            "Adversary_fake": adv_loss_fake,
+            "Adversary_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
-        })
+        }

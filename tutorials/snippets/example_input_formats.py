@@ -7,11 +7,11 @@ from vegans.GAN import WassersteinGAN
 from vegans.utils.layers import LayerReshape
 
 
-def call_gan_training(generator, adversariat):
+def call_gan_training(generator, adversary):
     gan_model = WassersteinGAN(
-        generator=generator, adversariat=adversariat,
+        generator=generator, adversary=adversary,
         z_dim=z_dim, x_dim=im_dim, folder="TrainedModels/GAN",
-        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversariat": {"lr": lr_adv}}
+        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversary": {"lr": lr_adv}}
     )
     # gan_model.summary(save=True)
     gan_model.fit(
@@ -19,7 +19,7 @@ def call_gan_training(generator, adversariat):
         X_test=X_test,
         batch_size=batch_size,
         epochs=epochs,
-        steps={"Adversariat": 5},
+        steps={"Adversary": 5},
         print_every="0.5e",
         save_model_every=None,
         save_images_every="0.5e",
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         nn.Sigmoid()
     )
 
-    adversariat = nn.Sequential(
+    adversary = nn.Sequential(
         nn.Conv2d(in_channels=im_dim[0], out_channels=32, kernel_size=4, stride=2, padding=1),
         nn.ReLU(),
         nn.Conv2d(in_channels=32, out_channels=8, kernel_size=4, stride=2, padding=1),
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         nn.Identity()
     )
     z_dim = [1, 8, 8]
-    call_gan_training(generator, adversariat)
+    call_gan_training(generator, adversary)
 
 
     #########################################################################
@@ -104,7 +104,7 @@ if __name__ == '__main__':
             y_pred = self.output(x)
             return y_pred
 
-    class MyAdversariat(nn.Module):
+    class MyAdversary(nn.Module):
         def __init__(self, x_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
@@ -127,8 +127,8 @@ if __name__ == '__main__':
             return y_pred
 
     generator = MyGenerator(z_dim=z_dim)
-    adversariat = MyAdversariat(x_dim=im_dim)
-    call_gan_training(generator, adversariat)
+    adversary = MyAdversary(x_dim=im_dim)
+    call_gan_training(generator, adversary)
 
 
     #########################################################################
@@ -153,7 +153,7 @@ if __name__ == '__main__':
         LayerReshape(im_dim),
         nn.Sigmoid()
     )
-    adversariat = nn.Sequential(
+    adversary = nn.Sequential(
         nn.Flatten(),
         nn.Linear(int(np.prod(im_dim)), 512),
         nn.LeakyReLU(0.2),
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         nn.Linear(256, 1),
         nn.Identity()
     )
-    call_gan_training(generator, adversariat)
+    call_gan_training(generator, adversary)
 
     #########################################################################
     # Flat network: OO
@@ -194,7 +194,7 @@ if __name__ == '__main__':
             y_pred = self.output(x)
             return y_pred
 
-    class MyAdversariat(nn.Module):
+    class MyAdversary(nn.Module):
         def __init__(self, x_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
@@ -213,5 +213,5 @@ if __name__ == '__main__':
             return y_pred
 
     generator = MyGenerator(z_dim=z_dim)
-    adversariat = MyAdversariat(x_dim=im_dim)
-    call_gan_training(generator, adversariat)
+    adversary = MyAdversary(x_dim=im_dim)
+    call_gan_training(generator, adversary)

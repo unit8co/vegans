@@ -28,7 +28,7 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import CrossEntropyLoss, BCELoss
-from vegans.utils.networks import Generator, Adversariat, Encoder
+from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.utils.utils import get_input_dim, concatenate, NormalNegativeLogLikelihood
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
@@ -40,7 +40,7 @@ class InfoGAN(AbstractGenerativeModel):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             encoder,
             x_dim,
             z_dim,
@@ -52,8 +52,8 @@ class InfoGAN(AbstractGenerativeModel):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./InfoGAN",
             ngpu=0,
+            folder="./InfoGAN",
             secure=True):
 
         c_dim_discrete = [c_dim_discrete] if isinstance(c_dim_discrete, int) else c_dim_discrete
@@ -68,15 +68,13 @@ class InfoGAN(AbstractGenerativeModel):
         self.c_dim = tuple([sum(self.c_dim_discrete) + sum(self.c_dim_continuous)])
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=self.c_dim)
 
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
         if secure:
             AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=self.c_dim, name="Generator")
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.adversariat = Adversariat(adversariat, input_size=x_dim, adv_type="Discriminator", device=device, ngpu=ngpu, secure=secure)
+        self.adversary = Adversary(adversary, input_size=x_dim, adv_type="Discriminator", device=device, ngpu=ngpu, secure=secure)
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
         self.neural_nets = {
-            "Generator": self.generator, "Adversariat": self.adversariat, "Encoder": self.encoder
+            "Generator": self.generator, "Adversary": self.adversary, "Encoder": self.encoder
         }
 
         super().__init__(
@@ -117,10 +115,11 @@ class InfoGAN(AbstractGenerativeModel):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {
-        "Generator": BCELoss(), "Adversariat": BCELoss(),
-        "Discrete": CrossEntropyLoss(), "Continuous": NormalNegativeLogLikelihood()
-    }
+        loss_functions = {
+            "Generator": BCELoss(), "Adversary": BCELoss(),
+            "Discrete": CrossEntropyLoss(), "Continuous": NormalNegativeLogLikelihood()
+        }
+        return loss_functions
 
 
     #########################################################################
@@ -182,15 +181,16 @@ class InfoGAN(AbstractGenerativeModel):
 
     def calculate_losses(self, X_batch, Z_batch, who=None):
         if who == "Generator":
-            self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Adversariat":
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
+        elif who == "Adversary":
+            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch)
         elif who == "Encoder":
-            self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
         else:
-            self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch)
-            self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
+            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
+        return losses
 
     def _calculate_generator_loss(self, X_batch, Z_batch):
         c = self.sample_c(n=len(Z_batch))
@@ -227,12 +227,12 @@ class InfoGAN(AbstractGenerativeModel):
             continuous_encoder_loss = torch.Tensor([0]).to(self.device)
 
         gen_loss = gen_loss_original + self.lambda_z*(discrete_encoder_loss + continuous_encoder_loss)
-        self._losses.update({
+        return {
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
             "Generator_Discrete": self.lambda_z*discrete_encoder_loss,
             "Generator_Continuous": self.lambda_z*continuous_encoder_loss
-        })
+        }
 
     def _calculate_encoder_loss(self, X_batch, Z_batch):
         c = self.sample_c(n=len(Z_batch))
@@ -262,28 +262,28 @@ class InfoGAN(AbstractGenerativeModel):
             continuous_encoder_loss = torch.Tensor([0]).to(self.device)
 
         enc_loss = 0.5*(discrete_encoder_loss + continuous_encoder_loss)
-        self._losses.update({
+        return {
             "Encoder": enc_loss,
             "Encoder_Discrete": discrete_encoder_loss,
             "Encoder_Continuous": continuous_encoder_loss
-        })
+        }
 
-    def _calculate_adversariat_loss(self, X_batch, Z_batch):
+    def _calculate_adversary_loss(self, X_batch, Z_batch):
         c = self.sample_c(n=len(Z_batch))
         fake_images = self.generate(z=Z_batch, c=c).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 
-        adv_loss_fake = self.loss_functions["Adversariat"](
+        adv_loss_fake = self.loss_functions["Adversary"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
         )
-        adv_loss_real = self.loss_functions["Adversariat"](
+        adv_loss_real = self.loss_functions["Adversary"](
             real_predictions, torch.ones_like(real_predictions, requires_grad=False)
         )
         adv_loss = 0.5*(adv_loss_fake + adv_loss_real)
-        self._losses.update({
-            "Adversariat": adv_loss,
-            "Adversariat_fake": adv_loss_fake,
-            "Adversariat_real": adv_loss_real,
+        return {
+            "Adversary": adv_loss,
+            "Adversary_fake": adv_loss_fake,
+            "Adversary_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
-        })
+        }

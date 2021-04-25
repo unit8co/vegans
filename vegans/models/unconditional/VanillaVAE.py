@@ -42,12 +42,10 @@ class VanillaVAE(AbstractGenerativeModel):
             lambda_KL=10,
             fixed_noise_size=32,
             device=None,
-            folder="./VanillaVAE",
             ngpu=0,
+            folder="./VanillaVAE",
             secure=True):
 
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
         self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
         self.autoencoder = Autoencoder(self.encoder, self.decoder)
@@ -86,7 +84,8 @@ class VanillaVAE(AbstractGenerativeModel):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Autoencoder": MSELoss()}
+        loss_functions = {"Autoencoder": MSELoss()}
+        return loss_functions
 
 
     #########################################################################
@@ -96,10 +95,8 @@ class VanillaVAE(AbstractGenerativeModel):
         return self.encoder(x)
 
     def calculate_losses(self, X_batch, Z_batch, who=None):
-        if who == "Autoencoder":
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
-        else:
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+        losses = self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+        return losses
 
     def _calculate_autoencoder_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(X_batch)
@@ -114,11 +111,11 @@ class VanillaVAE(AbstractGenerativeModel):
         )
 
         total_loss = reconstruction_loss + self.lambda_KL*kl_loss
-        self._losses.update({
+        return {
             "Autoencoder": total_loss,
             "Kullback-Leibler": self.lambda_KL*kl_loss,
             "Reconstruction": reconstruction_loss,
-        })
+        }
 
 
     #########################################################################

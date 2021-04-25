@@ -1,3 +1,4 @@
+import os
 import torch
 
 import numpy as np
@@ -7,6 +8,7 @@ import vegans.utils.utils as utils
 from torch.nn import MSELoss
 from torchvision.utils import make_grid
 from vegans.utils.utils import get_input_dim
+from vegans.utils.networks import NeuralNetwork
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
 
@@ -14,20 +16,20 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     #########################################################################
     # Actions before training
     #########################################################################
-    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, folder, ngpu, secure):
-        """The AbstractConditionalGenerativeModel is the most basic building block of VeGAN for conditional models. All conditional GAN
+    def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, ngpu, folder, secure):
+        """The AbstractConditionalGenerativeModel is the most basic building block of vegans for conditional models. All conditional GAN
         implementation should at least inherit from this class.
 
         Parameters
         ----------
         x_dim : list, tuple
-            Number of the output dimension of the generator and input dimension of the discriminator / critic.
+            Number of the output dimensions of the generator and input dimension of the discriminator / critic.
             In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
         z_dim : int, list, tuple
-            Number of the latent dimension for the generator input. Might have dimensions of an image.
+            Number of the latent dimensions for the generator input. Might have dimensions of an image.
         y_dim : int, list, tuple
             Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.
-            [nr_channels, nr_height_pixels, nr_width_pixels] or an integer
+            [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.
         optim : dict or torch.optim
             Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
             name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
@@ -36,18 +38,19 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
         feature_layer : torch.nn.*
             Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-            If `feature_layer` is not None, the original generator loss is replaced by a feature loss.
+            If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
+            [here](https://arxiv.org/abs/1606.03498v1).
         fixed_noise_size : int
             Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
             subdirectory, the tensorboard images tab and the samples in get_training_results().
         device : string
             Device used while training the model. Either "cpu" or "cuda".
+        ngpu : int
+            Number of gpus used during training if device == "cuda".
         folder : string
             Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
             tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
             already exists a time stamp is appended to make it unique.
-        ngpu : int
-            Number of gpus used during training if device == "cuda".
         """
         self.adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         self.gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
@@ -85,7 +88,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             "Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width)."
         )
         assert X_train.shape[1:] == self.x_dim[:], (
-            "Wrong input shape for adversariat / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
+            "Wrong input shape for adversary / encoder. Given: {}. Needed: {}.".format(X_train.shape, self.x_dim)
         )
 
         if X_test is not None:
@@ -119,13 +122,11 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
 
     @staticmethod
     def _check_conditional_network_input(network, in_dim, y_dim, name):
-        from vegans.utils.networks import NeuralNetwork
-        arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
+        architecture = NeuralNetwork._get_iterative_layers(network, input_type="Object")
         has_error = False
 
-        for i, layer in enumerate(arch):
+        for i, layer in enumerate(architecture):
             if "in_features" in layer.__dict__:
-                inpt_layer = layer
                 inpt_dim = int(layer.__dict__["in_features"])
                 if inpt_dim == in_dim:
                     has_error = True
@@ -133,13 +134,12 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                     has_error = True
                 break
             elif "in_channels" in layer.__dict__:
-                inpt_layer = layer
                 inpt_dim = int(layer.__dict__["in_channels"])
                 if inpt_dim == in_dim[0]:
                     has_error = True
                 break
         else:
-            raise TypeError("No input layer found. No Linear or Conv2d /ConvTranspose2d layers?")
+            raise ValueError("No layer with `in_features`, `in_channels` or `num_features` found.")
 
         if has_error:
             required_dim = get_input_dim(in_dim, y_dim)
@@ -164,14 +164,12 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
 
     @staticmethod
     def _check_unconditional_network_input(network, in_dim, y_dim, name):
-        from vegans.utils.networks import NeuralNetwork
-        arch = NeuralNetwork._get_iterative_layers(network, input_type="Object")
+        architecture = NeuralNetwork._get_iterative_layers(network, input_type="Object")
         has_error = False
         concat_input = get_input_dim(in_dim, y_dim)
 
-        for i, layer in enumerate(arch):
+        for i, layer in enumerate(architecture):
             if "in_features" in layer.__dict__:
-                inpt_layer = layer
                 inpt_dim = int(layer.__dict__["in_features"])
                 if inpt_dim == concat_input:
                     has_error = True
@@ -179,7 +177,6 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                     has_error = True
                 break
             elif "in_channels" in layer.__dict__:
-                inpt_layer = layer
                 inpt_dim = int(layer.__dict__["in_channels"])
                 if inpt_dim == concat_input[0]:
                     has_error = True
@@ -210,7 +207,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     #########################################################################
     def fit(self, X_train, y_train, X_test=None, y_test=None, epochs=5, batch_size=32, steps=None,
             print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
-        """ Method to call when the conditional generative adversarial network should be trained.
+        """ Trains the model, iterating over all contained networks.
 
         Parameters
         ----------
@@ -274,15 +271,13 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 Z = self.sample(n=len(X))
                 for name, _ in self.neural_nets.items():
                     for _ in range(self.steps[name]):
-                        self._losses = {}
-                        self.calculate_losses(X_batch=X, Z_batch=Z, y_batch=y, who=name)
+                        self._losses = self.calculate_losses(X_batch=X, Z_batch=Z, y_batch=y, who=name)
                         self._zero_grad(who=name)
                         self._backward(who=name)
                         self._step(who=name)
 
                 if print_every is not None and step % print_every == 0:
-                    self._losses = {}
-                    self.calculate_losses(X_batch=X, Z_batch=Z, y_batch=y)
+                    self._losses = self.calculate_losses(X_batch=X, Z_batch=Z, y_batch=y)
                     self._summarise_batch(
                         batch=batch, max_batches=max_batches, epoch=epoch,
                         max_epochs=epochs, print_every=print_every
@@ -344,7 +339,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     #########################################################################
     def _log_images(self, images, step, writer):
         assert len(self.x_dim) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversariat / encoder.input_size = {}.".format(self.x_dim)
+            "Called _log_images in AbstractGenerativeModel for adversary / encoder.input_size = {}.".format(self.x_dim)
         )
         if writer is not None:
             grid = make_grid(images)
@@ -357,13 +352,12 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 ax.set_title("Label: {}".format(lbl))
             except ValueError:
                 pass
-        plt.savefig(self.folder+"images/image_{}.png".format(step))
+        plt.savefig(os.path.join(self.folder+"/images/image_{}.png".format(step)))
         plt.close()
         print("Images logged.")
 
     def _log_losses(self, X_batch, Z_batch, y_batch, mode):
-        self._losses = {}
-        self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
+        self._losses = self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
         self._append_losses(mode=mode)
 
 
@@ -460,6 +454,6 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
             y = torch.from_numpy(y).to(self.device)
         inpt = self.concatenate(z, y).float().to(self.device)
         sample = self._Z_transformer(inpt)
-        if self._is_training:
+        if self.training:
             return sample
         return sample.detach().cpu().numpy()

@@ -12,6 +12,10 @@ Default optimizer:
     - torch.optim.Adam
 Custom parameter:
     - eps: Small value preventing overflow and nans when calculating the Kullback-Leibler divergence.
+
+References
+----------
+.. [1] https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
 """
 
 import torch
@@ -26,7 +30,7 @@ class ConditionalKLGAN(AbstractConditionalGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             y_dim,
@@ -36,12 +40,12 @@ class ConditionalKLGAN(AbstractConditionalGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./CKLGAN",
             ngpu=None,
+            folder="./CKLGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             z_dim=z_dim, x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
@@ -54,7 +58,8 @@ class ConditionalKLGAN(AbstractConditionalGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Adversariat": torch.nn.BCELoss()}
+        loss_functions = {"Adversary": torch.nn.BCELoss()}
+        return loss_functions
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
@@ -65,4 +70,4 @@ class ConditionalKLGAN(AbstractConditionalGAN1v1):
         else:
             gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
 
-        self._losses.update({"Generator": gen_loss})
+        return {"Generator": gen_loss}

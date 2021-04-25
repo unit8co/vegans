@@ -6,6 +6,8 @@ import numpy as np
 def preprocess_cifar(root, normalize=True, pad=None):
     """Load the mnist data from root.
 
+    Download from here: http://www.cs.toronto.edu/~kriz/cifar.html.
+
     Parameters
     ----------
     root : str
@@ -20,16 +22,15 @@ def preprocess_cifar(root, normalize=True, pad=None):
     numpy.array
         train and test data as well as labels.
     """
-    root = root if root.endswith("/") else root + "/"
-    root += "CIFAR10/"
+    root = os.path.join(root, "CIFAR10")
 
-    if os.path.exists(root+"train_data.pickle"):
-        with open(root+"train_data.pickle", "rb") as f:
+    if os.path.exists(os.path.join(root, "train_data.pickle")):
+        with open(os.path.join(root, "train_data.pickle"), "rb") as f:
             train_data = pickle.load(f)
             X_train = train_data["data"]
             y_train = train_data["targets"]
     else:
-        train_files = [root+f for f in os.listdir(root) if "data" in f]
+        train_files = [os.path.join(root, f) for f in os.listdir(root) if "data" in f]
         with open(train_files[0], "rb") as f:
             train_data = pickle.load(f, encoding='bytes')
             X_train = train_data[b"data"].reshape((-1, 3, 32, 32))
@@ -40,10 +41,10 @@ def preprocess_cifar(root, normalize=True, pad=None):
                 X_train = np.concatenate((X_train, train_data[b"data"].reshape((-1, 3, 32, 32))))
                 y_train = np.concatenate((y_train, train_data[b"labels"]))
 
-        with open(root+"train_data.pickle", "wb") as f:
+        with open(os.path.join(root, "train_data.pickle"), "wb") as f:
             pickle.dump({"data": X_train, "targets": y_train}, f)
 
-    with open(root+"test_batch", "rb") as f:
+    with open(os.path.join(root, "test_batch"), "rb") as f:
         test_data = pickle.load(f, encoding='bytes')
         test_images = test_data[b"data"]
         red_channel = test_images[:, :1024].reshape((-1, 32, 32))

@@ -9,7 +9,7 @@ we use a discriminator to determine the "realness" of the latent vector.
 Losses:
     - Encoder: Kullback-Leibler
     - Decoder: Binary cross-entropy
-    - Adversariat: Binary cross-entropy
+    - Adversary: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
 Custom parameter:
@@ -27,7 +27,7 @@ import torch.nn as nn
 
 from torch.nn import MSELoss, BCELoss, L1Loss
 from vegans.utils.utils import WassersteinLoss
-from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversariat
+from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversary
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
 class AAE(AbstractGenerativeModel):
@@ -38,7 +38,7 @@ class AAE(AbstractGenerativeModel):
             self,
             encoder,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             optim=None,
@@ -48,19 +48,17 @@ class AAE(AbstractGenerativeModel):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./AAE",
             ngpu=0,
+            folder="./AAE",
             secure=True):
 
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
         self.adv_type = adv_type
         self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
         self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
         self.autoencoder = Autoencoder(self.encoder, self.generator)
-        self.adversariat = Adversariat(adversariat, input_size=z_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
+        self.adversary = Adversary(adversary, input_size=z_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
         self.neural_nets = {
-            "Generator": self.generator, "Encoder": self.encoder, "Adversariat": self.adversariat
+            "Generator": self.generator, "Encoder": self.encoder, "Adversary": self.adversary
         }
 
         super().__init__(
@@ -85,11 +83,12 @@ class AAE(AbstractGenerativeModel):
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":
-            self.loss_functions = {"Generator": MSELoss(), "Adversariat": BCELoss()}
+            loss_functions = {"Generator": MSELoss(), "Adversary": BCELoss()}
         elif self.adv_type == "Critic":
-            self.loss_functions = {"Generator": MSELoss(), "Adversariat": WassersteinLoss()}
+            loss_functions = {"Generator": MSELoss(), "Adversary": WassersteinLoss()}
         else:
             raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
+        return loss_functions
 
 
     #########################################################################
@@ -100,15 +99,16 @@ class AAE(AbstractGenerativeModel):
 
     def calculate_losses(self, X_batch, Z_batch, who=None):
         if who == "Generator":
-            self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
         elif who == "Encoder":
-            self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Adversariat":
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
+        elif who == "Adversary":
+            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch)
         else:
-            self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-            self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
-            self._calculate_adversariat_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
+            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
+            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
+        return losses
 
     def _calculate_generator_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(x=X_batch).detach()
@@ -117,9 +117,9 @@ class AAE(AbstractGenerativeModel):
             fake_images, X_batch
         )
 
-        self._losses.update({
+        return {
             "Generator": gen_loss,
-        })
+        }
 
     def _calculate_encoder_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(x=X_batch)
@@ -137,39 +137,39 @@ class AAE(AbstractGenerativeModel):
         )
 
         enc_loss = self.lambda_z*enc_loss_fake + enc_loss_reconstruction
-        self._losses.update({
+        return {
             "Encoder": enc_loss,
             "Encoder_x": self.lambda_z*enc_loss_fake,
             "Encoder_fake": enc_loss_reconstruction,
-        })
+        }
 
-    def _calculate_adversariat_loss(self, X_batch, Z_batch):
+    def _calculate_adversary_loss(self, X_batch, Z_batch):
         encoded_output = self.encode(x=X_batch).detach()
 
         fake_predictions = self.predict(x=encoded_output)
         real_predictions = self.predict(x=Z_batch)
 
-        adv_loss_fake = self.loss_functions["Adversariat"](
+        adv_loss_fake = self.loss_functions["Adversary"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
         )
-        adv_loss_real = self.loss_functions["Adversariat"](
+        adv_loss_real = self.loss_functions["Adversary"](
             real_predictions, torch.ones_like(real_predictions, requires_grad=False)
         )
 
         adv_loss = 1/3*(adv_loss_real + adv_loss_fake)
-        self._losses.update({
-            "Adversariat": adv_loss,
-            "Adversariat_fake": adv_loss_fake,
-            "Adversariat_real": adv_loss_real,
+        return {
+            "Adversary": adv_loss,
+            "Adversary_fake": adv_loss_fake,
+            "Adversary_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
-        })
+        }
 
     def _step(self, who=None):
         if who is not None:
             self.optimizers[who].step()
-            if who == "Adversariat":
+            if who == "Adversary":
                 if self.adv_type == "Critic":
-                    for p in self.adversariat.parameters():
+                    for p in self.adversary.parameters():
                         p.data.clamp_(-0.01, 0.01)
         else:
             [optimizer.step() for _, optimizer in self.optimizers.items()]

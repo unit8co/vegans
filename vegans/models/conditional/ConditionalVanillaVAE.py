@@ -44,14 +44,12 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
             lambda_KL=10,
             fixed_noise_size=32,
             device=None,
-            folder="./CVanillaVAE",
             ngpu=0,
+            folder="./CVanillaVAE",
             secure=True):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         dec_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-        if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
         if secure:
             AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
             AbstractConditionalGenerativeModel._check_conditional_network_input(decoder, in_dim=z_dim, y_dim=y_dim, name="Decoder")
@@ -93,7 +91,8 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Autoencoder": MSELoss()}
+        loss_functions = {"Autoencoder": MSELoss()}
+        return loss_functions
 
 
     #########################################################################
@@ -104,10 +103,8 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
         return self.encoder(inpt)
 
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
-        if who == "Autoencoder":
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        else:
-            self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
+        losses = self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
+        return losses
 
     def _calculate_autoencoder_loss(self, X_batch, Z_batch, y_batch):
         encoded_output = self.encode(x=X_batch, y=y_batch)
@@ -122,11 +119,11 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
         )
 
         total_loss = reconstruction_loss + self.lambda_KL*kl_loss
-        self._losses.update({
+        return {
             "Autoencoder": total_loss,
             "Kullback-Leibler": self.lambda_KL*kl_loss,
             "Reconstruction": reconstruction_loss,
-        })
+        }
 
 
     #########################################################################

@@ -28,7 +28,7 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             y_dim,
@@ -37,12 +37,12 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./CLSGAN",
             ngpu=None,
+            folder="./CLSGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
@@ -53,4 +53,5 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
+        loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
+        return loss_functions

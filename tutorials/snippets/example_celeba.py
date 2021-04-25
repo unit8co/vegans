@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
-from sklearn.preprocessing import OneHotEncoder
 from vegans.GAN import (
     ConditionalAAE,
     ConditionalBicycleGAN,
@@ -26,32 +25,26 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 if __name__ == '__main__':
 
     datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="cifar", download=True)
+    train_dataloader = loading.load_data(datapath, which="CelebA", batch_size=8, max_loaded_images=3000)
 
     epochs = 3
-    batch_size = 32
 
-    X_train = X_train.reshape((-1, 1, 32, 32))
-    X_test = X_test.reshape((-1, 1, 32, 32))
-    one_hot_encoder = OneHotEncoder(sparse=False)
-    y_train = one_hot_encoder.fit_transform(y_train.reshape(-1, 1))
-    y_test = one_hot_encoder.transform(y_test.reshape(-1, 1))
-
-    x_dim = X_train.shape[1:]
-    y_dim = y_train.shape[1:]
-    z_dim = 64
+    X_train, y_train = iter(train_dataloader).next()
+    x_dim = X_train.numpy().shape[1:]
+    y_dim = y_train.numpy().shape[1:]
+    z_dim = 16
     gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
     adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="mnist")
-    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="mnist")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="example")
+    critic = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="example")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
 
     #########################################################################
     # Training
@@ -61,7 +54,8 @@ if __name__ == '__main__':
         # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
         # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        # ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalKLGAN
     ]
 
     for model in models:
@@ -69,42 +63,42 @@ if __name__ == '__main__':
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim, "folder": folder}
 
         if model.__name__ in ["ConditionalAAE"]:
-            discriminator_aee = loading.load_adversariat(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
+            discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
             gan_model = model(
-                generator=generator, adversariat=discriminator_aee, encoder=encoder, **kwargs
+                generator=generator, adversary=discriminator_aee, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalBicycleGAN", "ConditionalVAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
             gan_model = model(
-                generator=generator, adversariat=discriminator, encoder=encoder_reduced, **kwargs
+                generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
 
         elif model.__name__ in ["ConditionalEBGAN"]:
             m = np.mean(X_train)
             gan_model = model(
-                generator=generator, adversariat=autoencoder, m=m, **kwargs
+                generator=generator, adversary=autoencoder, m=m, **kwargs
             )
 
         elif model.__name__ in ["ConditionalKLGAN", "ConditionalLSGAN", "ConditionalPix2Pix", "ConditionalVanillaGAN"]:
             gan_model = model(
-                generator=generator, adversariat=discriminator, **kwargs
+                generator=generator, adversary=discriminator, **kwargs
             )
 
         elif model.__name__ in ["ConditionalLRGAN"]:
             gan_model = model(
-                generator=generator, adversariat=discriminator, encoder=encoder, **kwargs
+                generator=generator, adversary=discriminator, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalVanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalWassersteinGAN", "ConditionalWassersteinGANGP"]:
             gan_model = model(
-                generator=generator, adversariat=critic, **kwargs
+                generator=generator, adversary=critic, **kwargs
             )
 
         else:
@@ -112,11 +106,11 @@ if __name__ == '__main__':
 
         gan_model.summary(save=True)
         gan_model.fit(
-            X_train=X_train,
-            y_train=y_train,
-            X_test=X_test,
-            y_test=y_test,
-            batch_size=batch_size,
+            X_train=train_dataloader,
+            y_train=None,
+            X_test=None,
+            y_test=None,
+            batch_size=None,
             epochs=epochs,
             steps=None,
             print_every="0.2e",

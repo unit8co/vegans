@@ -56,16 +56,16 @@ def test_init(gan, last_layer):
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=16)
     adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
 
-    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
     with pytest.raises(TypeError):
-        gan(generator=gen, adversariat=adv, x_dim=17, z_dim=z_dim, y_dim=y_dim, folder=None)
+        gan(generator=gen, adversary=adv, x_dim=17, z_dim=z_dim, y_dim=y_dim, folder=None)
     with pytest.raises(TypeError):
-        gan(generator=gen, adversariat=adv, x_dim=16, z_dim=11, y_dim=y_dim, folder=None)
+        gan(generator=gen, adversary=adv, x_dim=16, z_dim=11, y_dim=y_dim, folder=None)
 
     gen = generate_net(in_dim=15, last_layer=torch.nn.Sigmoid, out_dim=17)
     adv = generate_net(in_dim=21, last_layer=last_layer, out_dim=1)
     with pytest.raises(AssertionError):
-        gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+        gan(generator=gen, adversary=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
 
 
 @pytest.mark.parametrize("gan, last_layer", networks)
@@ -83,7 +83,7 @@ def test_fit_vector(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -106,7 +106,7 @@ def test_fit_vector_feature_loss(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
+    testgan = gan(generator=gen, adversary=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -133,7 +133,7 @@ def test_fit_error_vector(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=adv, x_dim=16, z_dim=z_dim, y_dim=y_dim, folder=None)
 
     with pytest.raises(AssertionError):
         testgan.fit(
@@ -178,7 +178,7 @@ def test_fit_image(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -202,7 +202,7 @@ def test_fit_image_feature_loss(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
+    testgan = gan(generator=gen, adversary=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer=adv.hidden_part)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -230,7 +230,7 @@ def test_fit_error_image(gan, last_layer):
         "epochs": 1, "batch_size": 4, "steps": None, "print_every": None, "save_model_every": None,
         "save_images_every": None, "save_losses_every": "1e", "enable_tensorboard": False
     }
-    testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
 
     with pytest.raises(AssertionError):
         testgan.fit(
@@ -258,7 +258,7 @@ def test_fit_error_image(gan, last_layer):
         )
 
     with pytest.raises(AssertionError):
-        testgan = gan(generator=gen, adversariat=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer="hidden_part")
+        testgan = gan(generator=gen, adversary=adv, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None, feature_layer="hidden_part")
 
 
 @pytest.mark.parametrize("gan, optim",

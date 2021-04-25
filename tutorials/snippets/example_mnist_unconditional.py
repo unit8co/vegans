@@ -33,12 +33,12 @@ if __name__ == '__main__':
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="mnist")
-    discriminator = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="mnist")
-    critic = loading.load_adversariat(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="mnist")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, which="mnist")
+    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
+    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="example")
+    critic = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, adv_type="Critic", which="example")
+    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, which="example")
+    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, which="example")
+    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, which="example")
 
     #########################################################################
     # Training
@@ -56,53 +56,53 @@ if __name__ == '__main__':
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "folder": folder}
 
         if model.__name__ in ["AAE"]:
-            discriminator_aee = loading.load_adversariat(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="mnist")
+            discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example")
             gan_model = model(
-                generator=generator, adversariat=discriminator_aee, encoder=encoder, **kwargs
+                generator=generator, adversary=discriminator_aee, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["BicycleGAN", "VAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="example")
             gan_model = model(
-                generator=generator, adversariat=discriminator, encoder=encoder_reduced, **kwargs
+                generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
 
         elif model.__name__ in ["EBGAN"]:
             m = np.mean(X_train)
             gan_model = model(
-                generator=generator, adversariat=autoencoder, m=m, **kwargs
+                generator=generator, adversary=autoencoder, m=m, **kwargs
             )
 
         elif model.__name__ in ["InfoGAN"]:
             c_dim_discrete = [10]
             c_dim_continuous = 0
             c_dim = sum(c_dim_discrete) + c_dim_continuous
-            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=c_dim, which="mnist")
-            encoder_helper = loading.load_encoder(x_dim=x_dim, z_dim=32, which="mnist")
+            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=c_dim, which="example")
+            encoder_helper = loading.load_encoder(x_dim=x_dim, z_dim=32, which="example")
             gan_model = model(
-                generator=generator_conditional, adversariat=discriminator, encoder=encoder_helper,
+                generator=generator_conditional, adversary=discriminator, encoder=encoder_helper,
                 c_dim_discrete=c_dim_discrete, c_dim_continuous=c_dim_continuous, **kwargs
             )
 
         elif model.__name__ in ["KLGAN", "LSGAN", "Pix2Pix", "VanillaGAN"]:
             gan_model = model(
-                generator=generator, adversariat=discriminator, **kwargs
+                generator=generator, adversary=discriminator, **kwargs
             )
 
         elif model.__name__ in ["LRGAN"]:
             gan_model = model(
-                generator=generator, adversariat=discriminator, encoder=encoder, **kwargs
+                generator=generator, adversary=discriminator, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["VanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, which="example")
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
 
         elif model.__name__ in ["WassersteinGAN", "WassersteinGANGP"]:
             gan_model = model(
-                generator=generator, adversariat=critic, **kwargs
+                generator=generator, adversary=critic, **kwargs
             )
 
         else:
@@ -116,10 +116,10 @@ if __name__ == '__main__':
             epochs=epochs,
             steps=None,
             print_every="0.2e",
-            save_model_every=None,
+            save_model_every="0.1e",
             save_images_every="0.2e",
             save_losses_every=10,
-            enable_tensorboard=False
+            enable_tensorboard=True
         )
         samples, losses = gan_model.get_training_results(by_epoch=False)
 

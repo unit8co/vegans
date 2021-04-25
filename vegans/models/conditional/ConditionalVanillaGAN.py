@@ -32,7 +32,7 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             y_dim,
@@ -41,12 +41,12 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./CVanillaGAN",
             ngpu=None,
+            folder="./CVanillaGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
@@ -57,4 +57,5 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss()}
+        loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss()}
+        return loss_functions

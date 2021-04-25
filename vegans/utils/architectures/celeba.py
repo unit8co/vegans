@@ -19,9 +19,9 @@ def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
     ----------
     root : str
         Path to CelebA root directory.
-    batch_size : TYPE
+    batch_size : int
         batch size during training.
-    max_loaded_images : TYPE
+    max_loaded_images : int
         Number of examples loaded into memory, before new batch is loaded.
     kwargs
         Other input arguments to torchvision.utils.data.DataLoader
@@ -34,7 +34,8 @@ def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
     class DataSet(Dataset):
         def __init__(self, root, max_loaded_images):
             self.root = root
-            self.datapath = root + "CelebA/img_align_celeba/img_align_celeba/"
+            self.datapath = os.path.join(root, "CelebA/img_align_celeba/img_align_celeba/")
+            self.attributepath = os.path.join(root, "CelebA/list_attr_celeba.csv")
             self.nr_samples = 202599
             self.max_loaded_images = max_loaded_images
             self.image_shape = (3, 218, 178)
@@ -56,7 +57,7 @@ def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
 
         def _load_images(self, start):
             end = start + self.max_loaded_images
-            attributes = pd.read_csv(root + "CelebA/list_attr_celeba.csv").iloc[start:start+end, :]
+            attributes = pd.read_csv(self.attributepath).iloc[start:start+end, :]
             attributes = self._transform_targets(targets=attributes)
 
             batch_image_names = self.image_names[start:end]

@@ -1,5 +1,5 @@
 """
-Test for conditional models with encoder, generator, adversariat structure.
+Test for conditional models with encoder, generator, adversary structure.
 """
 
 import torch
@@ -58,29 +58,29 @@ def test_init(gan, adv_dim, enc_dim):
 
     # TEST CRITIC
     crit = generate_net(in_dim=adv_dim, last_layer=torch.nn.Identity, out_dim=1)
-    testgan = gan(generator=gen, adversariat=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", folder=None)
+    testgan = gan(generator=gen, adversary=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", folder=None)
 
     # TEST DISCRIMINATOR
     disc = generate_net(in_dim=adv_dim, last_layer=torch.nn.Sigmoid, out_dim=1)
-    testgan = gan(generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
 
     # TEST x_dim AND z_dim
     with pytest.raises(TypeError):
-        gan(generator=gen, adversariat=disc, encoder=enc, x_dim=17, z_dim=10, folder=None)
+        gan(generator=gen, adversary=disc, encoder=enc, x_dim=17, z_dim=10, folder=None)
     with pytest.raises(TypeError):
-        gan(generator=gen, adversariat=disc, encoder=enc, x_dim=16, z_dim=11, folder=None)
+        gan(generator=gen, adversary=disc, encoder=enc, x_dim=16, z_dim=11, folder=None)
 
     # TEST GENERATOR OUTPUT DIMENSIONS
     gen = generate_net(in_dim=z_dim+y_dim, last_layer=torch.nn.Sigmoid, out_dim=17)
     with pytest.raises(AssertionError):
-        gan(generator=gen, adversariat=disc, encoder=enc, x_dim=16, z_dim=10, y_dim=y_dim, folder=None)
+        gan(generator=gen, adversary=disc, encoder=enc, x_dim=16, z_dim=10, y_dim=y_dim, folder=None)
 
     # TEST ENCODER OUTPUT DIMENSIONS
     if enc_dim == z_dim:
         gen = generate_net(in_dim=z_dim+y_dim, last_layer=torch.nn.Sigmoid, out_dim=16)
         enc = generate_net(in_dim=x_dim+y_dim, last_layer=torch.nn.Identity, out_dim=17)
         with pytest.raises(AssertionError):
-            gan(generator=gen, adversariat=disc, encoder=enc, x_dim=16, z_dim=10, y_dim=y_dim, folder=None)
+            gan(generator=gen, adversary=disc, encoder=enc, x_dim=16, z_dim=10, y_dim=y_dim, folder=None)
 
 
 @pytest.mark.parametrize("gan, adv_dim, enc_dim", networks_flat)
@@ -103,7 +103,7 @@ def test_fit_vector(gan, adv_dim, enc_dim):
 
     # TEST CRITIC
     crit = generate_net(in_dim=adv_dim, last_layer=torch.nn.Identity, out_dim=1)
-    testgan = gan(generator=gen, adversariat=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", folder=None)
+    testgan = gan(generator=gen, adversary=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", folder=None)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -111,7 +111,7 @@ def test_fit_vector(gan, adv_dim, enc_dim):
 
     # TEST DISCRIMINATOR
     disc = generate_net(in_dim=adv_dim, last_layer=torch.nn.Sigmoid, out_dim=1)
-    testgan = gan(generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
+    testgan = gan(generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, folder=None)
     testgan.fit(
         X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, **fit_kwargs
     )
@@ -139,7 +139,7 @@ def test_fit_vector_feature_loss(gan, adv_dim, enc_dim):
     # TEST CRITIC
     crit = generate_net(in_dim=adv_dim, last_layer=torch.nn.Identity, out_dim=1)
     testgan = gan(
-        generator=gen, adversariat=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=crit, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None, adv_type="Critic", feature_layer=crit.hidden_part
     )
     testgan.fit(
@@ -150,7 +150,7 @@ def test_fit_vector_feature_loss(gan, adv_dim, enc_dim):
     # TEST DISCRIMINATOR
     disc = generate_net(in_dim=adv_dim, last_layer=torch.nn.Sigmoid, out_dim=1)
     testgan = gan(
-        generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None, feature_layer=disc.hidden_part
     )
     testgan.fit(
@@ -184,7 +184,7 @@ def test_fit_error_vector(gan, adv_dim, enc_dim):
     }
 
     testgan = gan(
-        generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None, feature_layer=disc.hidden_part
     )
 
@@ -234,7 +234,7 @@ def test_fit_image(gan, adv_dim, enc_dim):
     }
 
     testgan = gan(
-        generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None
     )
     testgan.fit(
@@ -263,7 +263,7 @@ def test_fit_image_feature_loss(gan, adv_dim, enc_dim):
     }
 
     testgan = gan(
-        generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None, feature_layer=disc.hidden_part
     )
     testgan.fit(
@@ -297,7 +297,7 @@ def test_fit_image_error(gan, adv_dim, enc_dim):
     }
 
     testgan = gan(
-        generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+        generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
         folder=None, feature_layer=disc.hidden_part
     )
     with pytest.raises(AssertionError):
@@ -327,7 +327,7 @@ def test_fit_image_error(gan, adv_dim, enc_dim):
 
     with pytest.raises(AssertionError):
         testgan = gan(
-            generator=gen, adversariat=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
+            generator=gen, adversary=disc, encoder=enc, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
             folder=None, feature_layer="hidden_part"
         )
 

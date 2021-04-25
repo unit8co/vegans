@@ -30,7 +30,7 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             y_dim,
@@ -40,12 +40,12 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./CPix2Pix",
             ngpu=None,
+            folder="./CPix2Pix",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size,
@@ -58,7 +58,8 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": BCELoss(), "Adversariat": BCELoss(), "L1": L1Loss()}
+        loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss(), "L1": L1Loss()}
+        return loss_functions
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
@@ -73,8 +74,8 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             X_batch, fake_images
         )
         gen_loss = gen_loss_original + self.lambda_x*gen_loss_pixel_wise
-        self._losses.update({
+        return {
             "Generator": gen_loss,
             "Generator_Original": gen_loss_original,
             "Generator_L1": gen_loss_pixel_wise
-        })
+        }

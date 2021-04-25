@@ -28,7 +28,7 @@ class LSGAN(AbstractGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             optim=None,
@@ -36,12 +36,12 @@ class LSGAN(AbstractGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./LSGAN",
             ngpu=None,
+            folder="./LSGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             z_dim=z_dim, x_dim=x_dim, adv_type="Discriminator",
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
@@ -53,4 +53,5 @@ class LSGAN(AbstractGAN1v1):
         return torch.optim.Adam
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": torch.nn.MSELoss(), "Adversariat": torch.nn.MSELoss()}
+        loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
+        return loss_functions

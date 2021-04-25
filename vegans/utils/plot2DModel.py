@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_2d_grid(model, nr_images=10, show=True):
-    image_dim = model.adversariat.input_size[1]
+    image_dim = model.adversary.input_size[1]
     the_max = 2
     x_limit = np.linspace(-the_max, the_max, nr_images)
     y_limit = np.linspace(the_max, -the_max, nr_images)

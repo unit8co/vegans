@@ -37,7 +37,7 @@ class WassersteinGANGP(AbstractGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             optim=None,
@@ -46,12 +46,12 @@ class WassersteinGANGP(AbstractGAN1v1):
             fixed_noise_size=32,
             lmbda_grad=10,
             device=None,
-            folder="./WassersteinGANGP",
             ngpu=None,
+            folder="./WassersteinGANGP",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             z_dim=z_dim, x_dim=x_dim, adv_type="Critic",
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
@@ -67,15 +67,14 @@ class WassersteinGANGP(AbstractGAN1v1):
         return torch.optim.RMSprop
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss(), "GP": self._gradient_penalty}
+        loss_functions = {"Generator": WassersteinLoss(), "Adversary": WassersteinLoss(), "GP": self._gradient_penalty}
+        return loss_functions
 
     def _gradient_penalty(self, real_samples, fake_samples):
-        if len(real_samples.shape) == 2:
-            alpha = torch.Tensor(np.random.random((real_samples.size(0), 1))).to(self.device)
-        elif len(real_samples.shape) == 4:
-            alpha = torch.Tensor(np.random.random((real_samples.size(0), 1, 1, 1))).to(self.device)
+        sample_shape = (real_samples.size(0), *[1 for _ in range(len(real_samples.shape)-1)])
+        alpha = torch.rand(size=sample_shape, device=self.device)
         interpolates = (alpha * real_samples + ((1 - alpha) * fake_samples)).requires_grad_(True).float()
-        d_interpolates = self.adversariat(interpolates).to(self.device)
+        d_interpolates = self.adversary(interpolates).to(self.device)
         dummy = torch.ones_like(d_interpolates, requires_grad=False).to(self.device)
         gradients = torch.autograd.grad(
             outputs=d_interpolates,
@@ -93,23 +92,23 @@ class WassersteinGANGP(AbstractGAN1v1):
     #########################################################################
     # Actions during training
     #########################################################################
-    def _calculate_adversariat_loss(self, X_batch, Z_batch):
+    def _calculate_adversary_loss(self, X_batch, Z_batch):
         fake_images = self.generate(z=Z_batch).detach()
-        fake_predictions = self.adversariat(fake_images)
-        real_predictions = self.adversariat(X_batch.float())
+        fake_predictions = self.adversary(fake_images)
+        real_predictions = self.adversary(X_batch.float())
 
-        adv_loss_fake = self.loss_functions["Adversariat"](
+        adv_loss_fake = self.loss_functions["Adversary"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
         )
-        adv_loss_real = self.loss_functions["Adversariat"](
+        adv_loss_real = self.loss_functions["Adversary"](
             real_predictions, torch.ones_like(real_predictions, requires_grad=False)
         )
         adv_loss_grad = self.loss_functions["GP"](X_batch, fake_images)
         adv_loss = 0.5*(adv_loss_fake + adv_loss_real) + self.lmbda_grad*adv_loss_grad
-        self._losses.update({
-            "Adversariat": adv_loss,
-            "Adversariat_fake": adv_loss_fake,
-            "Adversariat_real": adv_loss_real,
-            "Adversariat_grad": adv_loss_grad,
+        return {
+            "Adversary": adv_loss,
+            "Adversary_fake": adv_loss_fake,
+            "Adversary_real": adv_loss_real,
+            "Adversary_grad": adv_loss_grad,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
-        })
+        }

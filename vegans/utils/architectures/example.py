@@ -12,9 +12,9 @@ def load_example_generator(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns
@@ -55,22 +55,22 @@ def load_example_generator(x_dim, z_dim, y_dim=None):
     return MyGenerator(gen_in_dim=gen_in_dim)
 
 
-def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
-    """ Load some example architecture for the adversariat.
+def load_example_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic"):
+    """ Load some example architecture for the adversary.
 
     Parameters
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns
     -------
     torch.nn.Module
-        Architectures for adversariat.
+        Architectures for adversary.
     """
     possible_types = ["Discriminator", "Critic"]
     if adv_type == "Critic":
@@ -94,7 +94,7 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     else:
         first_layer = nn.Identity()
 
-    class MyAdversariat(nn.Module):
+    class MyAdversary(nn.Module):
         def __init__(self, adv_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
@@ -113,7 +113,7 @@ def load_example_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
             x = self.feature_part(x)
             return self.output(x)
 
-    return MyAdversariat(adv_in_dim=adv_in_dim)
+    return MyAdversary(adv_in_dim=adv_in_dim)
 
 
 def load_example_encoder(x_dim, z_dim, y_dim=None):
@@ -123,7 +123,7 @@ def load_example_encoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
     y_dim : None, optional
         Indicating the number of dimensions for the labels.
@@ -177,7 +177,7 @@ def load_example_decoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
     y_dim : None, optional
         Indicating the number of dimensions for the labels.
@@ -222,9 +222,9 @@ def load_example_autoencoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns

@@ -12,11 +12,11 @@ def preprocess_mnist(torch_data, normalize=True, pad=None):
 
     Parameters
     ----------
-    torch_data : TYPE
+    torch_data : dict
         Original data loaded by `tochvision.datasets`
     normalize : bool, optional
         If True, data will be scaled to the interval [0, 1]
-    pad : None, optional
+    pad : int, optional
         Integer indicating the padding applied to each side of the input images.
 
     Returns
@@ -43,7 +43,7 @@ def load_mnist_generator(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
     y_dim : None, optional
         Indicating the number of dimensions for the labels.
@@ -122,22 +122,22 @@ def load_mnist_generator(x_dim, z_dim, y_dim=None):
     return MyGenerator(gen_in_dim=gen_in_dim)
 
 
-def load_mnist_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
-    """ Load some mnist architecture for the adversariat.
+def load_mnist_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic"):
+    """ Load some mnist architecture for the adversary.
 
     Parameters
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns
     -------
     torch.nn.Module
-        Architectures for adversariat.
+        Architectures for adversary.
     """
     possible_types = ["Discriminator", "Critic"]
     if adv_type == "Critic":
@@ -155,7 +155,7 @@ def load_mnist_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     else:
         adv_in_dim = x_dim
 
-    class MyAdversariat(nn.Module):
+    class MyAdversary(nn.Module):
         def __init__(self, adv_in_dim):
             super().__init__()
             self.hidden_part = nn.Sequential(
@@ -185,7 +185,7 @@ def load_mnist_adversariat(x_dim, z_dim, y_dim=None, adv_type="Critic"):
             x = self.hidden_part(x)
             return self.output(x)
 
-    return MyAdversariat(adv_in_dim=adv_in_dim)
+    return MyAdversary(adv_in_dim=adv_in_dim)
 
 
 def load_mnist_encoder(x_dim, z_dim, y_dim=None):
@@ -195,9 +195,9 @@ def load_mnist_encoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns
@@ -250,9 +250,9 @@ def load_mnist_decoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns
@@ -298,9 +298,9 @@ def load_mnist_autoencoder(x_dim, z_dim, y_dim=None):
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : TYPE
+    z_dim : integer, list
         Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
+    y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
     Returns

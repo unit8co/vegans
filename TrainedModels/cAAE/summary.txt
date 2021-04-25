@@ -75,7 +75,7 @@ Estimated Total Size (MB): 1.42
 
 
 
-Adversariat
+Adversary
 -----------
 Input shape:  (74,)
 ----------------------------------------------------------------
@@ -89,7 +89,7 @@ Input shape:  (74,)
          LeakyReLU-6                  [-1, 256]               0
             Linear-7                    [-1, 1]             257
            Sigmoid-8                    [-1, 1]               0
-     MyAdversariat-9                    [-1, 1]               0
+     MyAdversary-9                    [-1, 1]               0
 ================================================================
 Total params: 169,985
 Trainable params: 169,985
@@ -123,7 +123,7 @@ Parameter Group 0
     eps: 1e-08
     lr: 0.001
     weight_decay: 0
-), 'Adversariat': Adam (
+), 'Adversary': Adam (
 Parameter Group 0
     amsgrad: False
     betas: (0.9, 0.999)
@@ -132,7 +132,7 @@ Parameter Group 0
     weight_decay: 0
 )}
 device: ---> cuda
-loss_functions: ---> {'Generator': MSELoss(), 'Adversariat': BCELoss()}
+loss_functions: ---> {'Generator': MSELoss(), 'Adversary': BCELoss()}
 y_dim: ---> (10,)
 lambda_z: ---> 10
 adv_type: ---> Discriminator

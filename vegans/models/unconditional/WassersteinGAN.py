@@ -37,7 +37,7 @@ class WassersteinGAN(AbstractGAN1v1):
     def __init__(
             self,
             generator,
-            adversariat,
+            adversary,
             x_dim,
             z_dim,
             optim=None,
@@ -46,12 +46,12 @@ class WassersteinGAN(AbstractGAN1v1):
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder="./WassersteinGAN",
             ngpu=None,
+            folder="./WassersteinGAN",
             secure=True):
 
         super().__init__(
-            generator=generator, adversariat=adversariat,
+            generator=generator, adversary=adversary,
             z_dim=z_dim, x_dim=x_dim, adv_type="Critic",
             optim=optim, optim_kwargs=optim_kwargs,
             feature_layer=feature_layer,
@@ -70,7 +70,8 @@ class WassersteinGAN(AbstractGAN1v1):
         return torch.optim.RMSprop
 
     def _define_loss(self):
-        self.loss_functions = {"Generator": WassersteinLoss(), "Adversariat": WassersteinLoss()}
+        loss_functions = {"Generator": WassersteinLoss(), "Adversary": WassersteinLoss()}
+        return loss_functions
 
 
     #########################################################################
@@ -79,8 +80,8 @@ class WassersteinGAN(AbstractGAN1v1):
     def _step(self, who=None):
         if who is not None:
             self.optimizers[who].step()
-            if who == "Adversariat":
-                for p in self.adversariat.parameters():
+            if who == "Adversary":
+                for p in self.adversary.parameters():
                     p.data.clamp_(-self._clip_val, self._clip_val)
         else:
             [optimizer.step() for _, optimizer in self.optimizers.items()]

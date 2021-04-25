@@ -31,7 +31,7 @@ class WassersteinLoss():
         ----------
         input : torch.Tensor
             Input tensor. Output of a critic.
-        target : TYPE
+        target : torch.Tensor
             Label, either 1 or -1. Zeros are translated to -1.
 
         Returns
@@ -95,13 +95,18 @@ def concatenate(tensor1, tensor2):
 def get_input_dim(dim1, dim2):
     """ Get the number of input dimension from two inputs.
 
-    Tensors often need to be concatenated in different ways. This library
-    supports the concatenation of a 2D tensor with a 4D Tensor. For both
-    tensors the first dimension will be number of samples which is not
-    considered in this function. Therefore pass a 1D or 3D Tensor indicating
-    the vector or image dimensions (nr_channles, height, width). Calculates the
-    output dim when concatenating two images, an image with a vector or a vector
-    with an image.
+    Tensors often need to be concatenated in different ways, especially for conditional algorithms
+    leveraging label information. This function returns the output dimensions of a tensor after the concatenation of
+    two 2D tensors (two vectors), two 4D tensors (two images) or one 2D tensor with another 4D Tensor (vector with image).
+    For both tensors the first dimension will be number of samples which is not considered in this function.
+    Therefore `dim1` and `dim2` are both either 1D or 3D Tensors indicating the vector or
+    image dimensions (nr_channles, height, width).
+    In a usual use case `dim1` is either the latent z dimension (often a vector) or a sample from the sample space
+    (might be an image). `dim2` often represents the conditional y dimension that is concatenated with the noise
+    or a sample vefore passing it to a neural network.
+
+    This function ca be used to get the input dimension for the generator, adversary, encoder or decoder in a
+    conditional use case.
 
     Parameters
     ----------
@@ -139,7 +144,16 @@ def plot_losses(losses, show=True, share=False):
     Parameters
     ----------
     losses : dict
-        Dictionary containing the losses for some networks.
+        Dictionary containing the losses for some networks. The structure of the dictionary is:
+        ```
+        {
+            mode1: {loss_type1_1: losses1_1, loss_type1_2: losses1_2, ...},
+            mode2: {loss_type2_1: losses2_1, loss_type2_2: losses2_2, ...},
+            ...
+        }
+        ```
+        where `mode` is probably one of "Train" or "Test", loss_type might be "Generator", "Adversary", "Encoder", ...
+        and losses are lists of loss values collected during training.
     show : bool, optional
         If True, `plt.show` is called to visualise the images directly.
     share : bool, optional
@@ -147,8 +161,8 @@ def plot_losses(losses, show=True, share=False):
 
     Returns
     -------
-    TYPE
-        Description
+    plt.figure, plt.axis
+        Created figure and axis objects.
     """
     if share:
         fig, ax = plt.subplots(1, 1, figsize=(8, 8))
@@ -182,7 +196,7 @@ def plot_images(images, labels=None, show=True, n=None):
     Parameters
     ----------
     images : np.array
-        Must be of shape [nr_samples, height, width].
+        Must be of shape [nr_samples, height, width] or [nr_samples, height, width, 3].
     labels : np.array, optional
         Array of labels used in the title.
     show : bool, optional
@@ -192,9 +206,13 @@ def plot_images(images, labels=None, show=True, n=None):
 
     Returns
     -------
-    TYPE
-        Description
+    plt.figure, plt.axis
+        Created figure and axis objects.
     """
+    if len(images.shape)==4 and images.shape[1] == 3:
+        images = invert_channel_order(images=images)
+    elif len(images.shape)==4 and images.shape[1] == 1:
+        images = images.reshape((-1, images.shape[2], images.shape[3]))
     if n is None:
         n = images.shape[0]
     if n > 36:
