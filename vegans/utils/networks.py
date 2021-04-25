@@ -143,13 +143,14 @@ class Adversary(NeuralNetwork):
                 last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
 
             valid_last_layer = None
-            valid_types = ["Discriminator", "Critic", "AutoEncoder"]
+            valid_types = ["Discriminator", "Critic", "Autoencoder"]
             if adv_type == "Discriminator":
                 valid_last_layer = [torch.nn.Sigmoid]
             elif adv_type == "Critic":
                 valid_last_layer = [torch.nn.Linear, torch.nn.Identity]
             else:
-                raise TypeError("`adv_type` must be one of {}.".format(valid_types))
+                if adv_type not in valid_types:
+                    raise TypeError("`adv_type` must be one of {}. Given: {}.".format(valid_types, adv_type))
             self._type = adv_type
 
             if valid_last_layer is not None:

@@ -4,6 +4,30 @@ import torch.nn as nn
 from vegans.utils.utils import get_input_dim
 from vegans.utils.layers import LayerReshape
 
+class MyGenerator(nn.Module):
+    def __init__(self, gen_in_dim, x_dim):
+        super().__init__()
+        self.hidden_part = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(np.prod(gen_in_dim), 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 256),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(256),
+            nn.Linear(256, 512),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(512),
+            nn.Linear(512, 1024),
+            nn.LeakyReLU(0.2),
+            nn.BatchNorm1d(1024),
+            nn.Linear(1024, int(np.prod(x_dim))),
+            LayerReshape(x_dim)
+        )
+        self.output = nn.Sigmoid()
+
+    def forward(self, x):
+        x = self.hidden_part(x)
+        return self.output(x)
 
 def load_example_generator(x_dim, z_dim, y_dim=None):
     """ Load some example architecture for the generator.
@@ -27,33 +51,27 @@ def load_example_generator(x_dim, z_dim, y_dim=None):
     else:
         gen_in_dim = z_dim
 
-    class MyGenerator(nn.Module):
-        def __init__(self, gen_in_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(gen_in_dim), 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, 256),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(256),
-                nn.Linear(256, 512),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(512),
-                nn.Linear(512, 1024),
-                nn.LeakyReLU(0.2),
-                nn.BatchNorm1d(1024),
-                nn.Linear(1024, int(np.prod(x_dim))),
-                LayerReshape(x_dim)
-            )
-            self.output = nn.Sigmoid()
+    return MyGenerator(gen_in_dim=gen_in_dim, x_dim=x_dim)
 
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
 
-    return MyGenerator(gen_in_dim=gen_in_dim)
+class MyAdversary(nn.Module):
+    def __init__(self, adv_in_dim, first_layer, last_layer):
+        super().__init__()
+        self.hidden_part = nn.Sequential(
+            first_layer,
+            nn.Flatten(),
+            nn.Linear(np.prod(adv_in_dim), 512),
+            nn.LeakyReLU(0.2),
+            nn.Linear(512, 256),
+            nn.LeakyReLU(0.2),
+        )
+        self.feature_part = nn.Linear(256, 1)
+        self.output = last_layer()
 
+    def forward(self, x):
+        x = self.hidden_part(x)
+        x = self.feature_part(x)
+        return self.output(x)
 
 def load_example_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     """ Load some example architecture for the adversary.
@@ -94,27 +112,27 @@ def load_example_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic"):
     else:
         first_layer = nn.Identity()
 
-    class MyAdversary(nn.Module):
-        def __init__(self, adv_in_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                first_layer,
-                nn.Flatten(),
-                nn.Linear(np.prod(adv_in_dim), 512),
-                nn.LeakyReLU(0.2),
-                nn.Linear(512, 256),
-                nn.LeakyReLU(0.2),
-            )
-            self.feature_part = nn.Linear(256, 1)
-            self.output = last_layer()
+    return MyAdversary(adv_in_dim=adv_in_dim, first_layer=first_layer, last_layer=last_layer)
 
-        def forward(self, x):
-            x = self.hidden_part(x)
-            x = self.feature_part(x)
-            return self.output(x)
 
-    return MyAdversary(adv_in_dim=adv_in_dim)
+class MyEncoder(nn.Module):
+    def __init__(self, enc_in_dim, z_dim, first_layer):
+        super().__init__()
+        self.hidden_part = nn.Sequential(
+            first_layer,
+            nn.Flatten(),
+            nn.Linear(np.prod(enc_in_dim), 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, np.prod(z_dim)),
+            LayerReshape(z_dim)
+        )
+        self.output = nn.Identity()
 
+    def forward(self, x):
+        x = self.hidden_part(x)
+        return self.output(x)
 
 def load_example_encoder(x_dim, z_dim, y_dim=None):
     """ Load some example architecture for the encoder.
@@ -148,27 +166,27 @@ def load_example_encoder(x_dim, z_dim, y_dim=None):
     else:
         first_layer = nn.Identity()
 
-    class MyEncoder(nn.Module):
-        def __init__(self, enc_in_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                first_layer,
-                nn.Flatten(),
-                nn.Linear(np.prod(enc_in_dim), 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, np.prod(z_dim)),
-                LayerReshape(z_dim)
-            )
-            self.output = nn.Identity()
+    return MyEncoder(enc_in_dim=enc_in_dim, z_dim=z_dim, first_layer=first_layer)
 
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
 
-    return MyEncoder(enc_in_dim=enc_in_dim)
 
+class MyDecoder(nn.Module):
+    def __init__(self, x_dim, dec_in_dim):
+        super().__init__()
+        self.hidden_part = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(np.prod(dec_in_dim), 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, np.prod(x_dim)),
+            LayerReshape(x_dim)
+        )
+        self.output = nn.Identity()
+
+    def forward(self, x):
+        x = self.hidden_part(x)
+        return self.output(x)
 
 def load_example_decoder(x_dim, z_dim, y_dim=None):
     """ Load some example architecture for the decoder.
@@ -194,26 +212,33 @@ def load_example_decoder(x_dim, z_dim, y_dim=None):
     else:
         dec_in_dim = z_dim
 
-    class MyDecoder(nn.Module):
-        def __init__(self, x_dim, dec_in_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                nn.Flatten(),
-                nn.Linear(np.prod(dec_in_dim), 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, np.prod(x_dim)),
-                LayerReshape(x_dim)
-            )
-            self.output = nn.Identity()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
-
     return MyDecoder(x_dim=x_dim, dec_in_dim=dec_in_dim)
 
+
+class MyAutoEncoder(nn.Module):
+    def __init__(self, adv_in_dim, x_dim, first_layer):
+        super().__init__()
+        self.hidden_part = nn.Sequential(
+            first_layer,
+            nn.Flatten(),
+            nn.Linear(np.prod(adv_in_dim), 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 32),
+            nn.LeakyReLU(0.2),
+            nn.Linear(32, 128),
+            nn.LeakyReLU(0.2),
+            nn.Linear(128, 256),
+            nn.LeakyReLU(0.2),
+            nn.Linear(256, np.prod(x_dim)),
+            LayerReshape(x_dim)
+        )
+        self.output = nn.Identity()
+
+    def forward(self, x):
+        x = self.hidden_part(x)
+        return self.output(x)
 
 def load_example_autoencoder(x_dim, z_dim, y_dim=None):
     """ Load some example architecture for the auto-encoder.
@@ -245,29 +270,4 @@ def load_example_autoencoder(x_dim, z_dim, y_dim=None):
     else:
         first_layer = nn.Identity()
 
-    class MyAutoEncoder(nn.Module):
-        def __init__(self, adv_in_dim):
-            super().__init__()
-            self.hidden_part = nn.Sequential(
-                first_layer,
-                nn.Flatten(),
-                nn.Linear(np.prod(adv_in_dim), 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, 32),
-                nn.LeakyReLU(0.2),
-                nn.Linear(32, 128),
-                nn.LeakyReLU(0.2),
-                nn.Linear(128, 256),
-                nn.LeakyReLU(0.2),
-                nn.Linear(256, np.prod(x_dim)),
-                LayerReshape(x_dim)
-            )
-            self.output = nn.Identity()
-
-        def forward(self, x):
-            x = self.hidden_part(x)
-            return self.output(x)
-
-    return MyAutoEncoder(adv_in_dim=adv_in_dim)
+    return MyAutoEncoder(adv_in_dim=adv_in_dim, x_dim=x_dim, first_layer=first_layer)

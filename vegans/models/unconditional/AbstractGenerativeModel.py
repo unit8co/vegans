@@ -17,49 +17,43 @@ from vegans.utils.utils import plot_losses
 from torch.utils.tensorboard import SummaryWriter
 
 class AbstractGenerativeModel(ABC):
+    """The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should
+    at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.
+
+    Parameters
+    ----------
+    x_dim : list, tuple
+        Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
+    z_dim : int, list, tuple
+        Number of the latent dimensions for the generator input. Might have dimensions of an image.
+    optim : dict or torch.optim
+        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+        name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
+    optim_kwargs : dict
+        Optimizer keyword arguments used for each network. Must be a dictionary with network
+        name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+    feature_layer : torch.nn.*
+        Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
+        [here](https://arxiv.org/abs/1606.03498v1).
+    fixed_noise_size : int
+        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+        subdirectory, the tensorboard images tab and the samples in get_training_results().
+    device : string
+        Device used while training the model. Either "cpu" or "cuda".
+    ngpu : int
+        Number of gpus used during training if device == "cuda".
+    folder : string
+        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+        already exists a time stamp is appended to make it unique.
+    """
+
     #########################################################################
     # Actions before training
     #########################################################################
     def __init__(self, x_dim, z_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, ngpu, folder, secure):
-        """The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should
-        at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.
-
-        Parameters
-        ----------
-        x_dim : list, tuple
-            Number of the output dimensions of the generator and input dimension of the discriminator / critic.
-            In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
-        z_dim : int, list, tuple
-            Number of the latent dimensions for the generator input. Might have dimensions of an image.
-        optim : dict or torch.optim
-            Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
-            name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
-        optim_kwargs : dict
-            Optimizer keyword arguments used for each network. Must be a dictionary with network
-            name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
-        feature_layer : torch.nn.*
-            Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-            If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
-            [here](https://arxiv.org/abs/1606.03498v1).
-        fixed_noise_size : int
-            Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
-            subdirectory, the tensorboard images tab and the samples in get_training_results().
-        device : string
-            Device used while training the model. Either "cpu" or "cuda".
-        ngpu : int
-            Number of gpus used during training if device == "cuda".
-        folder : string
-            Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
-            tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
-            already exists a time stamp is appended to make it unique.
-
-        Raises
-        ------
-        NotImplementedError
-            Description
-        ValueError
-            Description
-        """
         self.x_dim = tuple([x_dim]) if isinstance(x_dim, int) else tuple(x_dim)
         self.z_dim = tuple([z_dim]) if isinstance(z_dim, int) else tuple(z_dim)
         self.ngpu = ngpu if ngpu is not None else 0
@@ -564,7 +558,6 @@ class AbstractGenerativeModel(ABC):
             np.round(remaining_batches*time_per_batch/60, 3), remaining_batches
             )
         )
-        print("\n")
         self.current_timer = time.perf_counter()
 
     def _log_images(self, images, step, writer):
@@ -610,25 +603,27 @@ class AbstractGenerativeModel(ABC):
         return fig, axs
 
     def _log_losses(self, X_batch, Z_batch, mode):
-        self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch)
+        self._losses = self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch)
         self._append_losses(mode=mode)
 
     def _append_losses(self, mode):
         if not hasattr(self, "logged_losses"):
-            self._create_logged_losses()
+            self.logged_losses = self._create_logged_losses()
         for name, loss in self._losses.items():
             self.logged_losses[mode][name].append(self._losses[name].item())
 
     def _create_logged_losses(self):
         with_test = self.hyperparameters["nr_test"] is not None
-        self.logged_losses = {"Train": {}}
+        logged_losses = {"Train": {}}
         if with_test:
-            self.logged_losses["Test"] = {}
+            logged_losses["Test"] = {}
 
         for name, _ in self._losses.items():
-            self.logged_losses["Train"][name] = []
+            logged_losses["Train"][name] = []
             if with_test:
-                self.logged_losses["Test"][name] = []
+                logged_losses["Test"][name] = []
+
+        return logged_losses
 
     def _save_losses_plot(self):
         """ Creates the `losses.png` plot in the `self.folder` path.
@@ -724,11 +719,6 @@ class AbstractGenerativeModel(ABC):
         """
         if name is None:
             name = "model.torch"
-        print(self.__dict__)
-        for key, value in self.__dict__.items():
-            print(key, type(value))
-        for name, net in self.neural_nets.items():
-            print(net.state_dict())
         torch.save(self, os.path.join(self.folder, name))
         print("Model saved to {}.".format(os.path.join(self.folder, name)))
 

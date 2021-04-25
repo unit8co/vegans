@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
@@ -7,6 +8,7 @@ from vegans.GAN import (
     ConditionalBicycleGAN,
     ConditionalCycleGAN,
     ConditionalEBGAN,
+    ConditionalInfoGAN,
     ConditionalKLGAN,
     ConditionalLRGAN,
     ConditionalLSGAN,
@@ -25,15 +27,12 @@ if __name__ == '__main__':
     y_train = np.array([np.rot90(im) for im in X_train])
     y_test = np.array([np.rot90(im) for im in X_test])
 
-    lr_gen = 0.0001
-    lr_adv = 0.00005
-    epochs = 5
+    epochs = 2
     batch_size = 16
-    optim_kwargs = {"Generator": {"lr": lr_gen}, "Adversary": {"lr": lr_adv}}
 
-    X_train = X_train.reshape((-1, 1, 32, 32))
+    X_train = X_train.reshape((-1, 1, 32, 32))[:500]
     X_test = X_test.reshape((-1, 1, 32, 32))
-    y_train = y_train.reshape((-1, 1, 32, 32))
+    y_train = y_train.reshape((-1, 1, 32, 32))[:500]
     y_test = y_test.reshape((-1, 1, 32, 32))
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
@@ -55,11 +54,10 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
-        # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalCycleGAN
+        ConditionalAAE, ConditionalBicycleGAN, ConditionalCycleGAN, ConditionalEBGAN,
+        ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
+        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
@@ -73,7 +71,7 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalBicycleGAN", "ConditionalVAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
             gan_model = model(
                 generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
@@ -93,6 +91,17 @@ if __name__ == '__main__':
                 generator=generator, adversary=autoencoder, m=m, **kwargs
             )
 
+        elif model.__name__ in ["ConditionalInfoGAN"]:
+            c_dim_discrete = [5]
+            c_dim_continuous = 5
+            c_dim = sum(c_dim_discrete) + c_dim_continuous
+            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim+c_dim, y_dim=y_dim, which="example")
+            encoder_helper = loading.load_encoder(x_dim=(x_dim[0]+y_dim[0], *x_dim[1:]), z_dim=32, which="example")
+            gan_model = model(
+                generator=generator_conditional, adversary=discriminator, encoder=encoder_helper,
+                c_dim_discrete=c_dim_discrete, c_dim_continuous=c_dim_continuous, **kwargs
+            )
+
         elif model.__name__ in ["ConditionalKLGAN", "ConditionalLSGAN", "ConditionalPix2Pix", "ConditionalVanillaGAN"]:
             gan_model = model(
                 generator=generator, adversary=discriminator, **kwargs
@@ -104,7 +113,7 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalVanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
@@ -145,12 +154,12 @@ if __name__ == '__main__':
             fontsize=12
         )
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"generated_images.png")
+        plt.savefig(gan_model.folder+"/generated_images.png")
         fig, axs = utils.plot_losses(losses=losses, show=False)
         fig.suptitle(
             title,
             fontsize=12
         )
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"losses.png")
+        plt.savefig(gan_model.folder+"/losses.png")
         # gan_model.save()

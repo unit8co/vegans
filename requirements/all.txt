@@ -1,3 +1,2 @@
 -r core.txt
--r tutorials.txt
 -r dev.txt

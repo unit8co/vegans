@@ -28,7 +28,6 @@ if __name__ == '__main__':
     datapath = "./data/"
     X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
 
-
     epochs = 3
     batch_size = 32
 
@@ -58,12 +57,9 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        # ConditionalAAE, ConditionalBicycleGAN,
-        # ConditionalEBGAN,
-        ConditionalInfoGAN,
-        # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        # ConditionalVanillaVAE ,
+        ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
+        ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
         ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
@@ -152,12 +148,12 @@ if __name__ == '__main__':
             fontsize=12
         )
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"generated_images.png")
+        plt.savefig(gan_model.folder+"/generated_images.png")
         fig, axs = utils.plot_losses(losses=losses, show=False)
         fig.suptitle(
             title,
             fontsize=12
         )
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"losses.png")
+        plt.savefig(gan_model.folder+"/losses.png")
         # gan_model.save()

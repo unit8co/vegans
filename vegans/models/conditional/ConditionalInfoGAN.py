@@ -1,6 +1,6 @@
 """
-InfoGAN
--------
+ConditionalInfoGAN
+------------------
 Implements the InfoGAN[1].
 
 It introduces an encoder network which maps the generator output back to the latent
@@ -34,6 +34,74 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
 class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
+    """
+    ConditionalInfoGAN
+    ------------------
+    Implements the InfoGAN[1].
+
+    It introduces an encoder network which maps the generator output back to the latent
+    input space. This should help to prevent mode collapse and improve image variety.
+
+    Losses:
+        - Generator: Binary cross-entropy + Normal Log-Likelihood + Multinomial Log-Likelihood
+        - Discriminator: Binary cross-entropy
+        - Encoder: Normal Log-Likelihood + Multinomial Log-Likelihood
+    Default optimizer:
+        - torch.optim.Adam
+    Custom parameter:
+        - c_dim_discrete: Number of discrete multinomial dimensions (might be list of independent multinomial spaces).
+        - c_dim_continuous: Number of continuous normal dimensions.
+        - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
+
+    References
+    ----------
+    .. [1] https://dl.acm.org/doi/10.5555/3157096.3157340
+
+    Parameters
+    ----------
+    generator: nn.Module
+        Generator architecture. Produces output in the real space.
+    adversary: nn.Module
+        Adversary architecture. Produces predictions for real and fake samples to differentiate them.
+    encoder: nn.Module
+        Encoder architecture. Produces predictions in the latent space.
+    x_dim : list, tuple
+        Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
+    z_dim : int, list, tuple
+        Number of the latent dimensions for the generator input. Might have dimensions of an image.
+    y_dim : int, list, tuple
+        Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.
+        [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.
+    c_dim_discrete: int, list
+        Number of discrete multinomial dimensions (might be list of independent multinomial spaces).
+    c_dim_continuous: int
+        Number of continuous normal dimensions.
+    optim : dict or torch.optim
+        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+        name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
+    optim_kwargs : dict
+        Optimizer keyword arguments used for each network. Must be a dictionary with network
+        name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+    lambda_z: float
+        Weight for the reconstruction loss for the latent z dimensions.
+    feature_layer : torch.nn.*
+        Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
+        [here](https://arxiv.org/abs/1606.03498v1).
+    fixed_noise_size : int
+        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+        subdirectory, the tensorboard images tab and the samples in get_training_results().
+    device : string
+        Device used while training the model. Either "cpu" or "cuda".
+    ngpu : int
+        Number of gpus used during training if device == "cuda".
+    folder : string
+        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+        already exists a time stamp is appended to make it unique.
+    """
+
     #########################################################################
     # Actions before training
     #########################################################################
@@ -67,7 +135,11 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
         self.c_dim_discrete = tuple([i for i in list(c_dim_discrete)])
         self.c_dim_continuous = tuple([c_dim_continuous])
         self.c_dim = tuple([sum(self.c_dim_discrete) + sum(self.c_dim_continuous)])
-        gen_in_dim = get_input_dim(dim1=z_dim, dim2=sum(self.c_dim)+sum(y_dim))
+        if len(y_dim) == 3:
+            intermediate_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
+            gen_in_dim = get_input_dim(dim1=intermediate_in_dim, dim2=self.c_dim)
+        else:
+            gen_in_dim = get_input_dim(dim1=z_dim, dim2=sum(self.c_dim)+sum(y_dim))
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
 
         if secure:

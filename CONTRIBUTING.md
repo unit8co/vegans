@@ -11,7 +11,7 @@ With that out of the way, here are some notes on developing vegans:
 ## Dev setup
 
     # install everything
-    pip install -r requirements/dev-all.txt
+    pip install -r requirements/all.txt
     
     # run tests on cpu
     cd tests && pytest

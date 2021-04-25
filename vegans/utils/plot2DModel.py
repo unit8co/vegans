@@ -4,7 +4,7 @@ import torch
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-import utils.utils as utils
+import vegans.utils.utils as utils
 import matplotlib.pyplot as plt
 
 
@@ -20,7 +20,7 @@ def plot_2d_grid(model, nr_images=10, show=True):
         for i, xi in enumerate(x_limit):
             # z_input = torch.randn(size=(3, *model.generator.input_size), requires_grad=False).to(model.device)
             z_input = torch.Tensor([[xi, yi]]).to(model.device)
-            generated_image = model(x=z_input).cpu().detach().numpy()
+            generated_image = model(z=z_input).cpu().detach().numpy()
             image[i*image_dim:(i+1)*image_dim, j*image_dim:(j+1)*image_dim] = generated_image[0, 0, :, :]
     ax.imshow(image, cmap="gray")
     ax.grid(False)
@@ -41,7 +41,7 @@ def plot_on_click(model):
 
 def onclick(event):
     z_input = torch.Tensor([[event.xdata, event.ydata]]).to(model.device)
-    generated_image = model(x=z_input).cpu().detach().numpy()
+    generated_image = model(z=z_input).cpu().detach().numpy()
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(4, 4))
     ax.imshow(generated_image[0, 0, :, :], cmap="gray", origin=None)
     ax.set_title("(x, y) = ({}, {})".format(round(event.xdata, 2), round(event.ydata, 2)))
@@ -49,9 +49,8 @@ def onclick(event):
 
 if __name__ == '__main__':
     datapath = "./Data/mnist/"
-    model_path = "./TrainedModels/GAN/model.torch"
+    model_path = "./MyModels/VanillaGAN/models/model_2.torch"
     model = torch.load(model_path)
-    model.eval()
     assert model.generator.input_size[0] == 2, (
         "Wrong input_size required. Given: {}. Needed: 2.".format(model.generator.input_size[0])
     )

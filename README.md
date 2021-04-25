@@ -65,7 +65,7 @@ import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
 # Data preparation
-datapath =  "./data/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+datapath =  "./data/" # root path to data, if does not exist will be downloaded into this folder
 X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
@@ -108,7 +108,7 @@ import vegans.utils.loading as loading
 from vegans.GAN import ConditionalVanillaGAN
 
 # Data preparation
-datapath =  "./data/" # https://github.com/tneuer/vegans/tree/version/overhaul/data/mnist
+datapath =  "./data/" # root path to data, if does not exist will be downloaded into this folder
 X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
 X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
 X_test = X_test.reshape((-1, 1, 32, 32))
@@ -288,36 +288,37 @@ All this results should be taken with a grain of salt. They were not extensively
   - WassersteinGAN SpectralNorm
   - Stacked GAN [here](https://arxiv.org/abs/1612.03242)
   - Progressive Growing GAN [here](https://arxiv.org/abs/1710.10196)
+  
 - Layers
   - Minibatch discrimination
   - Instance normalization
+  
 - Other
 
-  - Update Notebooks
+  - New links to correct github files
 
-  - Update requirements and setup
-  - architectures CIFAR and CelebA
-  - Bug while saving
-  - Document all networks
-  - Test all examples
+    
 
   - Core Improvements:
 
-    - Pass neural_nets instead of generator / encoder, ...
     - Hide feature_layer, secure in **kwargs
-    - Generalize conditional networks and only let them handle correct concatenation
-    - Separate VAE and GAN implementations
-- Abstraction for GED networks
-  - New links to correct github files
-  - Make it more PEP conform
-  - Interpolation
+  - Generalize conditional networks and only let them handle correct concatenation
+    - Abstraction for GDE networks (1v1+1)
+    - Make it more PEP conform
+    - Make \_default\_optimizer not abstract
+  
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
 
-
+  - Interpolation
 
 
 
 - Done
+  - ~~Test all examples~~
+  - ~~Bug while saving~~
+  - ~~Test saving and loading~~
+  - ~~Document all networks~~
+  - ~~Update requirements and setup~~
   - ~~No side effects for functions (self.\_losses, self.loss\_functions, self.\_optimizers, self.\_steps)~~
   - ~~Replace "Adversary"~~
   - ~~Residual Block~~

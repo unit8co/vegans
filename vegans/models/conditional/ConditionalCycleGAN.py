@@ -3,11 +3,12 @@ CycleGAN
 --------
 Implements the CycleGAN[1], a method for unpaired image to image translation tasks.
 
-
+It consists of two generative adversarial network. one responsible for mapping input from space X to space Y.
+The other produces output in space X from space Y.
 
 Losses:
-    - Generator1 and Generator2:
-    - Discriminator1 and Discriminator2:
+    - GeneratorX_Y and GeneratorY_X: Binary cross-entropy + cycle consistency
+    - DiscriminatorX_Y and DiscriminatorY_X: Binary cross-entropy
 Default optimizer:
     - torch.optim.Adam
 Custom parameter:
@@ -32,6 +33,67 @@ from vegans.utils.networks import Generator, Adversary, Autoencoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
 class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
+    """
+    CycleGAN
+    --------
+    Implements the CycleGAN[1], a method for unpaired image to image translation tasks.
+
+    It consists of two generative adversarial network. one responsible for mapping input from space X to space Y.
+    The other produces output in space X from space Y.
+
+    Losses:
+        - GeneratorX_Y and GeneratorY_X: Binary cross-entropy + cycle consistency
+        - DiscriminatorX_Y and DiscriminatorY_X: Binary cross-entropy
+    Default optimizer:
+        - torch.optim.Adam
+    Custom parameter:
+        - lambda_x: Weight for the reconstruction loss of the real x dimensions.
+
+    References
+    ----------
+    .. [1] https://arxiv.org/abs/1703.10593
+
+    Parameters
+    ----------
+    generatorX_Y: nn.Module
+        Generator architecture. Produces output in the real space Y from input space X.
+    adversaryX_Y: nn.Module
+        Adversary architecture. Produces predictions for real and fake samples in space Y to differentiate them.
+    generatorY_X: nn.Module
+        Generator architecture. Produces output in the real space X from input space Y.
+    adversaryY_X: nn.Module
+        Adversary architecture. Produces predictions for real and fake samples in space X to differentiate them.
+    x_dim : list, tuple
+        Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
+    z_dim : int, list, tuple
+        Number of the latent dimensions for the generator input. Might have dimensions of an image.
+    y_dim : int, list, tuple
+        Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.
+        [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.
+    optim : dict or torch.optim
+        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+        name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
+    optim_kwargs : dict
+        Optimizer keyword arguments used for each network. Must be a dictionary with network
+        name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+    lambda_x: float
+        Weight for the reconstruction loss of the real x dimensions.
+    adv_type: "Discriminator", "Critic" or "Autoencoder"
+        Indicating which adversarial architecture will be used.
+    fixed_noise_size : int
+        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+        subdirectory, the tensorboard images tab and the samples in get_training_results().
+    device : string
+        Device used while training the model. Either "cpu" or "cuda".
+    ngpu : int
+        Number of gpus used during training if device == "cuda".
+    folder : string
+        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+        already exists a time stamp is appended to make it unique.
+    """
+
     #########################################################################
     # Actions before training
     #########################################################################

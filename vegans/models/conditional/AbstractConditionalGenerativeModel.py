@@ -13,45 +13,46 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 
 class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
+    """The AbstractConditionalGenerativeModel is the most basic building block of vegans for conditional models. All conditional GAN
+    implementation should at least inherit from this class.
+
+    Parameters
+    ----------
+    x_dim : list, tuple
+        Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
+    z_dim : int, list, tuple
+        Number of the latent dimensions for the generator input. Might have dimensions of an image.
+    y_dim : int, list, tuple
+        Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.
+        [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.
+    optim : dict or torch.optim
+        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+        name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
+    optim_kwargs : dict
+        Optimizer keyword arguments used for each network. Must be a dictionary with network
+        name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
+    feature_layer : torch.nn.*
+        Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
+        [here](https://arxiv.org/abs/1606.03498v1).
+    fixed_noise_size : int
+        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+        subdirectory, the tensorboard images tab and the samples in get_training_results().
+    device : string
+        Device used while training the model. Either "cpu" or "cuda".
+    ngpu : int
+        Number of gpus used during training if device == "cuda".
+    folder : string
+        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+        already exists a time stamp is appended to make it unique.
+    """
+
     #########################################################################
     # Actions before training
     #########################################################################
     def __init__(self, x_dim, z_dim, y_dim, optim, optim_kwargs, feature_layer, fixed_noise_size, device, ngpu, folder, secure):
-        """The AbstractConditionalGenerativeModel is the most basic building block of vegans for conditional models. All conditional GAN
-        implementation should at least inherit from this class.
-
-        Parameters
-        ----------
-        x_dim : list, tuple
-            Number of the output dimensions of the generator and input dimension of the discriminator / critic.
-            In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].
-        z_dim : int, list, tuple
-            Number of the latent dimensions for the generator input. Might have dimensions of an image.
-        y_dim : int, list, tuple
-            Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.
-            [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.
-        optim : dict or torch.optim
-            Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
-            name keys and torch.optim as value, i.e. {"Generator": torch.optim.Adam}.
-        optim_kwargs : dict
-            Optimizer keyword arguments used for each network. Must be a dictionary with network
-            name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
-        feature_layer : torch.nn.*
-            Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-            If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
-            [here](https://arxiv.org/abs/1606.03498v1).
-        fixed_noise_size : int
-            Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
-            subdirectory, the tensorboard images tab and the samples in get_training_results().
-        device : string
-            Device used while training the model. Either "cpu" or "cuda".
-        ngpu : int
-            Number of gpus used during training if device == "cuda".
-        folder : string
-            Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
-            tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
-            already exists a time stamp is appended to make it unique.
-        """
         self.adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
         self.gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
         AbstractGenerativeModel.__init__(
@@ -135,7 +136,9 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 break
             elif "in_channels" in layer.__dict__:
                 inpt_dim = int(layer.__dict__["in_channels"])
-                if inpt_dim == in_dim[0]:
+                if not isinstance(in_dim, int) and inpt_dim == in_dim[0]:
+                    has_error = True
+                if not isinstance(y_dim, int) and inpt_dim == y_dim[0]:
                     has_error = True
                 break
         else:
