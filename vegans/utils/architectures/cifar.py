@@ -30,7 +30,13 @@ def preprocess_cifar(root, normalize=True, pad=None):
             X_train = train_data["data"]
             y_train = train_data["targets"]
     else:
-        train_files = [os.path.join(root, f) for f in os.listdir(root) if "data" in f]
+        try:
+            train_files = [os.path.join(root, f) for f in os.listdir(root) if "data" in f]
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                "No such file or directory: '{}'. Download from: http://www.cs.toronto.edu/~kriz/cifar.html."
+                .format(root)
+            )
         with open(train_files[0], "rb") as f:
             train_data = pickle.load(f, encoding='bytes')
             X_train = train_data[b"data"].reshape((-1, 3, 32, 32))

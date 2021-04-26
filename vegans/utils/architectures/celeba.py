@@ -39,7 +39,13 @@ def preprocess_celeba(root, batch_size, max_loaded_images=5000, **kwargs):
             self.nr_samples = 202599
             self.max_loaded_images = max_loaded_images
             self.image_shape = (3, 218, 178)
-            self.image_names = os.listdir(self.datapath)
+            try:
+                self.image_names = os.listdir(self.datapath)
+            except FileNotFoundError:
+                raise FileNotFoundError(
+                    "No such file or directory: '{}'. Download from: https://www.kaggle.com/jessicali9530/celeba-dataset."
+                    .format(self.datapath)
+                )
             self.current_batch = -1
             self._numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
 
