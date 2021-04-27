@@ -15,9 +15,9 @@ You need python 3.6 or above. Then:
 The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
 
 - Read through this README.md file
-- Check out the notebooks (00 to 04)
+- Check out the [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) (00 to 04)
 - If you want to create your own GAN algorithms, check out the notebooks 05 to 07
-- Look at the example code
+- Look at the example [code snippets](https://github.com/unit8co/vegans/tree/master/tutorials/snippets)
 
 vegans implements two types of generative models: Unsupervised and Supervised (examples given below). **Unsupervised algorithms** are used when no labels exist for the data you want to generate, for example in cases where it is too tedious or infeasible to generate labels for every output. The disadvantage is that after training the generation process will be unsupervised as well, meaning you have (in most cases) little control over which type of output is generated. **Supervised algorithms** on the other hand require you to specify the input dimension of the label (`y_dim`) and provide labels during training. All algorithms requiring labels are implemented as "ConditionalGAN" (e.g. `VanillaGAN` does not take labels, whereas `ConditionalVanillaGAN` does). These algorithms enable you to generate a specific output **conditonal** on a certain input.
 
@@ -51,11 +51,11 @@ All current generative model implementations come with a conditional variant to 
 - `ConditionalCycleGAN`
 - `ConditionalPix2Pix`
 
-This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: [example_conditional.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_conditional.py)  or [03_mnist-conditional.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/03_mnist-conditional.ipynb)) or it can also be a full image (when for example trying to rotate an image: [example_image_to_image.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_image_to_image.py)  or [04_mnist-image-to-image.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/04_mnist-image-to-image.ipynb)).
+This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: [example_mnist_conditional.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_conditional.py)  or [03_mnist-conditional.ipynb](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/03_mnist-conditional.ipynb)) or it can also be a full image (when for example trying to rotate an image: [example_image_to_image.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_rotation.py)  or [04_mnist-image-to-image.ipynb](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/04_mnist-image-to-image.ipynb)).
 
-Models can either be passed as `torch.nn.Sequential` objects or by defining custom architectures, see [example_input_formats.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_input_formats.py).
+Models can either be passed as `torch.nn.Sequential` objects or by defining custom architectures, see [example_input_formats.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_input_formats.py).
 
-Also look at the [jupyter notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks) for better visualized examples and how to use the library.
+Also look at the [jupyter notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) for better visualized examples and how to use the library.
 
 #### Unsupervised Learning Example
 
@@ -169,7 +169,7 @@ utils.plot_images(image, labels=["2"])
 
 #### Constructor arguments
 
-All of the generative model objects inherit from a `AbstractGenerativeModel` base class. and allow for the following input in the constructor.
+All of the generative model objects inherit from a [`AbstractGenerativeModel`](https://github.com/unit8co/vegans/blob/master/vegans/models/unconditional/AbstractGenerativeModel.py) base class. and allow for the following input in the constructor.
 
 * `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
 * `optim_kwargs`:  The optimizer keyword arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
@@ -242,13 +242,13 @@ Attentive readers might notice that in most places we try to talk about "Generat
 
 In the future we also plan to implement different VAE algorithms to have all generative models in one place but for now the library is focused on GAN algorithms.
 
-If you are researching new generative model training algorithms, you may find it useful to inherit from the `AbstractGenerativeModel` or  `AbstractConditionalGenerativeModel` base class.
+If you are researching new generative model training algorithms, you may find it useful to inherit from the `AbstractGenerativeModel` or  [`AbstractConditionalGenerativeModel`](https://github.com/unit8co/vegans/blob/master/vegans/models/conditional/AbstractConditionalGenerativeModel.py) base class.
 
 ### Learn more:
 
-Currently the best way to learn more about how to use vegans is to have a look at the example [notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks).
-You can start with this [simple example](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/00_univariate_gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
-Alternatively, can run example [scripts](https://github.com/tneuer/GAN-pytorch/tree/main/examples).
+Currently the best way to learn more about how to use vegans is to have a look at the example [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks).
+You can start with this [simple example](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/00_univariate-gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
+Alternatively, can run example [scripts](https://github.com/unit8co/vegans/tree/master/tutorials/snippets).
 
 ## Contribute
 PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING) for more details on the setup.
