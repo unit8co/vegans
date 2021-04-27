@@ -32,28 +32,6 @@ from vegans.utils.utils import WassersteinLoss
 
 class WassersteinGANGP(AbstractGAN1v1):
     """
-    WassersteinGANGP
-    ----------------
-    Implements the Wasserstein GAN Gradient Penalized[1].
-
-    Uses the Wasserstein loss to determine the realness of real and fake images.
-    The Wasserstein loss has several theoretical advantages over the Jensen-Shanon divergence
-    minimised by the original GAN. In this architecture the critic (discriminator) is often
-    trained multiple times for every generator step.
-    Lipschitz continuity is "enforced" by gradient penalization.
-
-    Losses:
-        - Generator: Wasserstein
-        - Critic: Wasserstein + Gradient penalization
-    Default optimizer:
-        - torch.optim.RMSprop
-    Custom parameter:
-        - lambda_grad: Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/abs/1704.00028
-
     Parameters
     ----------
     generator: nn.Module

@@ -32,26 +32,6 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 class AAE(AbstractGenerativeModel):
     """
-    AAE
-    ---
-    Implements the Adversarial Autoencoder[1].
-
-    Instead of using the Kullback Leibler divergence to improve the latent space distribution
-    we use a discriminator to determine the "realness" of the latent vector.
-
-    Losses:
-        - Encoder: Binary cross-entropy + Mean-squared error
-        - Generator: Mean-squared error
-        - Adversary: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_z: Weight for the discriminator loss computing the realness of the latent z dimension.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1511.05644.pdf
-
     Parameters
     ----------
     generator: nn.Module

@@ -25,24 +25,6 @@ from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditio
 
 class ConditionalKLGAN(AbstractConditionalGAN1v1):
     """
-    ConditionalKLGAN
-    ----------------
-    Implements the conditional variant of the  Kullback Leibler GAN.
-
-    Uses the Kullback Leibler loss for the generator.
-
-    Losses:
-        - Generator: Kullback-Leibler
-        - Autoencoder: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - eps: Small value preventing overflow and nans when calculating the Kullback-Leibler divergence.
-
-    References
-    ----------
-    .. [1] https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-
     Parameters
     ----------
     generator: nn.Module

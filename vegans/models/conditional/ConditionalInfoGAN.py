@@ -35,28 +35,6 @@ from vegans.models.conditional.AbstractConditionalGenerativeModel import Abstrac
 
 class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
     """
-    ConditionalInfoGAN
-    ------------------
-    Implements the InfoGAN[1].
-
-    It introduces an encoder network which maps the generator output back to the latent
-    input space. This should help to prevent mode collapse and improve image variety.
-
-    Losses:
-        - Generator: Binary cross-entropy + Normal Log-Likelihood + Multinomial Log-Likelihood
-        - Discriminator: Binary cross-entropy
-        - Encoder: Normal Log-Likelihood + Multinomial Log-Likelihood
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - c_dim_discrete: Number of discrete multinomial dimensions (might be list of independent multinomial spaces).
-        - c_dim_continuous: Number of continuous normal dimensions.
-        - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
-
-    References
-    ----------
-    .. [1] https://dl.acm.org/doi/10.5555/3157096.3157340
-
     Parameters
     ----------
     generator: nn.Module

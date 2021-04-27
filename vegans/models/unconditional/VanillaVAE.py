@@ -29,24 +29,6 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 class VanillaVAE(AbstractGenerativeModel):
     """
-    VanillaVAE
-    ----------
-    Implements the Variational Autoencoder[1].
-
-    Trains on Kullback-Leibler loss and mean squared error reconstruction loss.
-
-    Losses:
-        - Encoder: Kullback-Leibler
-        - Decoder: L2 (Mean Squared Error)
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1906.02691.pdf
-
     Parameters
     ----------
     encoder: nn.Module

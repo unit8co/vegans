@@ -31,22 +31,6 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 class LRGAN(AbstractGenerativeModel):
     """
-    LRGAN
-    -----
-    Implements the latent regressor GAN well described in the BicycleGAN paper[1].
-
-    It introduces an encoder network which maps the generator output back to the latent
-    input space. This should help to prevent mode collapse and improve image variety.
-
-    Losses:
-        - Generator: Binary cross-entropy + L1-latent-loss (Mean Absolute Error)
-        - Discriminator: Binary cross-entropy
-        - Encoder: L1-latent-loss (Mean Absolute Error)
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
-
     Parameters
     ----------
     generator: nn.Module

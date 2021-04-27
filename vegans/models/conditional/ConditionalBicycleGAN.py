@@ -37,28 +37,6 @@ from vegans.models.conditional.AbstractConditionalGenerativeModel import Abstrac
 
 class ConditionalBicycleGAN(AbstractConditionalGenerativeModel):
     """
-    ConditionalBicycleGAN
-    ---------------------
-    Implements the BicycleGAN[1], a combination of the VAEGAN and the LRGAN.
-
-    It utilizes both steps of the Variational Autoencoder (Kullback-Leibler Loss) and uses the same
-    encoder architecture for the latent regression of generated images.
-
-    Losses:
-        - Generator: Binary cross-entropy + L1-latent-loss + L1-reconstruction-loss
-        - Discriminator: Binary cross-entropy
-        - Encoder: Kullback-Leibler Loss + L1-latent-loss + L1-reconstruction-loss
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-        - lambda_x: Weight for the reconstruction loss of the real x dimensions.
-        - lambda_z: Weight for the reconstruction loss of the latent z dimensions.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1711.11586.pdf
-
     Parameters
     ----------
     generator: nn.Module

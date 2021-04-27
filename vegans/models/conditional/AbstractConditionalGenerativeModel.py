@@ -209,7 +209,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Actions during training
     #########################################################################
     def fit(self, X_train, y_train, X_test=None, y_test=None, epochs=5, batch_size=32, steps=None,
-            print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
+            print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=False):
         """ Trains the model, iterating over all contained networks.
 
         Parameters

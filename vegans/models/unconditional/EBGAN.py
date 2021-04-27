@@ -25,24 +25,6 @@ from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 class EBGAN(AbstractGAN1v1):
     """
-    EBGAN
-    -----
-    Implements the Energy based GAN[1].
-
-    Uses an auto-encoder as the adversary structure.
-
-    Losses:
-        - Generator: L2 (Mean Squared Error)
-        - Autoencoder: L2 (Mean Squared Error)
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - m: Cut off for the hinge loss. Look at reference for more information.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1609.03126.pdf
-
     Parameters
     ----------
     generator: nn.Module

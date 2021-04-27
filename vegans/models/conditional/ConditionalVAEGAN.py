@@ -34,27 +34,6 @@ from vegans.models.conditional.AbstractConditionalGenerativeModel import Abstrac
 
 class ConditionalVAEGAN(AbstractConditionalGenerativeModel):
     """
-    ConditionalVAEGAN
-    -----------------
-    Implements the conditional variant of the Variational Autoencoder Generative Adversarial Network[1].
-
-    Trains on Kullback-Leibler loss for the latent space and attaches a adversary to get better quality output.
-    The Decoder acts as the generator.
-
-    Losses:
-        - Encoder: Kullback-Leibler
-        - Generator / Decoder: Binary cross-entropy
-        - Adversary: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-        - lambda_x: Weight for the reconstruction loss of the real x dimensions.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1512.09300.pdf
-
     Parameters
     ----------
     generator: nn.Module
