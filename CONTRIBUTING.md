@@ -11,13 +11,10 @@ With that out of the way, here are some notes on developing vegans:
 ## Dev setup
 
     # install everything
-    pip install -r requirements.txt
-
+    pip install -r requirements/all.txt
+    
     # run tests on cpu
     cd tests && pytest
     
     # to also test on gpu use (requires gpu & pytorch with CUDA support installation)
     cd tests && pytest --gpu
-
-    # run notebooks by starting server and going to url
-    cd notebooks && jupyter notebook

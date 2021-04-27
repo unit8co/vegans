@@ -11,3 +11,9 @@
 .idea/
 *.iml
 .ipynb_checkpoints/
+
+# Sublime project files
+*.sublime*
+MyModels
+data
+.token
