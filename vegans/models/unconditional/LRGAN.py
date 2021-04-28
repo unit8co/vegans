@@ -147,8 +147,9 @@ class LRGAN(AbstractGenerativeModel):
             losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch)
         fake_Z = self.encode(x=fake_images)
 
         if self.feature_layer is None:
@@ -168,8 +169,9 @@ class LRGAN(AbstractGenerativeModel):
             "Generator_L1": self.lambda_z*latent_space_regression
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch).detach()
         fake_Z = self.encode(x=fake_images)
         latent_space_regression = self.loss_functions["L1"](
             fake_Z, Z_batch
@@ -178,8 +180,9 @@ class LRGAN(AbstractGenerativeModel):
             "Encoder": latent_space_regression
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 

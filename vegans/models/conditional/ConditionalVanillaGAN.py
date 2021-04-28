@@ -21,11 +21,11 @@ References
 
 import torch
 
-from torch.nn import BCELoss
+from vegans.models.unconditional.VanillaGAN import VanillaGAN
 from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
 
-class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
+class ConditionalVanillaGAN(AbstractConditionalGAN1v1, VanillaGAN):
     """
     Parameters
     ----------
@@ -90,10 +90,3 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu, secure=secure
         )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss()}
-        return loss_functions

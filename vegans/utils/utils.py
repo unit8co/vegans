@@ -21,9 +21,28 @@ class DataSet(Dataset):
             return self.X[index], self.y[index]
         return self.X[index]
 
+class KLLoss():
+    def __init__(self, eps):
+        self.eps = eps
+
+    def __call__(self, input, target):
+        """ Compute the Kullback-Leibler loss for GANs.
+
+        Parameters
+        ----------
+        input : torch.Tensor
+            Input tensor. Output of a critic.
+
+        Returns
+        -------
+        torch.Tensor
+            KL divergence
+        """
+        return -torch.mean(torch.log(input / (1 + self.eps - input) + self.eps))
+
 class WassersteinLoss():
     def __call__(self, input, target):
-        """ Computes the Wasserstein loss / divergence.
+        """ Compute the Wasserstein loss / divergence.
 
         Also known as earthmover distance.
 

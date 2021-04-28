@@ -18,10 +18,10 @@ References
 
 import torch
 
-from torch.nn import MSELoss
+from vegans.models.unconditional.LSGAN import LSGAN
 from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
-class ConditionalLSGAN(AbstractConditionalGAN1v1):
+class ConditionalLSGAN(AbstractConditionalGAN1v1, LSGAN):
     """
     Parameters
     ----------
@@ -86,10 +86,3 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1):
             fixed_noise_size=fixed_noise_size,
             device=device, folder=folder, ngpu=ngpu, secure=secure
         )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
-        return loss_functions

@@ -311,31 +311,6 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self.eval()
         self._clean_up(writers=[writer_train, writer_test])
 
-    def _calculate_feature_loss(self, X_real, X_fake, y_batch):
-        """Calculates feature loss if `self.feature_layer` is not None.
-
-        Every network takes the `feature_layer` argument in its constructor.
-        If it is not None, a layer of the discriminator / critic should be specified.
-        A feature loss will be calculated which is the MSE between the output for real
-        and fake samples of the specified `self.feature_layer`.
-
-        Parameters
-        ----------
-        X_real : torch.Tensor
-            Real samples.
-        X_fake : torch.Tensor
-            Fake samples.
-        y_batch : torch.Tensor
-            Labels of the X_real.
-        """
-        X_real = utils.concatenate(tensor1=X_real, tensor2=y_batch).float()
-        X_fake = utils.concatenate(tensor1=X_fake, tensor2=y_batch).float()
-
-        X_real_features = self.feature_layer(X_real)
-        X_fake_features = self.feature_layer(X_fake)
-        feature_loss = MSELoss()(X_real_features, X_fake_features)
-        return feature_loss
-
 
     #########################################################################
     # Logging during training
@@ -415,7 +390,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         """
         return utils.concatenate(tensor1=tensor1, tensor2=tensor2)
 
-    def generate(self, y, z=None):
+    def generate(self, y=None, z=None):
         """ Generate output with generator.
 
         Parameters
@@ -432,7 +407,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         """
         return self(y=y, z=z)
 
-    def predict(self, x, y):
+    def predict(self, x, y=None):
         """ Use the critic / discriminator to predict if input is real / fake.
 
         Parameters
@@ -447,15 +422,29 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         np.array
             Array with one output per x indicating the realness of an input.
         """
+        if y is None:
+            x_dim = tuple(x.shape[1:])
+            assert x_dim == self.adv_in_dim, (
+                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
+            )
+            return self._X_transformer(x)
+
         inpt = self.concatenate(x, y).float().to(self.device)
         return self._X_transformer(inpt)
 
-    def __call__(self, y, z=None):
-        if z is None:
+    def __call__(self, y=None, z=None):
+        if y is None and z is None:
+            raise ValueError("Either `y` or `z` must be not None.")
+        elif y is None:
+            inpt = z
+            if not isinstance(z, torch.Tensor):
+                y = torch.from_numpy(y).to(self.device)
+        else:
             z = self.sample(n=len(y))
-        if not isinstance(y, torch.Tensor):
-            y = torch.from_numpy(y).to(self.device)
-        inpt = self.concatenate(z, y).float().to(self.device)
+            if not isinstance(y, torch.Tensor):
+                y = torch.from_numpy(y).to(self.device)
+            inpt = self.concatenate(z, y).float().to(self.device)
+
         sample = self._Z_transformer(inpt)
         if self.training:
             return sample

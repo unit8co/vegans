@@ -235,9 +235,10 @@ class InfoGAN(AbstractGenerativeModel):
             losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None, c=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c)
         encoded = self.encode(x=fake_images)
 
         if self.c_dim_discrete[0] != 0:
@@ -277,9 +278,10 @@ class InfoGAN(AbstractGenerativeModel):
             "Generator_Continuous": self.lambda_z*continuous_encoder_loss
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c).detach()
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images=None, c=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c).detach()
         encoded = self.encode(x=fake_images)
 
         if self.c_dim_discrete[0] != 0:
@@ -311,9 +313,10 @@ class InfoGAN(AbstractGenerativeModel):
             "Encoder_Continuous": continuous_encoder_loss
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 

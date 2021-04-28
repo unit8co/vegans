@@ -109,7 +109,9 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
                 fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
             )
         else:
-            gen_loss_original = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
+            fake_concat = self.concatenate(fake_images, y_batch)
+            real_concat = self.concatenate(X_batch, y_batch)
+            gen_loss_original = self._calculate_feature_loss(X_real=real_concat, X_fake=fake_concat)
         gen_loss_pixel_wise = self.loss_functions["L1"](
             X_batch, fake_images
         )

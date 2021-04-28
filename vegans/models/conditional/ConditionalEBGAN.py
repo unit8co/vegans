@@ -20,10 +20,10 @@ References
 
 import torch
 
-from torch.nn import MSELoss
+from vegans.models.unconditional.EBGAN import EBGAN
 from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
-class ConditionalEBGAN(AbstractConditionalGAN1v1):
+class ConditionalEBGAN(AbstractConditionalGAN1v1, EBGAN):
     """
     Parameters
     ----------
@@ -102,23 +102,6 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1):
                 "Output: {}. x_dim: {}.".format(self.adversary.output_size, x_dim)
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
-        return loss_functions
-
-    def _set_up_training(self, X_train, y_train, X_test, y_test, epochs, batch_size, steps,
-        print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard):
-        train_dataloader, test_dataloader, writer_train, writer_test, save_periods = super()._set_up_training(
-            X_train, y_train, X_test, y_test, epochs, batch_size, steps,
-            print_every, save_model_every, save_images_every, save_losses_every, enable_tensorboard
-        )
-        if self.m is None:
-            self.m = np.mean(X_train)
-        return train_dataloader, test_dataloader, writer_train, writer_test, save_periods
-
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
         if self.feature_layer is None:
@@ -127,7 +110,9 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1):
                 fake_images, fake_predictions
             )
         else:
-            gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
+            fake_concat = self.concatenate(fake_images, y_batch)
+            real_concat = self.concatenate(X_batch, y_batch)
+            gen_loss = self._calculate_feature_loss(X_real=real_concat, X_fake=fake_concat)
         return {"Generator": gen_loss}
 
     def _calculate_adversary_loss(self, X_batch, Z_batch, y_batch):

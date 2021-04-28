@@ -48,10 +48,6 @@ class VanillaVAE(AbstractGenerativeModel):
         name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
     lambda_KL: float
         Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-    feature_layer : torch.nn.*
-        Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
-        [here](https://arxiv.org/abs/1606.03498v1).
     fixed_noise_size : int
         Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
         subdirectory, the tensorboard images tab and the samples in get_training_results().
@@ -135,12 +131,14 @@ class VanillaVAE(AbstractGenerativeModel):
         losses = self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch)
         return losses
 
-    def _calculate_autoencoder_loss(self, X_batch, Z_batch):
+    def _calculate_autoencoder_loss(self, X_batch, Z_batch, fake_images=None):
         encoded_output = self.encode(X_batch)
         mu = self.mu(encoded_output)
         log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-        fake_images = self.generate(Z_batch_encoded)
+
+        if fake_images is None:
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images = self.generate(Z_batch_encoded)
 
         kl_loss = 0.5*(log_variance.exp() + mu**2 - log_variance - 1).sum()
         reconstruction_loss = self.loss_functions["Autoencoder"](
@@ -153,10 +151,3 @@ class VanillaVAE(AbstractGenerativeModel):
             "Kullback-Leibler": self.lambda_KL*kl_loss,
             "Reconstruction": reconstruction_loss,
         }
-
-
-    #########################################################################
-    # Utility functions
-    #########################################################################
-    def sample(self, n):
-        return torch.randn(n, *self.z_dim, requires_grad=True, device=self.device)

@@ -119,7 +119,7 @@ class EBGAN(AbstractGAN1v1):
         if self.feature_layer is None:
             fake_predictions = self.predict(x=fake_images)
             gen_loss = self.loss_functions["Generator"](
-                fake_images, fake_predictions
+                fake_predictions, fake_images
             )
         else:
             gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)

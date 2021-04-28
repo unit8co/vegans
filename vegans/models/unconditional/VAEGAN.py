@@ -166,14 +166,15 @@ class VAEGAN(AbstractGenerativeModel):
             losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(Z_batch_encoded.detach())
-        fake_images_z = self.generate(Z_batch)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded.detach())
+        if fake_images_z is None:
+            fake_images_z = self.generate(Z_batch)
 
         if self.feature_layer is None:
             fake_predictions_x = self.predict(x=fake_images_x)
@@ -200,13 +201,14 @@ class VAEGAN(AbstractGenerativeModel):
             "Reconstruction": gen_loss_reconstruction
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images_x=None):
         encoded_output = self.encode(x=X_batch)
         mu = self.mu(encoded_output)
         log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+        if fake_images_x is None:
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded)
 
-        fake_images_x = self.generate(z=Z_batch_encoded)
         fake_predictions_x = self.predict(x=fake_images_x)
 
         enc_loss_fake_x = self.loss_functions["Generator"](
@@ -225,14 +227,15 @@ class VAEGAN(AbstractGenerativeModel):
             "Reconstruction": self.lambda_x*enc_loss_reconstruction
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(z=Z_batch_encoded).detach()
-        fake_images_z = self.generate(z=Z_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded).detach()
+        if fake_images_z is None:
+            fake_images_z = self.generate(Z_batch).detach()
 
         fake_predictions_x = self.predict(x=fake_images_x)
         fake_predictions_z = self.predict(x=fake_images_z)

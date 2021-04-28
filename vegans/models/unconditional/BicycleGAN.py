@@ -173,14 +173,15 @@ class BicycleGAN(AbstractGenerativeModel):
             losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(z=Z_batch_encoded.detach())
-        fake_images_z = self.generate(z=Z_batch)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded.detach())
+        if fake_images_z is None:
+            fake_images_z = self.generate(z=Z_batch)
         encoded_output_fake = self.encode(x=fake_images_x)
         fake_Z = self.mu(encoded_output_fake)
 
@@ -213,13 +214,14 @@ class BicycleGAN(AbstractGenerativeModel):
             "Reconstruction_z": self.lambda_z*gen_loss_reconstruction_z
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images_x=None):
         encoded_output = self.encode(X_batch)
         mu = self.mu(encoded_output)
         log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+        if fake_images_x is None:
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded)
 
-        fake_images_x = self.generate(z=Z_batch_encoded)
         fake_predictions_x = self.predict(x=fake_images_x)
         encoded_output_fake = self.encode(x=fake_images_x)
         fake_Z = self.mu(encoded_output_fake)
@@ -244,14 +246,15 @@ class BicycleGAN(AbstractGenerativeModel):
             "Reconstruction_z": self.lambda_z*enc_loss_reconstruction_z
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(z=Z_batch_encoded).detach()
-        fake_images_z = self.generate(z=Z_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded).detach()
+        if fake_images_z is None:
+            fake_images_z = self.generate(z=Z_batch).detach()
 
         fake_predictions_x = self.predict(x=fake_images_x)
         fake_predictions_z = self.predict(x=fake_images_z)
