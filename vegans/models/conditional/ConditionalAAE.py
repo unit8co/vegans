@@ -167,7 +167,7 @@ class ConditionalAAE(AbstractConditionalGenerativeModel, AAE):
         return AAE._calculate_generator_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):
-        encoded_output = self.encode(x=X_batch, y=y_batch).detach()
+        encoded_output = self.encode(x=X_batch, y=y_batch)
         fake_images = self.generate(y=y_batch, z=encoded_output)
         fake_concat = self.concatenate(encoded_output, y_batch)
         real_concat = self.concatenate(Z_batch, y_batch)
