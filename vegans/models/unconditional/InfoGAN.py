@@ -148,11 +148,10 @@ class InfoGAN(AbstractGenerativeModel):
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
-            if self.encoder.output_size == self.c_dim:
-                raise ValueError(
-                    "Encoder output size is equal to c_dim, but for InfoGAN the encoder last layers for mu, sigma and discrete values " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
+            assert self.encoder.output_size != self.z_dim, (
+                "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+                "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            )
 
     def _default_optimizer(self):
         return torch.optim.Adam

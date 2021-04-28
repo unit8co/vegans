@@ -61,7 +61,7 @@ if __name__ == '__main__':
         # ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
         # ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalAAE
+        ConditionalLRGAN
     ]
 
     for model in models:

@@ -22,14 +22,11 @@ References
 
 import torch
 
-from torch.nn import BCELoss, L1Loss
-from torch.nn import MSELoss as L2Loss
-
-from vegans.utils.utils import WassersteinLoss
+from torch.nn import L1Loss
 from vegans.utils.networks import Generator, Adversary, Encoder
-from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
+from vegans.models.unconditional.AbstractGANGAE import AbstractGANGAE
 
-class LRGAN(AbstractGenerativeModel):
+class LRGAN(AbstractGANGAE):
     """
     Parameters
     ----------
@@ -92,61 +89,28 @@ class LRGAN(AbstractGenerativeModel):
             folder="./LRGAN",
             secure=True):
 
-        self.adv_type = adv_type
-        self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
-        self.adversary = Adversary(adversary, input_size=x_dim, adv_type=adv_type, device=device, ngpu=ngpu, secure=secure)
-        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
-        self.neural_nets = {
-            "Generator": self.generator, "Adversary": self.adversary, "Encoder": self.encoder
-        }
-
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
+            generator=generator, adversary=adversary, encoder=encoder,
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, adv_type=adv_type, feature_layer=feature_layer,
+            fixed_noise_size=fixed_noise_size, device=device, ngpu=ngpu, folder=folder, secure=secure
         )
         self.lambda_z = lambda_z
         self.hyperparameters["lambda_z"] = lambda_z
 
         if self.secure:
-            assert (self.generator.output_size == self.x_dim), (
-                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-            )
-            assert (self.encoder.output_size == self.z_dim), (
+            assert self.encoder.output_size == self.z_dim, (
                 "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
-        if self.adv_type == "Discriminator":
-            loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss(), "L1": L1Loss()}
-        elif self.adv_type == "Critic":
-            loss_functions = {"Generator": WassersteinLoss(), "Adversary": WassersteinLoss(), "L1": L1Loss()}
-        else:
-            raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
+        loss_functions = super()._define_loss()
+        loss_functions.update({"L1": L1Loss()})
         return loss_functions
 
 
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x):
-        return self.encoder(x)
-
-    def calculate_losses(self, X_batch, Z_batch, who=None):
-        if who == "Generator":
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Adversary":
-            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Encoder":
-            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
-        else:
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
-            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
-        return losses
-
     def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None):
         if fake_images is None:
             fake_images = self.generate(z=Z_batch)
@@ -199,13 +163,3 @@ class LRGAN(AbstractGenerativeModel):
             "Adversary_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake
         }
-
-    def _step(self, who=None):
-        if who is not None:
-            self.optimizers[who].step()
-            if who == "Adversary":
-                if self.adv_type == "Critic":
-                    for p in self.adversary.parameters():
-                        p.data.clamp_(-0.01, 0.01)
-        else:
-            [optimizer.step() for _, optimizer in self.optimizers.items()]

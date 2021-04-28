@@ -22,13 +22,11 @@ References
 
 import torch
 
-from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import WassersteinLoss
 from vegans.models.unconditional.LRGAN import LRGAN
 from vegans.utils.networks import Generator, Adversary, Encoder
-from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
+from vegans.models.conditional.AbstractConditionalGANGAE import AbstractConditionalGANGAE
 
-class ConditionalLRGAN(AbstractConditionalGenerativeModel, LRGAN):
+class ConditionalLRGAN(AbstractConditionalGANGAE, LRGAN):
     """
     Parameters
     ----------
@@ -95,22 +93,9 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel, LRGAN):
             folder="./CLRGAN",
             secure=True):
 
-        enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        if secure:
-            AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
-            AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-            AbstractConditionalGenerativeModel._check_conditional_network_input(adversary, in_dim=x_dim, y_dim=y_dim, name="Adversary")
-        self.adv_type = adv_type
-        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.adversary = Adversary(adversary, input_size=adv_in_dim, adv_type=adv_type, device=device, ngpu=ngpu, secure=secure)
-        self.neural_nets = {
-            "Generator": self.generator, "Adversary": self.adversary, "Encoder": self.encoder
-        }
 
         super().__init__(
+            generator=generator, adversary=adversary, encoder=encoder,
             x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
             fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
@@ -118,9 +103,6 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel, LRGAN):
         self.hyperparameters["lambda_z"] = lambda_z
 
         if self.secure:
-            assert (self.generator.output_size == self.x_dim), (
-                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-            )
             assert (self.encoder.output_size == self.z_dim), (
                 "Encoder output shape must be equal to z_dim. {} vs. {}.".format(self.encoder.output_size, self.z_dim)
             )
@@ -128,30 +110,6 @@ class ConditionalLRGAN(AbstractConditionalGenerativeModel, LRGAN):
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x, y=None):
-        if y is None:
-            x_dim = tuple(x.shape[1:])
-            assert x_dim == self.adv_in_dim, (
-                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
-            )
-            return LRGAN.encode(self, x=x)
-
-        inpt = self.concatenate(x, y).float()
-        return LRGAN.encode(self, x=inpt)
-
-    def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
-        if who == "Generator":
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        elif who == "Adversary":
-            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        elif who == "Encoder":
-            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        else:
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch))
-            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch))
-        return losses
-
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
         fake_concat = self.concatenate(fake_images, y_batch)

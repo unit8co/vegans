@@ -45,10 +45,11 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        AAE, BicycleGAN, EBGAN,
-        InfoGAN, KLGAN, LRGAN, LSGAN,
-        VAEGAN, VanillaGAN,
-        VanillaVAE , WassersteinGAN, WassersteinGANGP,
+        # AAE, BicycleGAN, EBGAN,
+        # InfoGAN, KLGAN, LRGAN, LSGAN,
+        # VAEGAN, VanillaGAN,
+        # VanillaVAE , WassersteinGAN, WassersteinGANGP,
+        BicycleGAN
     ]
 
     for model in models:
