@@ -171,10 +171,10 @@ utils.plot_images(image, labels=["2"])
 
 All of the generative model objects inherit from a [`AbstractGenerativeModel`](https://github.com/unit8co/vegans/blob/master/vegans/models/unconditional/AbstractGenerativeModel.py) base class. and allow for the following input in the constructor.
 
-* `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
-* `optim_kwargs`:  The optimizer keyword arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
-* `feature_layer`: If not None, it should be a layer of the discriminator of critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
-* `fixed_noise_size`: The number of samples to save (from fixed noise vectors). These are saved within Tensorboard (if `enable_tensorboard=True` during fitting) and in the `Model/images` subfolder.
+* `optim`: The optimizer for all networks used during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks, for example `{"Generator": torch.optim.Adam}`.
+* `optim_kwargs`:  The optimizer keyword arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks, for example `{"Generator": {"lr": 0.001}}`.
+* `feature_layer`: If not None, it should be a layer of the discriminator or critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
+* `fixed_noise_size`: The number of samples to save (from fixed noise vectors). These are saved within tensorboard (if `enable_tensorboard=True` during fitting) and in the `Model/images` subfolder.
 * `device`: "cuda" (GPU) or "cpu" depending on the available resources.
 * `ngpu`: Number of gpus used during training
 * `folder`: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.
@@ -185,7 +185,7 @@ All of the generative model objects inherit from a [`AbstractGenerativeModel`](h
 The fit function takes the following optional arguments:
 
 - `epochs`: Number of epochs to train the algorithm. Default: 5
-- `batch_size`: Size of one batch. Should not be too large: Default: 32
+- `batch_size`: Size of one batch. Default: 32
 - `steps`: How often one network should be trained against another. Must be `dict` type with appropriate names. E.g., for the `WassersteinGAN` the dictionary could be `{"Generator": 1, "Adversary": 5}`, indicating that the adversary should be trained five times on every mini-batch while the generator is trained once. The keys of the dictionary are **fixed** by the specified algorithm (here ["Generator", "Adversary"], for BicycleGAN would be ["Generator", "Adversary", "Encoder"] ). An appropriate error is raised if wrong keys are passed. The possible names should be obvious from the constructor of every algorithm but a wrong dictionary, e.g. {"Genrtr": 1}, can be passed consciously to receive a list of correct and available key values.
 - `print_every`: Determines after how many batches a message should be printed to the console informing about the current state of training. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: 100
 - `save_model_every`: Determines after how many batches the model should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Models will be saved in subdirectory `folder`+"/models" (`folder` specified in the constructor, see above in **Constructor arguments**). Default: None
@@ -199,7 +199,7 @@ All of the generative model objects inherit from a `AbstractGenerativeModel` bas
 
 #### Generative Model methods:
 
-- `generate(z=None, n=None)`: Generate samples from noise vector or generate "n" samples.
+- `generate(z=None, n=None)` / `generate(y, z=None, n=None)`: Generate samples from noise vector or generate "n" samples. 
 
 - `get_hyperparameters()`: Get dictionary containing important hyperparameters.
 
@@ -251,7 +251,7 @@ You can start with this [simple example](https://github.com/unit8co/vegans/blob/
 Alternatively, can run example [scripts](https://github.com/unit8co/vegans/tree/master/tutorials/snippets).
 
 ## Contribute
-PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING) for more details on the setup.
+PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING.md) for more details on the setup.
 
 ## Credits
 Some of the code has been inspired by some existing GAN implementations:
