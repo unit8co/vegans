@@ -16,7 +16,7 @@ requirements = [
 ]
 
 setup(name='vegans',
-      version='0.1.0',
+      version='0.2.0',
       description='A library to easily train various existing GANs in PyTorch.',
       long_description=long_description,
       keywords='gan gans pytorch generative models adversarial networks Wasserstein GAN InfoGAN CycleGAN BicycleGAN ' +
