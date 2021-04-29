@@ -6,28 +6,26 @@ with open(path.join(this_directory, 'README.md'), 'r') as f:
     long_description = f.read()
 
 requirements = [
-  "matplotlib>=3.3.0",
-  "numpy>=1.20.2",
-  "pytorch>=1.8.0",
-  "tensorboard>=2.4.1",
-  "torchsummary>=1.5.1",
-  "torchvision>=0.9.0",
-
-  "pandas>=1.2.4",
-
-  "pytest>=6.2.3"
+  "matplotlib==3.4.1",
+  "numpy==1.20.2",
+  "pandas==1.1.5",
+  "torch==1.8.1",
+  "tensorboard==2.5.0",
+  "torchsummary==1.5.1",
+  "torchvision==0.9.1"
 ]
 
 setup(name='vegans',
       version='0.1.0',
       description='A library to easily train various existing GANs in PyTorch.',
       long_description=long_description,
-      keywords='gan gans pytorch generative adversarial networks Wasserstein GAN',
+      keywords='gan gans pytorch generative models adversarial networks Wasserstein GAN InfoGAN CycleGAN BicycleGAN ' +
+               'VAE AAE',
       url='https://github.com/unit8co/vegans/',
       author='Unit8',
       author_email='julien@unit8.co',
       license='MIT',
       packages=find_packages(),
-      python_requires='>=3.5',
+      python_requires='>=3.7',
       install_requires=requirements,
       zip_safe=False)

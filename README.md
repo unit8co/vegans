@@ -8,7 +8,7 @@ However researchers may also find the GenerativeModel base class useful for quic
 The focus is on simplicity and providing reasonable defaults.
 
 ## How to install
-You need python 3.6 or above. Then:
+You need python 3.7 or above. Then:
 `pip install vegans`
 
 ## How to use
