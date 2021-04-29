@@ -191,7 +191,7 @@ The fit function takes the following optional arguments:
 - `save_model_every`: Determines after how many batches the model should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Models will be saved in subdirectory `folder`+"/models" (`folder` specified in the constructor, see above in **Constructor arguments**). Default: None
 - `save_images_every`: Determines after how many batches sample images and loss curves should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Images will be saved in subdirectory `folder`+"/images" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: None
 - `save_losses_every`: Determines after how many batches the losses should be calculated and saved. Figure is shown after `save_images_every` . String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: "1e"
-- `enable_tensorboard`: Determines after how many batches a message should be printed to the console informing about the current state of training. Tensorboard information will be saved in subdirectory `folder`+"/tensorboard" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: True
+- `enable_tensorboard`: Tensorboard information for losses, samples and training time will be saved in subdirectory `folder`+"/tensorboard" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: False
 
 All of the generative model objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`.
 
@@ -310,84 +310,6 @@ All this results should be taken with a grain of salt. They were not extensively
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
 
   - Interpolation
-
-
-
-- Done
-  - ~~Test all examples~~
-  - ~~Bug while saving~~
-  - ~~Test saving and loading~~
-  - ~~Document all networks~~
-  - ~~Update requirements and setup~~
-  - ~~No side effects for functions (self.\_losses, self.loss\_functions, self.\_optimizers, self.\_steps)~~
-  - ~~Replace "Adversary"~~
-  - ~~Residual Block~~
-  - ~~Inception Block~~
-  - ~~InfoGAN~~
-  - ~~WassersteinLoss as object~~
-  - ~~Train on CIFAR10~~
-  - ~~CycleGAN~~
-  - ~~Turn off secure mode~~
-  - ~~Describe custom parameters~~
-  - ~~plot images for 3d channels if possible else make it work for only one channel~~
-  - ~~DataLoader~~
-  - ~~Download~~
-    - ~~Mnist~~
-    - ~~CelebA~~
-    - ~~CIFAR~~
-    - ~~Fashion-MNIST~~
-  - ~~Update README file~~
-  - ~~Include well defined loaders for~~
-    - ~~Mnist~~
-    - ~~Fashion-MNIST~~
-  - ~~DataLoader from torchvision.datasets~~
-  - ~~Architectures that at least work for mnist~~
-    - I~~mages to compare algorithms~~
-    - ~~Note number params / training time~~
-  - ~~Get rid of last layer name "output" in class Adversary and Encoder~~
-  - ~~Unify data loading~~
-  - ~~Better GPU handling~~
-  - ~~update notebooks~~
-  - ~~Update **tests**~~
-  - ~~Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))~~
-  - ~~enable Wasserstein loss for all architectures (when it makes sense)~~
-  - ~~Better default folder (probably None or make current subfolder)~~
-  - ~~Better number of default steps for critic~~
-  - ~~Adversarial Autoencoder~~
-  - ~~get_number_params()~~
-  - ~~BicycleGAN~~
-  - ~~Introduce latent_space_net and real_space_net to make VAE abstraction better~~
-  - ~~VAEGAN~~
-  - ~~VAE~~
-  - ~~KLGAN~~
-  - ~~EBGAN~~
-  - ~~GIF the results~~
-  - ~~Better use case in README file~~
-  - ~~Import good architectures (probably with help of torch)~~
-  - ~~Write tests~~
-  - ~~Test dependencies~~
-  - ~~LR-GAN~~
-  - ~~Least Squares GAN~~
-  - ~~Include sources in jupyter~~
-  - ~~Make all examples work nicely~~
-  - ~~Implement Pix2Pix architecture: https://blog.eduonix.com/artificial-intelligence/pix2pix-gan/~~
-  - ~~Include images in jupyter~~
-  - ~~Pix2Pix~~
-  - ~~Check output dim (generator, encoder)~~
-  - ~~Improve Doc for networks~~
-  - ~~Rename AbstractGAN1v1 -> AbstractAbstractGAN1v1~~
-  - ~~Rename AbstractConditionalGAN1v1 -> AbstractAbstractConditionalGAN1v1~~
-  - ~~Rename AbstractGenerativeModel -> AbstractAbstractGenerativeModel~~
-  - ~~Rename AbstractConditionalGenerativeModel -> AbstractAbstractConditionalGenerativeModel~~
-  - ~~return numpy array instead o tensor for generate.~~
-  - ~~Automatically use evaluation mode~~
-
-
-
-
-
-
-
 
 
 
