@@ -19,6 +19,7 @@ setup(name='vegans',
       version='0.2.0',
       description='A library to easily train various existing GANs in PyTorch.',
       long_description=long_description,
+      long_description_content_type="text/markdown",
       keywords='gan gans pytorch generative models adversarial networks Wasserstein GAN InfoGAN CycleGAN BicycleGAN ' +
                'VAE AAE',
       url='https://github.com/unit8co/vegans/',
