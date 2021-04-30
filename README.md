@@ -302,18 +302,22 @@ All this results should be taken with a grain of salt. They were not extensively
   - Core Improvements:
 
     - Hide feature_layer, secure in **kwargs
-    - Generalize conditional networks and only let them handle correct concatenation
-    - Abstraction for GDE networks (1v1+1)
     - Make it more PEP conform
     - Make \_default\_optimizer not abstract
+    - Windows installation issues
+    - CI workflow
+    - Documentation website
+    - build fancy examples
     
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
-
+  
   - Interpolation
 
 
 
 - Done
+  - ~~Generalize conditional networks and only let them handle correct concatenation~~
+  - ~~Abstraction for GDE networks (1v1+1)~~
   - ~~Test all examples~~
   - ~~Bug while saving~~
   - ~~Test saving and loading~~
