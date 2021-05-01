@@ -102,8 +102,8 @@ class ConditionalVAEGAN(AbstractConditionalGANGAE, VAEGAN):
 
         super().__init__(
             generator=generator, adversary=adversary, encoder=encoder,
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, adv_type=adv_type,
+            feature_layer=feature_layer, fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.mu = nn.Sequential(
             nn.Flatten(),

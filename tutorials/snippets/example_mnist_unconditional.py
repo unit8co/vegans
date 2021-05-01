@@ -49,7 +49,7 @@ if __name__ == '__main__':
         # InfoGAN, KLGAN, LRGAN, LSGAN,
         # VAEGAN, VanillaGAN,
         # VanillaVAE , WassersteinGAN, WassersteinGANGP,
-        BicycleGAN
+        LRGAN
     ]
 
     for model in models:
