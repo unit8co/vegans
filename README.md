@@ -295,10 +295,6 @@ All this results should be taken with a grain of salt. They were not extensively
   
 - Other
 
-  - New links to correct github files
-
-    
-
   - Core Improvements:
 
     - Hide feature_layer, secure in **kwargs
@@ -306,87 +302,13 @@ All this results should be taken with a grain of salt. They were not extensively
     - Make \_default\_optimizer not abstract
     - Windows installation issues
     - CI workflow
+    - Type annotations
     - Documentation website
     - build fancy examples
     
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
-  
+
   - Interpolation
-
-
-
-- Done
-  - ~~Generalize conditional networks and only let them handle correct concatenation~~
-  - ~~Abstraction for GDE networks (1v1+1)~~
-  - ~~Test all examples~~
-  - ~~Bug while saving~~
-  - ~~Test saving and loading~~
-  - ~~Document all networks~~
-  - ~~Update requirements and setup~~
-  - ~~No side effects for functions (self.\_losses, self.loss\_functions, self.\_optimizers, self.\_steps)~~
-  - ~~Replace "Adversary"~~
-  - ~~Residual Block~~
-  - ~~Inception Block~~
-  - ~~InfoGAN~~
-  - ~~WassersteinLoss as object~~
-  - ~~Train on CIFAR10~~
-  - ~~CycleGAN~~
-  - ~~Turn off secure mode~~
-  - ~~Describe custom parameters~~
-  - ~~plot images for 3d channels if possible else make it work for only one channel~~
-  - ~~DataLoader~~
-  - ~~Download~~
-    - ~~Mnist~~
-    - ~~CelebA~~
-    - ~~CIFAR~~
-    - ~~Fashion-MNIST~~
-  - ~~Update README file~~
-  - ~~Include well defined loaders for~~
-    - ~~Mnist~~
-    - ~~Fashion-MNIST~~
-  - ~~DataLoader from torchvision.datasets~~
-  - ~~Architectures that at least work for mnist~~
-    - I~~mages to compare algorithms~~
-    - ~~Note number params / training time~~
-  - ~~Get rid of last layer name "output" in class Adversary and Encoder~~
-  - ~~Unify data loading~~
-  - ~~Better GPU handling~~
-  - ~~update notebooks~~
-  - ~~Update **tests**~~
-  - ~~Feature loss (using forward hooks described [here](https://discuss.pytorch.org/t/how-can-l-load-my-best-model-as-a-feature-extractor-evaluator/17254/6))~~
-  - ~~enable Wasserstein loss for all architectures (when it makes sense)~~
-  - ~~Better default folder (probably None or make current subfolder)~~
-  - ~~Better number of default steps for critic~~
-  - ~~Adversarial Autoencoder~~
-  - ~~get_number_params()~~
-  - ~~BicycleGAN~~
-  - ~~Introduce latent_space_net and real_space_net to make VAE abstraction better~~
-  - ~~VAEGAN~~
-  - ~~VAE~~
-  - ~~KLGAN~~
-  - ~~EBGAN~~
-  - ~~GIF the results~~
-  - ~~Better use case in README file~~
-  - ~~Import good architectures (probably with help of torch)~~
-  - ~~Write tests~~
-  - ~~Test dependencies~~
-  - ~~LR-GAN~~
-  - ~~Least Squares GAN~~
-  - ~~Include sources in jupyter~~
-  - ~~Make all examples work nicely~~
-  - ~~Implement Pix2Pix architecture: https://blog.eduonix.com/artificial-intelligence/pix2pix-gan/~~
-  - ~~Include images in jupyter~~
-  - ~~Pix2Pix~~
-  - ~~Check output dim (generator, encoder)~~
-  - ~~Improve Doc for networks~~
-  - ~~Rename AbstractGAN1v1 -> AbstractAbstractGAN1v1~~
-  - ~~Rename AbstractConditionalGAN1v1 -> AbstractAbstractConditionalGAN1v1~~
-  - ~~Rename AbstractGenerativeModel -> AbstractAbstractGenerativeModel~~
-  - ~~Rename AbstractConditionalGenerativeModel -> AbstractAbstractConditionalGenerativeModel~~
-  - ~~return numpy array instead o tensor for generate.~~
-  - ~~Automatically use evaluation mode~~
-
-
 
 
 
