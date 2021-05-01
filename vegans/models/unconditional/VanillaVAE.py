@@ -113,9 +113,6 @@ class VanillaVAE(AbstractGenerativeModel):
                 "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {"Autoencoder": MSELoss()}
         return loss_functions

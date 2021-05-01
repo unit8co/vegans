@@ -87,9 +87,6 @@ class VanillaGAN(AbstractGAN1v1):
             device=device, folder=folder, ngpu=ngpu, secure=secure
         )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss()}
         return loss_functions

@@ -103,9 +103,6 @@ class WassersteinGAN(AbstractGAN1v1):
     def _default_optimizer(self):
         return torch.optim.RMSprop
 
-    def _default_optimizer(self):
-        return torch.optim.RMSprop
-
     def _define_loss(self):
         loss_functions = {"Generator": WassersteinLoss(), "Adversary": WassersteinLoss()}
         return loss_functions

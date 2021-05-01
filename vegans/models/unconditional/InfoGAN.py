@@ -153,9 +153,6 @@ class InfoGAN(AbstractGenerativeModel):
                 "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {
             "Generator": BCELoss(), "Adversary": BCELoss(),

@@ -200,9 +200,8 @@ class AbstractGenerativeModel(ABC):
         assert isinstance(self.neural_nets, dict), "'neural_nets' attribute of AbstractGenerativeModel must be dictionary."
         self._check_dict_keys(self.optimizers, where="_define_optimizer_kwargs")
 
-    @abstractmethod
     def _default_optimizer(self):
-        pass
+        return torch.optim.Adam
 
     @abstractmethod
     def _define_loss(self):

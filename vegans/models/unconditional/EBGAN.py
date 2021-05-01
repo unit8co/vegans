@@ -97,9 +97,6 @@ class EBGAN(AbstractGAN1v1):
         self.m = m
         self.hyperparameters["m"] = m
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
         return loss_functions

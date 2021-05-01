@@ -91,9 +91,6 @@ class KLGAN(AbstractGAN1v1):
         )
         self.hyperparameters["eps"] = eps
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {"Adversary": torch.nn.BCELoss(), "Generator": KLLoss(self.eps)}
         return loss_functions

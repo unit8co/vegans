@@ -94,9 +94,6 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
         self.lambda_x = 10
         self.hyperparameters["lambda_x"] = self.lambda_x
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
         loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss(), "L1": L1Loss()}
         return loss_functions
