@@ -15,6 +15,10 @@
 
 # Sublime project files
 *.sublime*
+
+# vegans specific folders
 MyModels
 data
+
+# Github token
 .token

@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md'), 'r') as f:
 
 requirements = [
   "matplotlib==3.4.1",
-  "numpy==1.20.2",
+  "numpy==1.19.5",
   "pandas==1.1.5",
   "torch==1.8.1",
   "tensorboard==2.5.0",
