@@ -33,10 +33,6 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      # Install requirements
-      - name: Install Tox and any other packages
-        run: pip install -r requirements/all.txt
-
       # Run tox.ini which runs pytest
       - name: Run Tox
         run: tox -e py
