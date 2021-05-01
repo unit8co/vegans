@@ -91,7 +91,7 @@ class LayerInception(Module):
         return "LayerInception(in_channels={}, out_channels={})".format(self.in_channels, self.out_channels)
 
 
-class LayerResidualBlock(Module):
+class LayerResidualConvBlock(Module):
     """ Implementation of the inception layer architecture.
 
     Uses a network in network (NIN) architecture to make networks wider
@@ -136,12 +136,12 @@ class LayerResidualBlock(Module):
 
     def __str__(self):
         return (
-            "LayerResidualBlock(in_channels={}, out_channels={}, skip_layers={}, kernel_size={})"
+            "LayerResidualConvBlock(in_channels={}, out_channels={}, skip_layers={}, kernel_size={})"
             .format(self.in_channels, self.out_channels, self.skip_layers, self.kernel_size)
         )
 
     def __repr__(self):
         return (
-            "LayerResidualBlock(in_channels={}, out_channels={}, skip_layers={}, kernel_size={})"
+            "LayerResidualConvBlock(in_channels={}, out_channels={}, skip_layers={}, kernel_size={})"
             .format(self.in_channels, self.out_channels, self.skip_layers, self.kernel_size)
         )

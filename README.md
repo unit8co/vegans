@@ -8,16 +8,16 @@ However researchers may also find the GenerativeModel base class useful for quic
 The focus is on simplicity and providing reasonable defaults.
 
 ## How to install
-You need python 3.6 or above. Then:
+You need python 3.7 or above. Then:
 `pip install vegans`
 
 ## How to use
 The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
 
 - Read through this README.md file
-- Check out the notebooks (00 to 04)
+- Check out the [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) (00 to 04)
 - If you want to create your own GAN algorithms, check out the notebooks 05 to 07
-- Look at the example code
+- Look at the example [code snippets](https://github.com/unit8co/vegans/tree/master/tutorials/snippets)
 
 vegans implements two types of generative models: Unsupervised and Supervised (examples given below). **Unsupervised algorithms** are used when no labels exist for the data you want to generate, for example in cases where it is too tedious or infeasible to generate labels for every output. The disadvantage is that after training the generation process will be unsupervised as well, meaning you have (in most cases) little control over which type of output is generated. **Supervised algorithms** on the other hand require you to specify the input dimension of the label (`y_dim`) and provide labels during training. All algorithms requiring labels are implemented as "ConditionalGAN" (e.g. `VanillaGAN` does not take labels, whereas `ConditionalVanillaGAN` does). These algorithms enable you to generate a specific output **conditonal** on a certain input.
 
@@ -51,11 +51,11 @@ All current generative model implementations come with a conditional variant to 
 - `ConditionalCycleGAN`
 - `ConditionalPix2Pix`
 
-This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: [example_conditional.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_conditional.py)  or [03_mnist-conditional.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/03_mnist-conditional.ipynb)) or it can also be a full image (when for example trying to rotate an image: [example_image_to_image.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_image_to_image.py)  or [04_mnist-image-to-image.ipynb](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/04_mnist-image-to-image.ipynb)).
+This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: [example_mnist_conditional.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_conditional.py)  or [03_mnist-conditional.ipynb](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/03_mnist-conditional.ipynb)) or it can also be a full image (when for example trying to rotate an image: [example_image_to_image.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_rotation.py)  or [04_mnist-image-to-image.ipynb](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/04_mnist-image-to-image.ipynb)).
 
-Models can either be passed as `torch.nn.Sequential` objects or by defining custom architectures, see [example_input_formats.py](https://github.com/tneuer/GAN-pytorch/blob/main/examples/example_input_formats.py).
+Models can either be passed as `torch.nn.Sequential` objects or by defining custom architectures, see [example_input_formats.py](https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_input_formats.py).
 
-Also look at the [jupyter notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks) for better visualized examples and how to use the library.
+Also look at the [jupyter notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) for better visualized examples and how to use the library.
 
 #### Unsupervised Learning Example
 
@@ -169,12 +169,12 @@ utils.plot_images(image, labels=["2"])
 
 #### Constructor arguments
 
-All of the generative model objects inherit from a `AbstractGenerativeModel` base class. and allow for the following input in the constructor.
+All of the generative model objects inherit from a [`AbstractGenerativeModel`](https://github.com/unit8co/vegans/blob/master/vegans/models/unconditional/AbstractGenerativeModel.py) base class. and allow for the following input in the constructor.
 
-* `optim`: The optimizer to use for all networks during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks.
-* `optim_kwargs`:  The optimizer keyword arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks.
-* `feature_layer`: If not None, it should be a layer of the discriminator of critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
-* `fixed_noise_size`: The number of samples to save (from fixed noise vectors). These are saved within Tensorboard (if `enable_tensorboard=True` during fitting) and in the `Model/images` subfolder.
+* `optim`: The optimizer for all networks used during training. If `None` a default optimizer (probably either `torch.optim.Adam` or `torch.optim.RMSprop`) is chosen by the specific model. A `dict` type with appropriate keys can be passed to specify different optimizers for different networks, for example `{"Generator": torch.optim.Adam}`.
+* `optim_kwargs`:  The optimizer keyword arguments. A `dict` type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks, for example `{"Generator": {"lr": 0.001}}`.
+* `feature_layer`: If not None, it should be a layer of the discriminator or critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.
+* `fixed_noise_size`: The number of samples to save (from fixed noise vectors). These are saved within tensorboard (if `enable_tensorboard=True` during fitting) and in the `Model/images` subfolder.
 * `device`: "cuda" (GPU) or "cpu" depending on the available resources.
 * `ngpu`: Number of gpus used during training
 * `folder`: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.
@@ -185,13 +185,13 @@ All of the generative model objects inherit from a `AbstractGenerativeModel` bas
 The fit function takes the following optional arguments:
 
 - `epochs`: Number of epochs to train the algorithm. Default: 5
-- `batch_size`: Size of one batch. Should not be too large: Default: 32
+- `batch_size`: Size of one batch. Default: 32
 - `steps`: How often one network should be trained against another. Must be `dict` type with appropriate names. E.g., for the `WassersteinGAN` the dictionary could be `{"Generator": 1, "Adversary": 5}`, indicating that the adversary should be trained five times on every mini-batch while the generator is trained once. The keys of the dictionary are **fixed** by the specified algorithm (here ["Generator", "Adversary"], for BicycleGAN would be ["Generator", "Adversary", "Encoder"] ). An appropriate error is raised if wrong keys are passed. The possible names should be obvious from the constructor of every algorithm but a wrong dictionary, e.g. {"Genrtr": 1}, can be passed consciously to receive a list of correct and available key values.
 - `print_every`: Determines after how many batches a message should be printed to the console informing about the current state of training. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: 100
 - `save_model_every`: Determines after how many batches the model should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Models will be saved in subdirectory `folder`+"/models" (`folder` specified in the constructor, see above in **Constructor arguments**). Default: None
 - `save_images_every`: Determines after how many batches sample images and loss curves should be saved. String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Images will be saved in subdirectory `folder`+"/images" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: None
 - `save_losses_every`: Determines after how many batches the losses should be calculated and saved. Figure is shown after `save_images_every` . String indicating fraction or multiples of epoch can be given. I.e. "0.25e" = four times per epoch, "2e" after two epochs. Default: "1e"
-- `enable_tensorboard`: Determines after how many batches a message should be printed to the console informing about the current state of training. Tensorboard information will be saved in subdirectory `folder`+"/tensorboard" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: True
+- `enable_tensorboard`: Tensorboard information for losses, samples and training time will be saved in subdirectory `folder`+"/tensorboard" (`folder` specified in the constructor, see above in **Constructor arguments**).  Default: False
 
 All of the generative model objects inherit from a `AbstractGenerativeModel` base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some `torch.nn.Module`), as well as a the dimensions of the latent space `z_dim` and input dimension of the images `x_dim`.
 
@@ -199,7 +199,7 @@ All of the generative model objects inherit from a `AbstractGenerativeModel` bas
 
 #### Generative Model methods:
 
-- `generate(z=None, n=None)`: Generate samples from noise vector or generate "n" samples.
+- `generate(z=None, n=None)` / `generate(y, z=None, n=None)`: Generate samples from noise vector or generate "n" samples. 
 
 - `get_hyperparameters()`: Get dictionary containing important hyperparameters.
 
@@ -242,16 +242,16 @@ Attentive readers might notice that in most places we try to talk about "Generat
 
 In the future we also plan to implement different VAE algorithms to have all generative models in one place but for now the library is focused on GAN algorithms.
 
-If you are researching new generative model training algorithms, you may find it useful to inherit from the `AbstractGenerativeModel` or  `AbstractConditionalGenerativeModel` base class.
+If you are researching new generative model training algorithms, you may find it useful to inherit from the `AbstractGenerativeModel` or  [`AbstractConditionalGenerativeModel`](https://github.com/unit8co/vegans/blob/master/vegans/models/conditional/AbstractConditionalGenerativeModel.py) base class.
 
 ### Learn more:
 
-Currently the best way to learn more about how to use vegans is to have a look at the example [notebooks](https://github.com/tneuer/GAN-pytorch/tree/main/notebooks).
-You can start with this [simple example](https://github.com/tneuer/GAN-pytorch/blob/main/notebooks/00_univariate_gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
-Alternatively, can run example [scripts](https://github.com/tneuer/GAN-pytorch/tree/main/examples).
+Currently the best way to learn more about how to use vegans is to have a look at the example [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks).
+You can start with this [simple example](https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/00_univariate-gaussian.ipynb) showing how to sample from a univariate Gaussian using a GAN.
+Alternatively, can run example [scripts](https://github.com/unit8co/vegans/tree/master/tutorials/snippets).
 
 ## Contribute
-PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING) for more details on the setup.
+PRs and suggestions are welcome. Look [here](https://github.com/unit8co/vegans/blob/master/CONTRIBUTING.md) for more details on the setup.
 
 ## Credits
 Some of the code has been inspired by some existing GAN implementations:
@@ -309,6 +309,11 @@ All this results should be taken with a grain of salt. They were not extensively
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
 
   - Interpolation
+
+
+
+
+
 
 
 
