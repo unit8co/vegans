@@ -97,7 +97,7 @@ class ConditionalVAEGAN(AbstractConditionalGANGAE, VAEGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CVAEGAN",
+            folder="./veganModels/cVAEGAN",
             secure=True):
 
         super().__init__(

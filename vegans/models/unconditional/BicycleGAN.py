@@ -97,7 +97,7 @@ class BicycleGAN(AbstractGANGAE):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./BicycleGAN",
+            folder="./veganModels/BicycleGAN",
             secure=True):
 
         super().__init__(

@@ -84,7 +84,7 @@ class WassersteinGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./WassersteinGAN",
+            folder="./veganModels/WassersteinGAN",
             secure=True):
 
         super().__init__(

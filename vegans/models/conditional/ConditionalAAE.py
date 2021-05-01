@@ -95,7 +95,7 @@ class ConditionalAAE(AbstractConditionalGenerativeModel, AAE):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CAAE",
+            folder="./veganModels/cAAE",
             secure=True):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)

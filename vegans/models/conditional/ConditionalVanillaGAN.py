@@ -80,7 +80,7 @@ class ConditionalVanillaGAN(AbstractConditionalGAN1v1, VanillaGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CVanillaGAN",
+            folder="./veganModels/cVanillaGAN",
             secure=True):
 
         super().__init__(

@@ -75,7 +75,7 @@ class VanillaGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./VanillaGAN",
+            folder="./veganModels/VanillaGAN",
             secure=True):
 
         super().__init__(

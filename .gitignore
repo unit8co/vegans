@@ -16,5 +16,6 @@
 # Sublime project files
 *.sublime*
 MyModels
+veganModels
 data
 .token

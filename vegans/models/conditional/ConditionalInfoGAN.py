@@ -99,7 +99,7 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel, InfoGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CInfoGAN",
+            folder="./veganModels/cInfoGAN",
             secure=True):
 
         c_dim_discrete = [c_dim_discrete] if isinstance(c_dim_discrete, int) else c_dim_discrete

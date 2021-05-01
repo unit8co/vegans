@@ -88,7 +88,7 @@ class ConditionalWassersteinGAN(AbstractConditionalGAN1v1, WassersteinGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CWassersteinGAN",
+            folder="./veganModels/cWassersteinGAN",
             secure=True):
 
         super().__init__(

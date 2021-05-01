@@ -81,7 +81,7 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CPix2Pix",
+            folder="./veganModels/cPix2Pix",
             secure=True):
 
         super().__init__(

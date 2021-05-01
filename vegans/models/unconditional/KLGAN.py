@@ -77,7 +77,7 @@ class KLGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./KLGAN",
+            folder="./veganModels/KLGAN",
             secure=True):
 
         self.eps = eps

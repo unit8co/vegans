@@ -90,7 +90,7 @@ class AAE(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./AAE",
+            folder="./veganModels/AAE",
             secure=True):
 
         self.adv_type = adv_type

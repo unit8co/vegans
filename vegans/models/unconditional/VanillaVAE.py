@@ -76,7 +76,7 @@ class VanillaVAE(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./VanillaVAE",
+            folder="./veganModels/VanillaVAE",
             secure=True):
 
         self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)

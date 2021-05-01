@@ -94,7 +94,7 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CCycleGAN",
+            folder="./veganModels/cCycleGAN",
             secure=True):
 
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
