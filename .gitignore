@@ -3,6 +3,7 @@
 
 # Setuptools distribution folder.
 /dist/
+.tox
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
@@ -14,6 +15,10 @@
 
 # Sublime project files
 *.sublime*
+
+# vegans specific folders
 MyModels
 data
+
+# Github token
 .token
