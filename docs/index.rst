@@ -10,6 +10,7 @@ Welcome to vegans's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   quickstart
    modules
 
 Indices and tables

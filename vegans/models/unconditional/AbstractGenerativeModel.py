@@ -719,7 +719,11 @@ class AbstractGenerativeModel(ABC):
         """
         if name is None:
             name = "model.torch"
-        torch.save(self, os.path.join(self.folder, name))
+        if self.folder is not None:
+            torch.save(self, os.path.join(self.folder, name))
+        else:
+            torch.save(self, os.path.join("", name))
+
         print("Model saved to {}.".format(os.path.join(self.folder, name)))
 
     @staticmethod
