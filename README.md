@@ -300,7 +300,10 @@ All this results should be taken with a grain of salt. They were not extensively
     - Hide feature_layer, secure in **kwargs
     - Make it more PEP conform
     - ~~Make \_default\_optimizer not abstract~~
+    - Windows installation issues
     - ~~CI workflow~~
+    - Create protected branches
+    - Conda installation
     - Type annotations
     - Documentation website
     - build fancy examples
