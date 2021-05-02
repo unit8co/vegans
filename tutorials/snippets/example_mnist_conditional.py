@@ -28,10 +28,10 @@ if __name__ == '__main__':
     datapath = "./data/"
     X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
 
-    epochs = 3
+    epochs = 1
     batch_size = 32
 
-    X_train = X_train.reshape((-1, 1, 32, 32))
+    X_train = X_train.reshape((-1, 1, 32, 32))[:500]
     X_test = X_test.reshape((-1, 1, 32, 32))
     nb_classes = len(set(y_train))
     y_train = np.eye(nb_classes)[y_train.reshape(-1)]
@@ -40,8 +40,6 @@ if __name__ == '__main__':
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
     z_dim = 64
-    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
-    adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
     ######################################C###################################
     # Architecture
@@ -142,7 +140,7 @@ if __name__ == '__main__':
             epochs, z_dim, training_time, gan_model.get_number_params()
         )
         fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
-        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
+        fig, axs = utils.plot_images(images=samples, labels=fixed_labels, show=False)
         fig.suptitle(
             title,
             fontsize=12
