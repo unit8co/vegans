@@ -305,7 +305,7 @@ All this results should be taken with a grain of salt. They were not extensively
     - Create protected branches
     - Conda installation
     - Type annotations
-    - Documentation website
+    - ~~Documentation website~~
     - build fancy examples
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
   
