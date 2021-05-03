@@ -32,7 +32,7 @@ jobs:
 
       # Run sphinx
       - name: Run Sphinx
-        run: make --directory ./docs/source clean html
+        run: ./sphinx/build_docs.sh
 
   check-examples:
     runs-on: ubuntu-latest

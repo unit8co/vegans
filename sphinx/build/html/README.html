@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans &mdash; vegans 0.2.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="copyright" title="Copyright" href="copyright.html" />
+    <link rel="next" title="vegans" href="modules.html" />
+    <link rel="prev" title="Quickstart guide" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Readme</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-install">How to install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-use">How to use</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#unsupervised-learning-example">Unsupervised Learning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supervised-conditional-learning-example">Supervised / Conditional Learning Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#slightly-more-details">Slightly More Details:</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#constructor-arguments">Constructor arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fit-arguments">fit() arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generative-model-methods">Generative Model methods:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#generative-model-attributes">Generative model attributes:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#learn-more">Learn more:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#contribute">Contribute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#some-results">Some Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#todo">TODO</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>vegans</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/README.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vegans">
+<h1>vegans<a class="headerlink" href="#vegans" title="Permalink to this headline">¶</a></h1>
+<p>A library to easily train various existing GANs (and other generative models) in PyTorch.</p>
+<p>This library targets mainly GAN users, who want to use existing GAN training techniques with their own generators/discriminators.
+However researchers may also find the GenerativeModel base class useful for quicker implementation of new GAN training techniquess.</p>
+<p>The focus is on simplicity and providing reasonable defaults.</p>
+<div class="section" id="how-to-install">
+<h2>How to install<a class="headerlink" href="#how-to-install" title="Permalink to this headline">¶</a></h2>
+<p>You need python 3.7 or above. Then:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">vegans</span></code></p>
+</div>
+<div class="section" id="how-to-use">
+<h2>How to use<a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
+<p>The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:</p>
+<ul class="simple">
+<li><p>Read through this README.md file</p></li>
+<li><p>Check out the <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/notebooks">notebooks</a> (00 to 04)</p></li>
+<li><p>If you want to create your own GAN algorithms, check out the notebooks 05 to 07</p></li>
+<li><p>Look at the example <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/snippets">code snippets</a></p></li>
+</ul>
+<p>vegans implements two types of generative models: Unsupervised and Supervised (examples given below). <strong>Unsupervised algorithms</strong> are used when no labels exist for the data you want to generate, for example in cases where it is too tedious or infeasible to generate labels for every output. The disadvantage is that after training the generation process will be unsupervised as well, meaning you have (in most cases) little control over which type of output is generated. <strong>Supervised algorithms</strong> on the other hand require you to specify the input dimension of the label (<code class="docutils literal notranslate"><span class="pre">y_dim</span></code>) and provide labels during training. All algorithms requiring labels are implemented as “ConditionalGAN” (e.g. <code class="docutils literal notranslate"><span class="pre">VanillaGAN</span></code> does not take labels, whereas <code class="docutils literal notranslate"><span class="pre">ConditionalVanillaGAN</span></code> does). These algorithms enable you to generate a specific output <strong>conditonal</strong> on a certain input.</p>
+<p>In the case of handwritten digit generation (<code class="docutils literal notranslate"><span class="pre">MNIST</span></code>) a supervised algorithm let’s you produce images of a certain number that you control (e.g. images of zeros). Supervised methods are also required for text-to-image, image-to-text, image-to-image, text-to-audio, etc. translation tasks, because output should be generated conditional on an input (what does the image look like <em>given</em> a specific text snippet). Currently, the encoding of the conditional vector (label, text, audio, …) has to be handled on the user side.</p>
+<p>An interesting middle ground is take by the <code class="docutils literal notranslate"><span class="pre">InfoGAN</span></code> algorithm which tries to learn the labels itself during training. We refer to the original <a class="reference external" href="https://dl.acm.org/doi/10.5555/3157096.3157340">paper</a> for more detailed information on the algorithm, but the vegans API for this method works similar to any other GAN. A conditional version exists, called <code class="docutils literal notranslate"><span class="pre">ConditionalInfoGAN</span></code> where label information can be provided but additional features are learned during training.</p>
+<p>You can currently use the following generative models:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AAE</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1511.05644.pdf">Adversarial Auto-Encoder</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BicycleGAN</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1711.11586.pdf">BicycleGAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">EBGAN</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1609.03126.pdf">Energy-Based GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InfoGAN</span></code>: <a class="reference external" href="https://dl.acm.org/doi/10.5555/3157096.3157340">Information-Based GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KLGAN</span></code>: <a class="reference external" href="https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/">Kullback-Leib GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LRGAN</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1711.11586.pdf">Latent-Regressor GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LSGAN</span></code>: <a class="reference external" href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf">Least-Squares GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VAEGAN</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1512.09300.pdf">Variational Auto-Encoder GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VanillaGAN</span></code>: <a class="reference external" href="https://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf">Classic minimax GAN</a>, in its non-saturated version</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VanillaVAE</span></code>: <a class="reference external" href="https://arxiv.org/pdf/1512.09300.pdf">Variational Auto-Encoder</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WassersteinGAN</span></code>: <a class="reference external" href="https://arxiv.org/abs/1701.07875">Wasserstein GAN</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WassersteinGANGP</span></code>: <a class="reference external" href="https://arxiv.org/abs/1704.00028">Wasserstein GAN with gradient penalty</a></p></li>
+</ul>
+<p>All current generative model implementations come with a conditional variant to allow for the usage of training labels to produce specific outputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ConditionalAEE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConditionalBicycleGAN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConditionalEBGAN</span></code></p></li>
+<li><p>…</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConditionalCycleGAN</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ConditionalPix2Pix</span></code></p></li>
+</ul>
+<p>This can either be used to pass a one hot encoded vector to predict a specific label (generate a certain number in case of mnist: <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_conditional.py">example_mnist_conditional.py</a>  or <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/03_mnist-conditional.ipynb">03_mnist-conditional.ipynb</a>) or it can also be a full image (when for example trying to rotate an image: <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_mnist_rotation.py">example_image_to_image.py</a>  or <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/04_mnist-image-to-image.ipynb">04_mnist-image-to-image.ipynb</a>).</p>
+<p>Models can either be passed as <code class="docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code> objects or by defining custom architectures, see <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/snippets/example_input_formats.py">example_input_formats.py</a>.</p>
+<p>Also look at the <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/notebooks">jupyter notebooks</a> for better visualized examples and how to use the library.</p>
+<div class="section" id="unsupervised-learning-example">
+<h3>Unsupervised Learning Example<a class="headerlink" href="#unsupervised-learning-example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">vegans.GAN</span> <span class="kn">import</span> <span class="n">VanillaGAN</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.loading</span> <span class="k">as</span> <span class="nn">loading</span>
+
+<span class="c1"># Data preparation</span>
+<span class="n">datapath</span> <span class="o">=</span>  <span class="s2">&quot;./data/&quot;</span> <span class="c1"># root path to data, if does not exist will be downloaded into this folder</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span> <span class="c1"># required shape</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+<span class="n">x_dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># [height, width, nr_channels]</span>
+<span class="n">z_dim</span> <span class="o">=</span> <span class="mi">64</span>
+
+<span class="c1"># Define your own architectures here. You can use a Sequential model or an object</span>
+<span class="c1"># inheriting from torch.nn.Module. Here, a default model for mnist is loaded.</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+
+<span class="n">gan</span> <span class="o">=</span> <span class="n">VanillaGAN</span><span class="p">(</span>
+    <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span>
+    <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+<span class="n">gan</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span> <span class="c1"># optional, shows architecture</span>
+
+<span class="c1"># Training</span>
+<span class="n">gan</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Vizualise results</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">get_training_results</span><span class="p">()</span>
+<span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_losses</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
+
+<span class="c1"># Sample new images, you can also pass a specific noise vector</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="supervised-conditional-learning-example">
+<h3>Supervised / Conditional Learning Example<a class="headerlink" href="#supervised-conditional-learning-example" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.loading</span> <span class="k">as</span> <span class="nn">loading</span>
+<span class="kn">from</span> <span class="nn">vegans.GAN</span> <span class="kn">import</span> <span class="n">ConditionalVanillaGAN</span>
+
+<span class="c1"># Data preparation</span>
+<span class="n">datapath</span> <span class="o">=</span>  <span class="s2">&quot;./data/&quot;</span> <span class="c1"># root path to data, if does not exist will be downloaded into this folder</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span> <span class="c1"># required shape</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+<span class="n">nb_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+
+<span class="n">x_dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># [nr_channels, height, width]</span>
+<span class="n">y_dim</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">z_dim</span> <span class="o">=</span> <span class="mi">64</span>
+
+<span class="c1"># Define your own architectures here. You can use a Sequential model or an object</span>
+<span class="c1"># inheriting from torch.nn.Module. Here, a default model for mnist is loaded.</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
+
+<span class="n">gan</span> <span class="o">=</span> <span class="n">ConditionalVanillaGAN</span><span class="p">(</span>
+    <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span>
+    <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span>
+    <span class="n">folder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">optim</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Generator&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">RMSprop</span><span class="p">,</span> <span class="s2">&quot;Adversary&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">},</span> <span class="c1"># optional</span>
+    <span class="n">optim_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Generator&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">},</span> <span class="s2">&quot;Adversary&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lr&quot;</span><span class="p">:</span> <span class="mf">0.0001</span><span class="p">}},</span> <span class="c1"># optional</span>
+    <span class="n">fixed_noise_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">ngpu</span><span class="o">=</span><span class="mi">0</span> <span class="c1"># optional</span>
+
+<span class="p">)</span>
+<span class="n">gan</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span> <span class="c1"># optional, shows architecture</span>
+
+<span class="c1"># Training</span>
+<span class="n">gan</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Generator&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Adversary&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="c1"># optional, train generator once and discriminator twice on every mini-batch</span>
+    <span class="n">print_every</span><span class="o">=</span><span class="s2">&quot;0.1e&quot;</span><span class="p">,</span> <span class="c1"># optional, prints progress 10 times per epoch</span>
+    					<span class="c1"># (might also be integer input indicating number of mini-batches)</span>
+    <span class="n">save_model_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">save_images_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
+    <span class="n">save_losses_every</span><span class="o">=</span><span class="s2">&quot;0.1e&quot;</span><span class="p">,</span> <span class="c1"># optional, save losses 10 times per epoch in internal losses dictionary used to generate</span>
+    						  <span class="c1"># plots during and after training</span>
+    <span class="n">enable_tensorboard</span><span class="o">=</span><span class="kc">False</span> <span class="c1"># optional, if true all progress is additionally saved in tensorboard subdirectory</span>
+<span class="p">)</span>
+
+<span class="c1"># Vizualise results</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">get_training_results</span><span class="p">()</span>
+<span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gan</span><span class="o">.</span><span class="n">fixed_labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_losses</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
+
+<span class="c1"># Generate specific label, for example &quot;2&quot;</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span> <span class="p">]])</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">gan</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="slightly-more-details">
+<h3>Slightly More Details:<a class="headerlink" href="#slightly-more-details" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="constructor-arguments">
+<h4>Constructor arguments<a class="headerlink" href="#constructor-arguments" title="Permalink to this headline">¶</a></h4>
+<p>All of the generative model objects inherit from a <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/vegans/models/unconditional/AbstractGenerativeModel.py"><code class="docutils literal notranslate"><span class="pre">AbstractGenerativeModel</span></code></a> base class. and allow for the following input in the constructor.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">optim</span></code>: The optimizer for all networks used during training. If <code class="docutils literal notranslate"><span class="pre">None</span></code> a default optimizer (probably either <code class="docutils literal notranslate"><span class="pre">torch.optim.Adam</span></code> or <code class="docutils literal notranslate"><span class="pre">torch.optim.RMSprop</span></code>) is chosen by the specific model. A <code class="docutils literal notranslate"><span class="pre">dict</span></code> type with appropriate keys can be passed to specify different optimizers for different networks, for example <code class="docutils literal notranslate"><span class="pre">{&quot;Generator&quot;:</span> <span class="pre">torch.optim.Adam}</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optim_kwargs</span></code>:  The optimizer keyword arguments. A <code class="docutils literal notranslate"><span class="pre">dict</span></code> type with appropriate keys can be passed to specify different optimizer keyword arguments for different networks, for example <code class="docutils literal notranslate"><span class="pre">{&quot;Generator&quot;:</span> <span class="pre">{&quot;lr&quot;:</span> <span class="pre">0.001}}</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_layer</span></code>: If not None, it should be a layer of the discriminator or critic. The output of this layer is used to compute the mean squared error between the real and fake samples, i.e. it uses the feature loss. The existing GAN loss (often Binary cross-entropy) is overwritten.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fixed_noise_size</span></code>: The number of samples to save (from fixed noise vectors). These are saved within tensorboard (if <code class="docutils literal notranslate"><span class="pre">enable_tensorboard=True</span></code> during fitting) and in the <code class="docutils literal notranslate"><span class="pre">Model/images</span></code> subfolder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">device</span></code>: “cuda” (GPU) or “cpu” depending on the available resources.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ngpu</span></code>: Number of gpus used during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">folder</span></code>: Folder which will contain all results of the network (architecture, model.torch, images, loss plots, etc.). An existing folder will never be deleted or overwritten. If the folder already exists a new folder will be created with the given name + current time stamp.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">secure</span></code>: By default, vegans performs plenty of checks on inputs and outputs for all networks (For example <code class="docutils literal notranslate"><span class="pre">encoder.output_size==z_dim</span></code>, <code class="docutils literal notranslate"><span class="pre">generator.output_size==x_dim</span></code>  or <code class="docutils literal notranslate"><span class="pre">Discriminator.last_layer==torch.nn.Sigmoid</span></code>). For some use cases these checks might be too restrictive. If <code class="docutils literal notranslate"><span class="pre">secure=False</span></code> vegans will perform only the most basic checks to run. Of course, if there are shape mismatches torch itself will still complain.</p></li>
+</ul>
+</div>
+<div class="section" id="fit-arguments">
+<h4>fit() arguments<a class="headerlink" href="#fit-arguments" title="Permalink to this headline">¶</a></h4>
+<p>The fit function takes the following optional arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">epochs</span></code>: Number of epochs to train the algorithm. Default: 5</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>: Size of one batch. Default: 32</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">steps</span></code>: How often one network should be trained against another. Must be <code class="docutils literal notranslate"><span class="pre">dict</span></code> type with appropriate names. E.g., for the <code class="docutils literal notranslate"><span class="pre">WassersteinGAN</span></code> the dictionary could be <code class="docutils literal notranslate"><span class="pre">{&quot;Generator&quot;:</span> <span class="pre">1,</span> <span class="pre">&quot;Adversary&quot;:</span> <span class="pre">5}</span></code>, indicating that the adversary should be trained five times on every mini-batch while the generator is trained once. The keys of the dictionary are <strong>fixed</strong> by the specified algorithm (here [“Generator”, “Adversary”], for BicycleGAN would be [“Generator”, “Adversary”, “Encoder”] ). An appropriate error is raised if wrong keys are passed. The possible names should be obvious from the constructor of every algorithm but a wrong dictionary, e.g. {“Genrtr”: 1}, can be passed consciously to receive a list of correct and available key values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">print_every</span></code>: Determines after how many batches a message should be printed to the console informing about the current state of training. String indicating fraction or multiples of epoch can be given. I.e. “0.25e” = four times per epoch, “2e” after two epochs. Default: 100</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_model_every</span></code>: Determines after how many batches the model should be saved. String indicating fraction or multiples of epoch can be given. I.e. “0.25e” = four times per epoch, “2e” after two epochs. Models will be saved in subdirectory <code class="docutils literal notranslate"><span class="pre">folder</span></code>+”/models” (<code class="docutils literal notranslate"><span class="pre">folder</span></code> specified in the constructor, see above in <strong>Constructor arguments</strong>). Default: None</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_images_every</span></code>: Determines after how many batches sample images and loss curves should be saved. String indicating fraction or multiples of epoch can be given. I.e. “0.25e” = four times per epoch, “2e” after two epochs. Images will be saved in subdirectory <code class="docutils literal notranslate"><span class="pre">folder</span></code>+”/images” (<code class="docutils literal notranslate"><span class="pre">folder</span></code> specified in the constructor, see above in <strong>Constructor arguments</strong>).  Default: None</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save_losses_every</span></code>: Determines after how many batches the losses should be calculated and saved. Figure is shown after <code class="docutils literal notranslate"><span class="pre">save_images_every</span></code> . String indicating fraction or multiples of epoch can be given. I.e. “0.25e” = four times per epoch, “2e” after two epochs. Default: “1e”</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enable_tensorboard</span></code>: Tensorboard information for losses, samples and training time will be saved in subdirectory <code class="docutils literal notranslate"><span class="pre">folder</span></code>+”/tensorboard” (<code class="docutils literal notranslate"><span class="pre">folder</span></code> specified in the constructor, see above in <strong>Constructor arguments</strong>).  Default: False</p></li>
+</ul>
+<p>All of the generative model objects inherit from a <code class="docutils literal notranslate"><span class="pre">AbstractGenerativeModel</span></code> base class. When building any such GAN, you must pass generator / decoder as well as discriminator / encoder networks (some <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code>), as well as a the dimensions of the latent space <code class="docutils literal notranslate"><span class="pre">z_dim</span></code> and input dimension of the images <code class="docutils literal notranslate"><span class="pre">x_dim</span></code>.</p>
+</div>
+<div class="section" id="generative-model-methods">
+<h4>Generative Model methods:<a class="headerlink" href="#generative-model-methods" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">generate(z=None,</span> <span class="pre">n=None)</span></code> / <code class="docutils literal notranslate"><span class="pre">generate(y,</span> <span class="pre">z=None,</span> <span class="pre">n=None)</span></code>: Generate samples from noise vector or generate “n” samples.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_hyperparameters()</span></code>: Get dictionary containing important hyperparameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_losses(by_epoch=False,</span> <span class="pre">agg=None)</span></code>: Return a dictionary of logged losses. Number of elements determined by the <code class="docutils literal notranslate"><span class="pre">save_losses_every</span></code> parameter passed to the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_number_params()</span></code>: Get the number of parameters per network.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_training_results(by_epoch=False,</span> <span class="pre">agg=None)</span></code>: Returns the samples generated from the <code class="docutils literal notranslate"><span class="pre">fixed_noise</span></code> attribute and the logged losses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load(path)</span></code>: Load a trained model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">predict(x)</span></code>: Use the adversary to predict the realness of an image.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample(n)</span></code>: Sample a noise vector of size n.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">save(name=None)</span></code>: Save the model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary(save=False)</span></code>: Print a summary of the model containing the number of parameters and general structure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to(device)</span></code>: Map all networks to a common device. Should be done before training.</p></li>
+</ul>
+</div>
+<div class="section" id="generative-model-attributes">
+<h4>Generative model attributes:<a class="headerlink" href="#generative-model-attributes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_layer</span></code>: Function to calculate feature loss with. If None no feature loss is computed. If not None the feature loss overwrites the “normal” generator loss.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fixed_noise</span></code>, (<code class="docutils literal notranslate"><span class="pre">fixed_noise_labels</span></code>): Noise vector sampled before training and used to generate the images in the created subdirectory (if <code class="docutils literal notranslate"><span class="pre">save_images_every</span></code> in the <code class="docutils literal notranslate"><span class="pre">fit</span></code> mehtod is not None). Also used to produce the results from <code class="docutils literal notranslate"><span class="pre">get_training_results()</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">folder</span></code>: Folder where all information belonging to GAN is stored. This includes</p>
+<ul>
+<li><p>Models in the <code class="docutils literal notranslate"><span class="pre">folder/models</span></code> subdirectory if <code class="docutils literal notranslate"><span class="pre">save_model_every</span></code> is not None in  the<code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.</p></li>
+<li><p>Images in the <code class="docutils literal notranslate"><span class="pre">folder/images</span></code> subdirectory if <code class="docutils literal notranslate"><span class="pre">save_images_every</span></code> is not None in the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.</p></li>
+<li><p>Tensorboard data in the <code class="docutils literal notranslate"><span class="pre">folder/tensorboard</span></code> subdirectory if <code class="docutils literal notranslate"><span class="pre">enable_tensorboard</span></code> is True in the <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.</p></li>
+<li><p>Loss in the <code class="docutils literal notranslate"><span class="pre">folder/losses.png</span></code> if <code class="docutils literal notranslate"><span class="pre">save_losses_every</span></code> is not None in <code class="docutils literal notranslate"><span class="pre">fit()</span></code> method.</p></li>
+<li><p>Loss in the <code class="docutils literal notranslate"><span class="pre">folder/summary.txt</span></code> if <code class="docutils literal notranslate"><span class="pre">summary(save=True)</span></code>called.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">images_produced</span></code>: Flag (True / False) if images are the target of the generator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_training_time</span></code>, <code class="docutils literal notranslate"><span class="pre">batch_training_times</span></code>: Time needed for training.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x_dim</span></code>, <code class="docutils literal notranslate"><span class="pre">z_dim</span></code>, (<code class="docutils literal notranslate"><span class="pre">y_dim</span></code>): Input dimensions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">training</span></code>: Flag (True / False) if model is in training or evaluation mode. Normally the flag is False and is automatically set to True in the main training loop.</p></li>
+</ul>
+<p>Attentive readers might notice that in most places we try to talk about “Generative Models” instead of “Generative Adversarial Networks”, because <code class="docutils literal notranslate"><span class="pre">vegans</span></code> currently also supports the Variational Autoencoder algorithm (<code class="docutils literal notranslate"><span class="pre">VanillaVAE</span></code>) which are their own method of generating data. However, you can interpret the decoder of the VAE equivalently to a generator of a GAN. Both take the latent space (and sometimes labels) as input and transform them to the desired output space. In an abstract sense the encoder of the VAE also corresponds to the discriminator of the GAN as both aim to condense their input from the image space to a lower dimensional latent dimension. These abstract commonalities are used in the <code class="docutils literal notranslate"><span class="pre">AbstractGenerativeModel</span></code> to unify both types of algorithms and provide a largely similar API.</p>
+<p>In the future we also plan to implement different VAE algorithms to have all generative models in one place but for now the library is focused on GAN algorithms.</p>
+<p>If you are researching new generative model training algorithms, you may find it useful to inherit from the <code class="docutils literal notranslate"><span class="pre">AbstractGenerativeModel</span></code> or  <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/vegans/models/conditional/AbstractConditionalGenerativeModel.py"><code class="docutils literal notranslate"><span class="pre">AbstractConditionalGenerativeModel</span></code></a> base class.</p>
+</div>
+</div>
+<div class="section" id="learn-more">
+<h3>Learn more:<a class="headerlink" href="#learn-more" title="Permalink to this headline">¶</a></h3>
+<p>Currently the best way to learn more about how to use vegans is to have a look at the example <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/notebooks">notebooks</a>.
+You can start with this <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/tutorials/notebooks/00_univariate-gaussian.ipynb">simple example</a> showing how to sample from a univariate Gaussian using a GAN.
+Alternatively, can run example <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/snippets">scripts</a>.</p>
+</div>
+</div>
+<div class="section" id="contribute">
+<h2>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h2>
+<p>PRs and suggestions are welcome. Look <a class="reference external" href="https://github.com/unit8co/vegans/blob/master/CONTRIBUTING.md">here</a> for more details on the setup.</p>
+</div>
+<div class="section" id="credits">
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h2>
+<p>Some of the code has been inspired by some existing GAN implementations:</p>
+<ul class="simple">
+<li><p>https://github.com/eriklindernoren/PyTorch-GAN</p></li>
+<li><p>https://github.com/martinarjovsky/WassersteinGAN</p></li>
+<li><p>https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html</p></li>
+</ul>
+<div class="section" id="some-results">
+<h3>Some Results<a class="headerlink" href="#some-results" title="Permalink to this headline">¶</a></h3>
+<p>All this results should be taken with a grain of salt. They were not extensively fine tuned in any way, so better results for individual networks are possible for sure. More time training as well as more regularization could most certainly improve results. All of these results were generated by running the example_conditional.py program in the examples folder. Especially the Variational Autoencoder would perform better if we increased it’s number of parameters to a comparable level.</p>
+<p>| Network                |                         MNIST Result                         |
+| :——————— | :———————————————————-: |
+| Cond. BicycleGAN       | <img alt="MNIST" src="TrainedModels/cBicycleGAN/generated_images.png" /> |
+| Cond. EBGAN            | <img alt="MNIST" src="TrainedModels/cEBGAN/generated_images.png" /> |
+| Cond. InfoGAN          | <img alt="MNIST" src="TrainedModels/cInfoGAN/generated_images.png" /> |
+| Cond. KLGAN            | <img alt="MNIST" src="TrainedModels/cKLGAN/generated_images.png" /> |
+| Cond. LRGAN            | <img alt="MNIST" src="TrainedModels/cLRGAN/generated_images.png" /> |
+| Cond. Pix2Pix          | <img alt="MNIST" src="TrainedModels/cPix2Pix/generated_images.png" /> |
+| Cond. VAEGAN           | <img alt="MNIST" src="TrainedModels/cVAEGAN/generated_images.png" /> |
+| Cond. VanillaGAN       | <img alt="MNIST" src="TrainedModels/cVanillaGAN/generated_images.png" /> |
+| Cond. WassersteinGAN   | <img alt="MNIST" src="TrainedModels/cWassersteinGAN/generated_images.png" /> |
+| Cond. WassersteinGANGP | <img alt="MNIST" src="TrainedModels/cWassersteinGANGP/generated_images.png" /> |
+| Cond. VAE              | <img alt="MNIST" src="TrainedModels/cVanillaVAE/generated_images.png" /> |</p>
+</div>
+</div>
+<div class="section" id="todo">
+<h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>GAN Implementations (sorted by priority)</p>
+<ul>
+<li><p>BEGAN</p></li>
+<li><p>WassersteinGAN SpectralNorm</p></li>
+<li><p>Stacked GAN <a class="reference external" href="https://arxiv.org/abs/1612.03242">here</a></p></li>
+<li><p>Progressive Growing GAN <a class="reference external" href="https://arxiv.org/abs/1710.10196">here</a></p></li>
+</ul>
+</li>
+<li><p>Layers</p>
+<ul>
+<li><p>Minibatch discrimination</p></li>
+<li><p>Instance normalization</p></li>
+</ul>
+</li>
+<li><p>Other</p>
+<ul>
+<li><p>Core Improvements:</p>
+<ul>
+<li><p>Hide feature_layer, secure in **kwargs</p></li>
+<li><p>Make it more PEP conform</p></li>
+<li><p>~~Make _default_optimizer not abstract~~</p></li>
+<li><p>Windows installation issues</p></li>
+<li><p>~~CI workflow~~</p></li>
+<li><p>Create protected branches</p></li>
+<li><p>Conda installation</p></li>
+<li><p>Type annotations</p></li>
+<li><p>Documentation website</p></li>
+<li><p>build fancy examples</p></li>
+</ul>
+</li>
+<li><p>Perceptual Loss <a class="reference external" href="https://arxiv.org/pdf/1603.08155.pdf">here</a></p></li>
+<li><p>Interpolation</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="modules.html" class="btn btn-neutral float-right" title="vegans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="copyright.html">Copyright</a> 2021, Unit8.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
