@@ -14,6 +14,7 @@ You need python 3.7 or above. Then:
 ## How to use
 The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
 
+- Check out the [documentation](https://unit8co.github.io/vegans/) or [quickstart guide](https://unit8co.github.io/vegans/quickstart.html)
 - Read through this README.md file
 - Check out the [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) (00 to 04)
 - If you want to create your own GAN algorithms, check out the notebooks 05 to 07
