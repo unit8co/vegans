@@ -1,8 +1,11 @@
+#from clearml import Task
+#task = Task.init('Private cluster', 'test3')
+#task.execute_remotely('gpu_support')
+
 import numpy as np
 import vegans.utils.loading as loading
 from vegans.utils.utils import plot_images
 from vegans.GAN import ConditionalVanillaGAN
-
 
 root = "./data/"
 X_train, y_train, X_test, y_test = loading.load_data(root=root, which="mnist", download=True)
