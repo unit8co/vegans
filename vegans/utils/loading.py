@@ -1,22 +1,26 @@
+import os
+import pickle
+import hashlib
+import requests
+import subprocess
 import torchvision
 
-from vegans.utils.architectures.mnist import (
-    preprocess_mnist, load_mnist_generator, load_mnist_adversary,
-    load_mnist_encoder, load_mnist_decoder, load_mnist_autoencoder
-)
-from vegans.utils.architectures.example import (
-    load_example_generator, load_example_adversary, load_example_encoder,
-    load_example_decoder, load_example_autoencoder
-)
-from vegans.utils.architectures.celeba import (
-    preprocess_celeba
-)
-from vegans.utils.architectures.cifar import (
-    preprocess_cifar
-)
+import numpy as np
+from pathlib import Path
+from abc import ABC, abstractmethod
 
-def load_data(root, which=None, **kwargs):
-    """ Wrapper around torchvision.datasets with certain preprocessing steps
+import vegans.utils.architectures as architectures
+
+class DatasetMetaData():
+    def __init__(self, directory, uris, python_hashes):
+        self.directory = directory
+        self.uris = uris
+        self.python_hashes = python_hashes
+
+class DatasetLoader(ABC):
+    """
+    Class that downloads a dataset and caches it locally.
+    Assumes that the file can be downloaded (i.e. publicly available via an URI)
 
     So far available are:
         - MNIST: Handwritten digits with labels. Can be downloaded via `download=True`.
@@ -25,209 +29,193 @@ def load_data(root, which=None, **kwargs):
                   and moved into `root` folder.
         - CIFAR: Pictures of objects with labels. Must be downloaded from http://www.cs.toronto.edu/~kriz/cifar.html
                   and moved into `root` folder.
-
-    Parameters
-    ----------
-    root : str
-        Path to root directory. Is created if `download=True` and the folder does not exists yet.
-    which : str, optional
-        One of the torchvision.datasets.
-    **kwargs
-        Keyword arguments to torchvision.datasets (`https://pytorch.org/vision/0.8/datasets.html`).
-
-    Returns
-    -------
-    np.array
-        Numpy array or torch dataset with train and test data.
     """
-    available = ["MNIST", "FashionMNIST", "CelebA", "CIFAR"]
-    which = which.replace("mnist", "MNIST")
 
-    if which.lower() == "mnist":
-        loader = eval("torchvision.datasets." + which)
-        torch_data_train = loader(root=root, train=True, **kwargs)
-        torch_data_test = loader(root=root, train=False, **kwargs)
-        X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
-        X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
+    def __init__(self, metadata, root=None):
+        self._metadata = metadata
+        if root is None:
+            self._root = Path(os.path.join(Path.home(), Path('.vegans/datasets/')))
+        else:
+            self._root = root
+        self.path = self._get_path_dataset()
+
+    def load(self):
+        """
+        Load the dataset in memory, as numpy arrays.
+        Downloads the dataset if it is not present already
+        """
+        if not self._is_already_downloaded():
+            self._download_dataset()
+        return self._load_from_disk()
+
+    def _is_already_downloaded(self):
+        return os.path.exists(self.path)
+
+    @abstractmethod
+    def _download_dataset(self):
+        """
+        Downloads the dataset in the root directory
+        """
+        os.makedirs(self._root, exist_ok=True)
+
+    def _get_path_dataset(self) -> Path:
+        return Path(os.path.join(self._root, self._metadata.directory))
+
+    def _check_dataset_integrity_or_raise(self, path, expected_hash):
+        """
+        Ensures that the dataset exists and its MD5 checksum matches the expected hash.
+        """
+        actual_hash = str(subprocess.check_output(["md5sum", path]).split()[0], 'utf-8')
+        if actual_hash != expected_hash:
+            raise ValueError("Expected hash for {}: {}, got: {}.".format(path, expected_hash, actual_hash))
+
+    @abstractmethod
+    def _load_from_disk(self):
+        """
+        Given a Path to the file and a DataLoaderMetadata object, returns train and test sets as numpy arrays.
+        One can assume that the file exists and its MD5 checksum has been verified before this function is called
+
+        Parameters
+        ----------
+        path_to_file: Path
+            A Path object where the dataset is located
+        metadata: Metadata
+            The dataset's metadata
+        """
+        pass
+
+    @abstractmethod
+    def load_generator(self):
+        """ Loads a working generator architecture
+        """
+        pass
+
+    @abstractmethod
+    def load_adversary(self):
+        """ Loads a working adversary architecture
+        """
+        pass
+
+    @abstractmethod
+    def load_encoder(self):
+        """ Loads a working encoder architecture
+        """
+        pass
+
+    @abstractmethod
+    def load_autoencoder(self):
+        """ Loads a working autoencoder architecture
+        """
+        pass
+
+    @abstractmethod
+    def load_decoder(self):
+        """ Loads a working generator architecture
+        """
+        pass
+
+
+class ExampleLoader(DatasetLoader):
+
+    def _download_dataset(self):
+        raise NotImplementedError("No corresponding dataset to this DatasetLoader. Used exclusively to load architectures.")
+
+    def _load_from_disk(self, path_to_file):
+        raise NotImplementedError("No corresponding dataset to this DatasetLoader. Used exclusively to load architectures.")
+
+    def load_generator(self, x_dim, z_dim, y_dim=None):
+        return architectures.load_example_generator(x_dim, z_dim, y_dim=y_dim)
+
+    def load_adversary(self, x_dim, z_dim, y_dim=None):
+        return architectures.load_example_adversary(x_dim, z_dim, y_dim=y_dim, adv_type=adv_type)
+
+    def load_encoder(self, x_dim, z_dim, y_dim=None):
+        return architectures.load_example_encoder(x_dim, z_dim, y_dim=y_dim)
+
+    def load_autoencoder(self, x_dim, z_dim, y_dim=None):
+        return architectures.load_example_autoencoder(x_dim, z_dim, y_dim=y_dim)
+
+    def load_decoder(self, x_dim, z_dim, y_dim=None):
+        return architectures.load_example_decoder(x_dim, z_dim, y_dim=y_dim)
+
+
+class MNISTLoader(DatasetLoader):
+
+    def __init__(self, x_dim=(1, 32, 32), z_dim=(64, ), y_dim=(10, ), root=None):
+        self.x_dim = x_dim
+        self.z_dim = z_dim
+        self.y_dim = y_dim
+        uris = {
+            "data": "",
+            "targets": ""
+        }
+        python_hashes = {
+            "data": "9e7c1694ff8fa70086505beb76ee1bda",
+            "targets": "06915ca44ac91e0fa65792d391bec292"
+        }
+        metadata = DatasetMetaData(directory="MNIST", uris=uris, python_hashes=python_hashes)
+        super().__init__(metadata=metadata, root=root)
+
+    def _download_dataset(self):
+        super()._download_dataset()
+        for key, uri in self._metadata.uris.items():
+            try:
+                request = requests.get(uri)
+                with open(self.path, "wb") as f:
+                    f.write(request.content)
+            except Exception as e:
+                raise ValueError("Could not download the dataset. Reason :" + e.__repr__()) from None
+
+    def _load_from_disk(self):
+        path = os.path.join(self.path, "mnist_data.pickle")
+        with open(path, "rb") as f:
+            data = pickle.load(f)
+            self._check_dataset_integrity_or_raise(path=path, expected_hash=self._metadata.python_hashes["data"])
+            X_train, X_test = data["train"], data["test"]
+
+        path = os.path.join(self.path, "mnist_targets.pickle")
+        if self.y_dim is not None:
+            with open(os.path.join(self.path, "mnist_targets.pickle"), "rb") as f:
+                targets = pickle.load(f)
+                self._check_dataset_integrity_or_raise(path=path, expected_hash=self._metadata.python_hashes["targets"])
+                y_train, y_test = targets["train"], targets["test"]
+        else:
+            y_train = None
+            y_test = None
+
+        X_train, y_train, X_test, y_test = self._preprocess(X_train, y_train, X_test, y_test)
+        if y_train is None:
+            return X_train, X_test
         return X_train, y_train, X_test, y_test
-    elif which.lower() == "fashionmnist":
-        loader = eval("torchvision.datasets." + which)
-        torch_data_train = loader(root=root, train=True, **kwargs)
-        torch_data_test = loader(root=root, train=False, **kwargs)
-        X_train, y_train = preprocess_mnist(torch_data_train, normalize=True, pad=2)
-        X_test, y_test = preprocess_mnist(torch_data_test, normalize=True, pad=2)
+
+    @staticmethod
+    def _preprocess(X_train, y_train, X_test, y_test):
+        """ Preprocess mnist by normalizing and padding.
+        """
+        max_number = X_train.max()
+        X_train = X_train / max_number
+        X_train = np.pad(X_train, [(0, 0), (2, 2), (2, 2)], mode='constant').reshape(60000, 1, 32, 32)
+
+        X_test = X_test / max_number
+        X_test = np.pad(X_test, [(0, 0), (2, 2), (2, 2)], mode='constant').reshape(10000, 1, 32, 32)
+
+        if y_train is not None:
+            y_train = np.eye(10)[y_train.reshape(-1)]
+            y_test = np.eye(10)[y_test.reshape(-1)]
         return X_train, y_train, X_test, y_test
-    elif which.lower() == "celeba":
-        train_dataloader = preprocess_celeba(root=root, **kwargs)
-        return train_dataloader
-    elif which.lower() == "cifar":
-        X_train, y_train, X_test, y_test = preprocess_cifar(root=root, normalize=True, pad=0)
-        return X_train, y_train, X_test, y_test
-    else:
-        raise ValueError("`which` must be one of {}.".format(available))
 
-def load_generator(x_dim, z_dim, y_dim=None, which="example"):
-    """ Load pre-defined (**NOT** pre-trained) architecture for a generator.
+    def load_generator(self):
+        return architectures.load_mnist_generator(z_dim=self.z_dim, y_dim=self.ydim)
 
-    Parameters
-    ----------
-    x_dim : integer, list
-        Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
-        Indicating the number of dimensions for the labels.
-    which : str, optional
-        Currently one of ["example", "mnist"]. Specifying "example" will provide you
-        with a minimally working architecture for most use cases. However it's generic definition
-        and underpowered structure will probably not result in desirable results. "mnist" provides
-        you with a working architecture (depending of course on the choice of other hyper-parameters like optimizer)
-        for both "mnist" datasets (MNIST and FashionMNIST). It might be useful for other problems where the input images
-        are of the form (1, 32, 32) but it is not guaranteed. It's more powerful architecture might some take to train
-        but should lead to reasonable results for certain use cases.
+    def load_adversary(self, adv_type):
+        return architectures.load_mnist_adversary(adv_type=adv_type, y_dim=self.ydim)
 
-    Returns
-    -------
-    nn.Module
-        Generator architecture that can be passed to any GAN algorithm.
-    """
-    available = ["example", "mnist"]
-    if which == "example":
-        return load_example_generator(x_dim, z_dim, y_dim=y_dim)
-    elif which == "mnist":
-        return load_mnist_generator(x_dim, z_dim, y_dim=y_dim)
-    else:
-        raise ValueError("`which` must be one of {}. Given: {}.".format(available, which))
+    def load_encoder(self):
+        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=self.z_dim, y_dim=self.ydim)
 
-def load_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic", which="example"):
-    """ Load pre-defined (**NOT** pre-trained) architecture for a adversary.
+    def load_autoencoder(self):
+        return architectures.load_mnist_autoencoder(z_dim=self.z_dim, y_dim=self.ydim)
 
-    Parameters
-    ----------
-    x_dim : integer, list
-        Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
-        Indicating the number of dimensions for the labels.
-    which : str, optional
-        Currently one of ["example", "mnist"]. Specifying "example" will provide you
-        with a minimally working architecture for most use cases. However it's generic definition
-        and underpowered structure will probably not result in desirable results. "mnist" provides
-        you with a working architecture (depending of course on the choice of other hyper-parameters like optimizer)
-        for both "mnist" datasets (MNIST and FashionMNIST). It might be useful for other problems where the input images
-        are of the form (1, 32, 32) but it is not guaranteed. It's more powerful architecture might some take to train
-        but should lead to reasonable results for certain use cases.
-
-    Returns
-    -------
-    nn.Module
-        Adversary architecture that can be passed to any GAN algorithm.
-    """
-    available = ["example", "mnist"]
-    if which == "example":
-        return load_example_adversary(x_dim, z_dim, y_dim=y_dim, adv_type=adv_type)
-    elif which == "mnist":
-        return load_mnist_adversary(x_dim, z_dim, y_dim=y_dim, adv_type=adv_type)
-    else:
-        raise ValueError("`which` must be one of {}. Given: {}.".format(available, which))
-
-def load_encoder(x_dim, z_dim, y_dim=None, which="example"):
-    """ Load pre-defined (**NOT** pre-trained) architecture for an encoder.
-
-    Parameters
-    ----------
-    x_dim : integer, list
-        Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
-        Indicating the number of dimensions for the labels.
-    which : str, optional
-        Currently one of ["example", "mnist"]. Specifying "example" will provide you
-        with a minimally working architecture for most use cases. However it's generic definition
-        and underpowered structure will probably not result in desirable results. "mnist" provides
-        you with a working architecture (depending of course on the choice of other hyper-parameters like optimizer)
-        for both "mnist" datasets (MNIST and FashionMNIST). It might be useful for other problems where the input images
-        are of the form (1, 32, 32) but it is not guaranteed. It's more powerful architecture might some take to train
-        but should lead to reasonable results for certain use cases.
-
-    Returns
-    -------
-    nn.Module
-        Encoder architecture that can be passed to certain GAN algorithms.
-    """
-    available = ["example", "mnist"]
-    if which == "example":
-        return load_example_encoder(x_dim, z_dim, y_dim=y_dim)
-    elif which == "mnist":
-        return load_mnist_encoder(x_dim, z_dim, y_dim=y_dim)
-    else:
-        raise ValueError("`which` must be one of {}. Given: {}.".format(available, which))
-
-def load_decoder(x_dim, z_dim, y_dim=None, which="example"):
-    """ Load pre-defined (**NOT** pre-trained) architecture for a decoder.
-
-    Parameters
-    ----------
-    x_dim : integer, list
-        Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
-        Indicating the number of dimensions for the labels.
-    which : str, optional
-        Currently one of ["example", "mnist"]. Specifying "example" will provide you
-        with a minimally working architecture for most use cases. However it's generic definition
-        and underpowered structure will probably not result in desirable results. "mnist" provides
-        you with a working architecture (depending of course on the choice of other hyper-parameters like optimizer)
-        for both "mnist" datasets (MNIST and FashionMNIST). It might be useful for other problems where the input images
-        are of the form (1, 32, 32) but it is not guaranteed. It's more powerful architecture might some take to train
-        but should lead to reasonable results for certain use cases.
-
-    Returns
-    -------
-    nn.Module
-        Decoder architecture that can be passed to some GAN algorithms and VAEs.
-    """
-    available = ["example", "mnist"]
-    if which == "example":
-        return load_example_decoder(x_dim, z_dim, y_dim=y_dim)
-    elif which == "mnist":
-        return load_mnist_decoder(x_dim, z_dim, y_dim=y_dim)
-    else:
-        raise ValueError("`which` must be one of {}. Given: {}.".format(available, which))
-
-def load_autoencoder(x_dim, z_dim, y_dim=None, which="example"):
-    """ Load pre-defined (**NOT** pre-trained) architecture for an auto-encoder.
-
-    Parameters
-    ----------
-    x_dim : integer, list
-        Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
-    y_dim : None, optional
-        Indicating the number of dimensions for the labels.
-    which : str, optional
-        Currently one of ["example", "mnist"]. Specifying "example" will provide you
-        with a minimally working architecture for most use cases. However it's generic definition
-        and underpowered structure will probably not result in desirable results. "mnist" provides
-        you with a working architecture (depending of course on the choice of other hyper-parameters like optimizer)
-        for both "mnist" datasets (MNIST and FashionMNIST). It might be useful for other problems where the input images
-        are of the form (1, 32, 32) but it is not guaranteed. It's more powerful architecture might some take to train
-        but should lead to reasonable results for certain use cases.
-
-    Returns
-    -------
-    nn.Module
-        Auto-encoder architecture that can be passed to for example the EBGAN.
-    """
-    available = ["example", "mnist"]
-    if which == "example":
-        return load_example_autoencoder(x_dim, z_dim, y_dim=y_dim)
-    elif which == "mnist":
-        return load_mnist_autoencoder(x_dim, z_dim, y_dim=y_dim)
-    else:
-        raise ValueError("`which` must be one of {}. Given: {}.".format(available, which))
+    def load_decoder(self):
+        return architectures.load_mnist_decoder(z_dim=self.z_dim, y_dim=self.ydim)
 
