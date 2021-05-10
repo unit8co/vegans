@@ -32,26 +32,6 @@ from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerati
 
 class AAE(AbstractGenerativeModel):
     """
-    AAE
-    ---
-    Implements the Adversarial Autoencoder[1].
-
-    Instead of using the Kullback Leibler divergence to improve the latent space distribution
-    we use a discriminator to determine the "realness" of the latent vector.
-
-    Losses:
-        - Encoder: Binary cross-entropy + Mean-squared error
-        - Generator: Mean-squared error
-        - Adversary: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_z: Weight for the discriminator loss computing the realness of the latent z dimension.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1511.05644.pdf
-
     Parameters
     ----------
     generator: nn.Module
@@ -170,9 +150,10 @@ class AAE(AbstractGenerativeModel):
             losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch).detach()
-        fake_images = self.generate(encoded_output)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            encoded_output = self.encode(x=X_batch).detach()
+            fake_images = self.generate(encoded_output)
         gen_loss = self.loss_functions["Generator"](
             fake_images, X_batch
         )
@@ -181,9 +162,10 @@ class AAE(AbstractGenerativeModel):
             "Generator": gen_loss,
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        fake_images = self.generate(z=encoded_output)
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images=None, encoded_output=None):
+        if fake_images is None:
+            encoded_output = self.encode(x=X_batch)
+            fake_images = self.generate(z=encoded_output)
 
         if self.feature_layer is None:
             fake_predictions = self.predict(x=encoded_output)
@@ -203,8 +185,9 @@ class AAE(AbstractGenerativeModel):
             "Encoder_fake": enc_loss_reconstruction,
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, encoded_output=None):
+        if encoded_output is None:
+            encoded_output = self.encode(x=X_batch).detach()
 
         fake_predictions = self.predict(x=encoded_output)
         real_predictions = self.predict(x=Z_batch)

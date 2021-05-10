@@ -26,34 +26,12 @@ import torch
 
 import numpy as np
 
-from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 from vegans.utils.utils import WassersteinLoss
+from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 
 class WassersteinGANGP(AbstractGAN1v1):
     """
-    WassersteinGANGP
-    ----------------
-    Implements the Wasserstein GAN Gradient Penalized[1].
-
-    Uses the Wasserstein loss to determine the realness of real and fake images.
-    The Wasserstein loss has several theoretical advantages over the Jensen-Shanon divergence
-    minimised by the original GAN. In this architecture the critic (discriminator) is often
-    trained multiple times for every generator step.
-    Lipschitz continuity is "enforced" by gradient penalization.
-
-    Losses:
-        - Generator: Wasserstein
-        - Critic: Wasserstein + Gradient penalization
-    Default optimizer:
-        - torch.optim.RMSprop
-    Custom parameter:
-        - lambda_grad: Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/abs/1704.00028
-
     Parameters
     ----------
     generator: nn.Module
@@ -151,10 +129,11 @@ class WassersteinGANGP(AbstractGAN1v1):
     #########################################################################
     # Actions during training
     #########################################################################
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
-        fake_predictions = self.adversary(fake_images)
-        real_predictions = self.adversary(X_batch.float())
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch).detach()
+        fake_predictions = self.predict(x=fake_images)
+        real_predictions = self.predict(x=X_batch)
 
         adv_loss_fake = self.loss_functions["Adversary"](
             fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)

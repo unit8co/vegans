@@ -23,31 +23,13 @@ import torch
 import numpy as np
 import torch.nn as nn
 
-from torch.nn import MSELoss
 from vegans.utils.utils import get_input_dim
+from vegans.models.unconditional.VanillaVAE import VanillaVAE
 from vegans.utils.networks import Encoder, Decoder, Autoencoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
-class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
+class ConditionalVanillaVAE(AbstractConditionalGenerativeModel, VanillaVAE):
     """
-    ConditionalVanillaVAE
-    ---------------------
-    Implements the conditional variant of the Variational Autoencoder[1].
-
-    Trains on Kullback-Leibler loss and mean squared error reconstruction loss.
-
-    Losses:
-        - Encoder: Kullback-Leibler
-        - Decoder: L2 (Mean Squared Error)
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1906.02691.pdf
-
     Parameters
     ----------
     encoder: nn.Module
@@ -70,10 +52,6 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
         name keys and dictionary with keyword arguments as value, i.e. {"Generator": {"lr": 0.0001}}.
     lambda_KL: float
         Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-    feature_layer : torch.nn.*
-        Output layer used to compute the feature loss. Should be from either the discriminator or critic.
-        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced
-        [here](https://arxiv.org/abs/1606.03498v1).
     fixed_noise_size : int
         Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
         subdirectory, the tensorboard images tab and the samples in get_training_results().
@@ -145,20 +123,19 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
                 "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        loss_functions = {"Autoencoder": MSELoss()}
-        return loss_functions
-
-
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x, y):
+    def encode(self, x, y=None):
+        if y is None:
+            x_dim = tuple(x.shape[1:])
+            assert x_dim == self.adv_in_dim, (
+                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
+            )
+            return VanillaVAE.encode(self, x=x)
+
         inpt = self.concatenate(x, y).float()
-        return self.encoder(inpt)
+        return VanillaVAE.encode(self, x=inpt)
 
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
         losses = self._calculate_autoencoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
@@ -170,22 +147,6 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel):
         log_variance = self.log_variance(encoded_output)
         Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
         fake_images = self.generate(z=Z_batch_encoded, y=y_batch)
-
-        kl_loss = 0.5*(log_variance.exp() + mu**2 - log_variance - 1).sum()
-        reconstruction_loss = self.loss_functions["Autoencoder"](
-            fake_images, X_batch
-        )
-
-        total_loss = reconstruction_loss + self.lambda_KL*kl_loss
-        return {
-            "Autoencoder": total_loss,
-            "Kullback-Leibler": self.lambda_KL*kl_loss,
-            "Reconstruction": reconstruction_loss,
-        }
-
-
-    #########################################################################
-    # Utility functions
-    #########################################################################
-    def sample(self, n):
-        return torch.randn(n, *self.z_dim, requires_grad=True, device=self.device)
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return VanillaVAE._calculate_autoencoder_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)

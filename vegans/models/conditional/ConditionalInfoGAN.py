@@ -27,36 +27,13 @@ import torch
 import numpy as np
 import torch.nn as nn
 
-from torch.nn import CrossEntropyLoss, BCELoss
+from vegans.models.unconditional.InfoGAN import InfoGAN
 from vegans.utils.networks import Generator, Adversary, Encoder
-from vegans.utils.utils import get_input_dim, concatenate, NormalNegativeLogLikelihood
-from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
+from vegans.utils.utils import get_input_dim, NormalNegativeLogLikelihood
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
-class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
+class ConditionalInfoGAN(AbstractConditionalGenerativeModel, InfoGAN):
     """
-    ConditionalInfoGAN
-    ------------------
-    Implements the InfoGAN[1].
-
-    It introduces an encoder network which maps the generator output back to the latent
-    input space. This should help to prevent mode collapse and improve image variety.
-
-    Losses:
-        - Generator: Binary cross-entropy + Normal Log-Likelihood + Multinomial Log-Likelihood
-        - Discriminator: Binary cross-entropy
-        - Encoder: Normal Log-Likelihood + Multinomial Log-Likelihood
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - c_dim_discrete: Number of discrete multinomial dimensions (might be list of independent multinomial spaces).
-        - c_dim_continuous: Number of continuous normal dimensions.
-        - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
-
-    References
-    ----------
-    .. [1] https://dl.acm.org/doi/10.5555/3157096.3157340
-
     Parameters
     ----------
     generator: nn.Module
@@ -185,48 +162,20 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
                     "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
                 )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        loss_functions = {
-            "Generator": BCELoss(), "Adversary": BCELoss(),
-            "Discrete": CrossEntropyLoss(), "Continuous": NormalNegativeLogLikelihood()
-        }
-        return loss_functions
-
 
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x, y):
+    def encode(self, x, y=None):
+        if y is None:
+            x_dim = tuple(x.shape[1:])
+            assert x_dim == self.adv_in_dim, (
+                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
+            )
+            return InfoGAN.encode(self, x=x)
+
         inpt = self.concatenate(x, y).float()
-        return self.encoder(inpt)
-
-    def sample_c(self, n):
-        """ Sample the conditional vector.
-
-        Parameters
-        ----------
-        n : int
-            Number of outputs to be generated.
-        """
-        samples = []
-        if self.c_dim_discrete[0] != 0:
-            for c in self.c_dim_discrete:
-                weights = torch.ones(size=(n, c))
-                c_discrete = torch.zeros(size=(n, c), device=self.device)
-                idx = torch.multinomial(input=weights, num_samples=1)
-                for row in range(n):
-                    c_discrete[row, idx[row]] = 1.
-                samples.append(c_discrete)
-
-        if self.c_dim_continuous[0] != 0:
-            c_continuous = torch.randn(size=(n, *self.c_dim_continuous), requires_grad=True, device=self.device)
-            samples.append(c_continuous)
-
-        samples = torch.cat(tuple(samples), axis=1)
-        return samples
+        return InfoGAN.encode(self, x=inpt)
 
     def generate(self, y, c=None, z=None):
         """ Generate output with generator / decoder.
@@ -249,7 +198,7 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
         if z is None:
             n = len(y)
             z = self.sample(n=n)
-        y = concatenate(tensor1=y, tensor2=c)
+        y = self.concatenate(tensor1=y, tensor2=c)
         return self(y=y, z=z)
 
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
@@ -268,95 +217,20 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         c = self.sample_c(n=len(Z_batch))
         fake_images = self.generate(y=y_batch, z=Z_batch, c=c)
-        encoded = self.encode(x=fake_images, y=y_batch)
-
-        if self.c_dim_discrete[0] != 0:
-            reconstructed_c_discrete = self.multinomial(encoded)
-        if self.c_dim_continuous[0] != 0:
-            reconstructed_mu = self.mu(encoded)
-            reconstructed_variance = self.log_variance(encoded).exp()
-
-        if self.feature_layer is None:
-            fake_predictions = self.predict(x=fake_images, y=y_batch)
-            gen_loss_original = self.loss_functions["Generator"](
-                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-            )
-        else:
-            gen_loss_original = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
-        discrete_encoder_loss = torch.Tensor([0]).to(self.device)
-        start = 0
-        if self.c_dim_discrete[0] != 0:
-            for c_dim in self.c_dim_discrete:
-                end = start + c_dim
-                discrete_encoder_loss += self.loss_functions["Discrete"](
-                    reconstructed_c_discrete[:, start:end], torch.argmax(c[:, start:end].long(), axis=1)
-                )
-                start += c_dim
-        if self.c_dim_continuous[0] != 0:
-            continuous_encoder_loss = self.loss_functions["Continuous"](
-                x=c[:, -self.c_dim_continuous[0]:], mu=reconstructed_mu, variance=reconstructed_variance
-            )
-        else:
-            continuous_encoder_loss = torch.Tensor([0]).to(self.device)
-
-        gen_loss = gen_loss_original + self.lambda_z*(discrete_encoder_loss + continuous_encoder_loss)
-        return {
-            "Generator": gen_loss,
-            "Generator_Original": gen_loss_original,
-            "Generator_Discrete": self.lambda_z*discrete_encoder_loss,
-            "Generator_Continuous": self.lambda_z*continuous_encoder_loss
-        }
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return InfoGAN._calculate_generator_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat, c=c)
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):
         c = self.sample_c(n=len(Z_batch))
         fake_images = self.generate(y=y_batch, z=Z_batch, c=c).detach()
-        encoded = self.encode(x=fake_images, y=y_batch)
-
-        if self.c_dim_discrete[0] != 0:
-            reconstructed_c_discrete = self.multinomial(encoded)
-        if self.c_dim_continuous[0] != 0:
-            reconstructed_mu = self.mu(encoded)
-            reconstructed_variance = self.log_variance(encoded).exp()
-
-        discrete_encoder_loss = torch.Tensor([0]).to(self.device)
-        start = 0
-        if self.c_dim_discrete[0] != 0:
-            for c_dim in self.c_dim_discrete:
-                end = start + c_dim
-                discrete_encoder_loss += self.loss_functions["Discrete"](
-                    reconstructed_c_discrete[:, start:end], torch.argmax(c[:, start:end].long(), axis=1)
-                )
-                start += c_dim
-        if self.c_dim_continuous[0] != 0:
-            continuous_encoder_loss = self.loss_functions["Continuous"](
-                c[:, -self.c_dim_continuous[0]:], reconstructed_mu, reconstructed_variance
-            )
-        else:
-            continuous_encoder_loss = torch.Tensor([0]).to(self.device)
-
-        enc_loss = 0.5*(discrete_encoder_loss + continuous_encoder_loss)
-        return {
-            "Encoder": enc_loss,
-            "Encoder_Discrete": discrete_encoder_loss,
-            "Encoder_Continuous": continuous_encoder_loss
-        }
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return InfoGAN._calculate_encoder_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat, c=c)
 
     def _calculate_adversary_loss(self, X_batch, Z_batch, y_batch):
         c = self.sample_c(n=len(Z_batch))
         fake_images = self.generate(y=y_batch, z=Z_batch, c=c).detach()
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
-        real_predictions = self.predict(x=X_batch, y=y_batch)
-
-        adv_loss_fake = self.loss_functions["Adversary"](
-            fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
-        )
-        adv_loss_real = self.loss_functions["Adversary"](
-            real_predictions, torch.ones_like(real_predictions, requires_grad=False)
-        )
-        adv_loss = 0.5*(adv_loss_fake + adv_loss_real)
-        return {
-            "Adversary": adv_loss,
-            "Adversary_fake": adv_loss_fake,
-            "Adversary_real": adv_loss_real,
-            "RealFakeRatio": adv_loss_real / adv_loss_fake
-        }
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return InfoGAN._calculate_adversary_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)
