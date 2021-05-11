@@ -57,7 +57,7 @@ class DatasetLoader(ABC):
         return os.path.exists(self.path)
 
     def _download_dataset(self):
-        print("Downloading {}...".format(self._metadata.directory))
+        print("Downloading {} to {}...".format(self._metadata.directory, self._get_path_dataset()))
         os.makedirs(self._root, exist_ok=True)
         file_name = self._metadata.directory + ".zip"
         source = os.path.join(_SOURCE, file_name)
