@@ -1,10 +1,16 @@
 import torch
 import pytest
+import shutil
 
 import numpy as np
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
+
+# def teardown_module(module):
+#     print('******TEARDOWN******')
+#     default_directory = loading.MNISTLoader()._root
+#     shutil.rmtree(default_directory)
 
 def test_MNISTLoader():
     loader = loading.MNISTLoader()
@@ -13,6 +19,7 @@ def test_MNISTLoader():
     assert y_train.shape == (60000, 10)
     assert X_test.shape == (10000, 1, 32, 32)
     assert y_test.shape == (10000, 10)
+    X_train, y_train, X_test, y_test = loader.load()
 
 def test_FashionMNISTLoader():
     loader = loading.FashionMNISTLoader()

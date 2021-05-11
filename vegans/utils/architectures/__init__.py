@@ -4,5 +4,3 @@ from .mnist import (
 from .example import (
     load_example_generator, load_example_adversary, load_example_encoder, load_example_decoder, load_example_autoencoder
 )
-from .celeba import preprocess_celeba
-from .cifar import preprocess_cifar

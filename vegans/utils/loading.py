@@ -1,25 +1,25 @@
 import os
+import wget
 import pickle
-import hashlib
-import requests
 import subprocess
-import torchvision
 
 import numpy as np
 import pandas as pd
 
 from PIL import Image
 from pathlib import Path
+from zipfile import ZipFile
 from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
 from vegans.utils.utils import invert_channel_order
 
 import vegans.utils.architectures as architectures
 
+_SOURCE = "https://vegans-data.s3.eu-west-3.amazonaws.com/"
+
 class DatasetMetaData():
-    def __init__(self, directory, uris, m5hashes):
+    def __init__(self, directory, m5hashes):
         self.directory = directory
-        self.uris = uris
         self.m5hashes = m5hashes
 
 class DatasetLoader(ABC):
@@ -47,7 +47,7 @@ class DatasetLoader(ABC):
     def load(self):
         """
         Load the dataset in memory, as numpy arrays.
-        Downloads the dataset if it is not present already
+        Downloads the dataset if it is not present _is_already_downloaded
         """
         if not self._is_already_downloaded():
             self._download_dataset()
@@ -56,9 +56,16 @@ class DatasetLoader(ABC):
     def _is_already_downloaded(self):
         return os.path.exists(self.path)
 
-    @abstractmethod
     def _download_dataset(self):
+        print("Downloading {}...".format(self._metadata.directory))
         os.makedirs(self._root, exist_ok=True)
+        file_name = self._metadata.directory + ".zip"
+        source = os.path.join(_SOURCE, file_name)
+        target = os.path.join(self._root, file_name)
+        wget.download(source, target)
+        with ZipFile(target, 'r') as zipObj:
+            zipObj.extractall(self._root)
+        os.remove(target)
 
     def _get_path_dataset(self) -> Path:
         return Path(os.path.join(self._root, self._metadata.directory))
@@ -112,9 +119,6 @@ class DatasetLoader(ABC):
 
 class ExampleLoader(DatasetLoader):
 
-    def _download_dataset(self):
-        raise NotImplementedError("No corresponding dataset to this DatasetLoader. Used exclusively to load architectures.")
-
     def _load_from_disk(self, path_to_file):
         raise NotImplementedError("No corresponding dataset to this DatasetLoader. Used exclusively to load architectures.")
 
@@ -142,27 +146,12 @@ class MNISTLoader(DatasetLoader):
         self.y_dim = y_dim
         self.path_data = "mnist_data.pickle"
         self.path_targets = "mnist_targets.pickle"
-        uris = {
-            "data": "",
-            "targets": ""
-        }
         m5hashes = {
             "data": "9e7c1694ff8fa70086505beb76ee1bda",
             "targets": "06915ca44ac91e0fa65792d391bec292"
         }
-        metadata = DatasetMetaData(directory="MNIST", uris=uris, m5hashes=m5hashes)
+        metadata = DatasetMetaData(directory="MNIST", m5hashes=m5hashes)
         super().__init__(metadata=metadata, root=root)
-
-    def _download_dataset(self):
-        super()._download_dataset()
-        for key, uri in self._metadata.uris.items():
-            try:
-                request = requests.get(uri)
-                path = os.path.join(self.path, key)
-                with open(self.path, "wb") as f:
-                    f.write(request.content)
-            except Exception as e:
-                raise ValueError("Could not download the dataset. Reason :" + e.__repr__()) from None
 
     def _load_from_disk(self):
         X_train, X_test = self._load_from_path(
@@ -227,15 +216,11 @@ class FashionMNISTLoader(MNISTLoader):
         self.y_dim = y_dim
         self.path_data = "fashionmnist_data.pickle"
         self.path_targets = "fashionmnist_targets.pickle"
-        uris = {
-            "data": "",
-            "targets": ""
-        }
         m5hashes = {
             "data": "a25612811c69618cdb9f3111446285f4",
             "targets": "a85af1a3c426f56c52911c7a1cfe5b19"
         }
-        metadata = DatasetMetaData(directory="FashionMNIST", uris=uris, m5hashes=m5hashes)
+        metadata = DatasetMetaData(directory="FashionMNIST", m5hashes=m5hashes)
         DatasetLoader.__init__(self, metadata=metadata, root=root)
 
 
@@ -246,15 +231,11 @@ class CIFAR10Loader(MNISTLoader):
         self.y_dim = y_dim
         self.path_data = "cifar10_data.pickle"
         self.path_targets = "cifar10_targets.pickle"
-        uris = {
-            "data": "",
-            "targets": ""
-        }
         m5hashes = {
             "data": "40e8e2ca6c43feaa1c7c78a9982b978e",
             "targets": "9a7e604de1826613e860e0bce5a6c1d0"
         }
-        metadata = DatasetMetaData(directory="CIFAR10", uris=uris, m5hashes=m5hashes)
+        metadata = DatasetMetaData(directory="CIFAR10", m5hashes=m5hashes)
         DatasetLoader.__init__(self, metadata=metadata, root=root)
 
     @staticmethod
@@ -278,15 +259,11 @@ class CIFAR100Loader(MNISTLoader):
         self.y_dim = y_dim
         self.path_data = "cifar100_data.pickle"
         self.path_targets = "cifar100_targets.pickle"
-        uris = {
-            "data": "",
-            "targets": ""
-        }
         m5hashes = {
             "data": "d0fc36fde6df99d13fc8d9b20a87bd37",
             "targets": "48495792f9c4d719b84b56127d4d725a"
         }
-        metadata = DatasetMetaData(directory="CIFAR100", uris=uris, m5hashes=m5hashes)
+        metadata = DatasetMetaData(directory="CIFAR100", m5hashes=m5hashes)
         DatasetLoader.__init__(self, metadata=metadata, root=root)
 
     @staticmethod
@@ -321,26 +298,11 @@ class CelebALoader(DatasetLoader):
         self.batch_size = batch_size
         self.max_loaded_images = max_loaded_images
         self.kwargs = kwargs
-        uris = {
-            "data": ""
-        }
         m5hashes = {
             "targets": "55dfc34188defde688032331b34f9286"
         }
-        metadata = DatasetMetaData(directory="CelebA", uris=uris, m5hashes=m5hashes)
+        metadata = DatasetMetaData(directory="CelebA", m5hashes=m5hashes)
         DatasetLoader.__init__(self, metadata=metadata, root=root)
-
-    def _download_dataset(self):
-        super()._download_dataset()
-        os.mkdir(os.path.join(self._root, "CelebA"))
-        for key, uri in self._metadata.uris.items():
-            try:
-                request = requests.get(uri)
-                path = os.path.join(self.path, key)
-                with open(path, "wb") as f:
-                    f.write(request.content)
-            except Exception as e:
-                raise ValueError("Could not download the dataset. Reason :" + e.__repr__()) from None
 
     def _load_from_disk(self):
         class DataSet():
