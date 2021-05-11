@@ -367,17 +367,17 @@ class CelebALoader(DatasetLoader):
 
         return train_dataloader
 
-    def load_generator(self):
-        return architectures.load_mnist_generator(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_generator(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
+        return architectures.load_mnist_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_adversary(self, adv_type):
-        return architectures.load_mnist_adversary(adv_type=adv_type, y_dim=self.ydim)
+    def load_adversary(self, x_dim=(3, 32, 32), y_dim=10, adv_type="Discriminator"):
+        return architectures.load_mnist_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
 
-    def load_encoder(self):
-        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=self.z_dim, y_dim=self.ydim)
+    def load_encoder(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
+        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_autoencoder(self):
-        return architectures.load_mnist_autoencoder(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_autoencoder(self, z_dim=64, y_dim=10):
+        return architectures.load_mnist_autoencoder(z_dim=z_dim, y_dim=y_dim)
 
-    def load_decoder(self):
-        return architectures.load_mnist_decoder(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_decoder(self, z_dim=64, y_dim=10):
+        return architectures.load_mnist_decoder(z_dim=z_dim, y_dim=y_dim)
