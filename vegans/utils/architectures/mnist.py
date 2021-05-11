@@ -8,7 +8,7 @@ from vegans.utils.layers import LayerReshape
 
 
 class MyGenerator(nn.Module):
-    def __init__(self, gen_in_dim):
+    def __init__(self, x_dim, gen_in_dim):
         super().__init__()
 
         if len(gen_in_dim) == 1:
@@ -51,7 +51,7 @@ class MyGenerator(nn.Module):
             nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(num_features=32),
             nn.LeakyReLU(0.2),
-            nn.ConvTranspose2d(in_channels=32, out_channels=1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(in_channels=32, out_channels=x_dim[0], kernel_size=3, stride=1, padding=1),
         )
         self.output = nn.Sigmoid()
 
@@ -61,7 +61,7 @@ class MyGenerator(nn.Module):
         x = self.decoding(x)
         return self.output(x)
 
-def load_mnist_generator(z_dim, y_dim=None):
+def load_mnist_generator(x_dim, z_dim, y_dim=None):
     """ Load some mnist architecture for the generator.
 
     Parameters
@@ -78,13 +78,12 @@ def load_mnist_generator(z_dim, y_dim=None):
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
     y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
-    assert y_dim is None or y_dim == (10, ) or y_dim == (20, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
     if len(z_dim) > 1:
         assert (z_dim[1] <= 16) and (z_dim[1] % 2 == 0), "z_dim[1] must be smaller 16 and divisible by 2. Given: {}.".format(z_dim[1])
         assert z_dim[1] == z_dim[2], "z_dim[1] must be equal to z_dim[2]. Given: {} and {}.".format(z_dim[1], z_dim[2])
 
     gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim) if y_dim is not None else z_dim
-    return MyGenerator(gen_in_dim=gen_in_dim)
+    return MyGenerator(x_dim=x_dim, gen_in_dim=gen_in_dim)
 
 
 class MyAdversary(nn.Module):
@@ -138,8 +137,6 @@ def load_mnist_adversary(x_dim=(1, 32, 32), y_dim=None, adv_type="Critic"):
     else:
         raise ValueError("'adv_type' must be one of: {}.".format(possible_types))
 
-    assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
-
     adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim) if y_dim is not None else x_dim
     return MyAdversary(adv_in_dim=adv_in_dim, last_layer=last_layer)
 
@@ -187,8 +184,6 @@ def load_mnist_encoder(x_dim, z_dim, y_dim=None):
         Architectures for encoder.
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
-    assert x_dim == (1, 32, 32) or x_dim == (11, 32, 32), "x_dim must be (1, 32, 32). Given: {}.".format(x_dim)
-    assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
     assert len(z_dim) == 1, "z_dim must be of length one. Given: {}.".format(z_dim)
 
     enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim) if y_dim is not None else x_dim
@@ -230,8 +225,6 @@ def load_mnist_decoder(z_dim, y_dim=None):
     torch.nn.Module
         Architectures for decoder.
     """
-    assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
-
     dec_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim) if y_dim is not None else z_dim
     return MyDecoder(dec_in_dim=dec_in_dim)
 
@@ -286,7 +279,5 @@ def load_mnist_autoencoder(x_dim=(1, 32, 32), y_dim=None):
     torch.nn.Module
         Architectures for autoencoder.
     """
-    assert y_dim is None or y_dim == (10, ), "y_dim must be (10, ). Given: {}.".format(y_dim)
-
     ae_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim) if y_dim is not None else x_dim
     return MyAutoEncoder(ae_in_dim=ae_in_dim)
