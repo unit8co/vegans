@@ -6,6 +6,8 @@ import numpy as np
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
+from vegans.GAN import ConditionalVanillaGAN
+
 
 # def teardown_module(module):
 #     print('******TEARDOWN******')
@@ -19,7 +21,11 @@ def test_MNISTLoader():
     assert y_train.shape == (60000, 10)
     assert X_test.shape == (10000, 1, 32, 32)
     assert y_test.shape == (10000, 10)
-    X_train, y_train, X_test, y_test = loader.load()
+    generator = loader.load_generator()
+    adversary = loader.load_adversary()
+    gan_model = ConditionalVanillaGAN(
+        generator=generator, adversary=adversary, x_dim=(1, 32, 32), z_dim=32, y_dim=10, folder=None
+    )
 
 def test_FashionMNISTLoader():
     loader = loading.FashionMNISTLoader()
@@ -36,6 +42,11 @@ def test_Cifar10Loader():
     assert y_train.shape == (50000, 10)
     assert X_test.shape == (10000, 3, 32, 32)
     assert y_test.shape == (10000, 10)
+    generator = loader.load_generator()
+    adversary = loader.load_adversary()
+    gan_model = ConditionalVanillaGAN(
+        generator=generator, adversary=adversary, x_dim=(3, 32, 32), z_dim=64, y_dim=10, folder=None
+    )
 
 def test_Cifar100Loader():
     loader = loading.CIFAR100Loader()

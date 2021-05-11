@@ -140,10 +140,7 @@ class ExampleLoader(DatasetLoader):
 
 class MNISTLoader(DatasetLoader):
 
-    def __init__(self, x_dim=(1, 32, 32), z_dim=(64, ), y_dim=(10, ), root=None):
-        self.x_dim = x_dim
-        self.z_dim = z_dim
-        self.y_dim = y_dim
+    def __init__(self, root=None):
         self.path_data = "mnist_data.pickle"
         self.path_targets = "mnist_targets.pickle"
         m5hashes = {
@@ -157,17 +154,11 @@ class MNISTLoader(DatasetLoader):
         X_train, X_test = self._load_from_path(
             path=os.path.join(self.path, self.path_data), m5hash=self._metadata.m5hashes["data"]
         )
-
-        if self.y_dim is not None:
-            y_train, y_test = self._load_from_path(
-                path=os.path.join(self.path, self.path_targets), m5hash=self._metadata.m5hashes["targets"]
-            )
-        else:
-            y_train = y_test = None
+        y_train, y_test = self._load_from_path(
+            path=os.path.join(self.path, self.path_targets), m5hash=self._metadata.m5hashes["targets"]
+        )
 
         X_train, y_train, X_test, y_test = self._preprocess(X_train, y_train, X_test, y_test)
-        if y_train is None:
-            return X_train, X_test
         return X_train, y_train, X_test, y_test
 
     def _load_from_path(self, path, m5hash):
@@ -193,27 +184,24 @@ class MNISTLoader(DatasetLoader):
             y_test = np.eye(10)[y_test.reshape(-1)]
         return X_train, y_train, X_test, y_test
 
-    def load_generator(self):
-        return architectures.load_mnist_generator(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_generator(self, x_dim=(1, 32, 32), z_dim=32, y_dim=10):
+        return architectures.load_mnist_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_adversary(self, adv_type):
-        return architectures.load_mnist_adversary(adv_type=adv_type, y_dim=self.ydim)
+    def load_adversary(self, x_dim=(1, 32, 32), y_dim=10, adv_type="Discriminator"):
+        return architectures.load_mnist_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
 
-    def load_encoder(self):
-        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=self.z_dim, y_dim=self.ydim)
+    def load_encoder(self, x_dim=(1, 32, 32), z_dim=32, y_dim=10):
+        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_autoencoder(self):
-        return architectures.load_mnist_autoencoder(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_autoencoder(self, z_dim=32, y_dim=10):
+        return architectures.load_mnist_autoencoder(z_dim=z_dim, y_dim=y_dim)
 
-    def load_decoder(self):
-        return architectures.load_mnist_decoder(z_dim=self.z_dim, y_dim=self.ydim)
+    def load_decoder(self, z_dim=32, y_dim=10):
+        return architectures.load_mnist_decoder(z_dim=z_dim, y_dim=y_dim)
 
 
 class FashionMNISTLoader(MNISTLoader):
-    def __init__(self, x_dim=(1, 32, 32), z_dim=(64, ), y_dim=(10, ), root=None):
-        self.x_dim = x_dim
-        self.z_dim = z_dim
-        self.y_dim = y_dim
+    def __init__(self, root=None):
         self.path_data = "fashionmnist_data.pickle"
         self.path_targets = "fashionmnist_targets.pickle"
         m5hashes = {
@@ -225,10 +213,7 @@ class FashionMNISTLoader(MNISTLoader):
 
 
 class CIFAR10Loader(MNISTLoader):
-    def __init__(self, x_dim=(3, 32, 32), z_dim=(64, ), y_dim=(10, ), root=None):
-        self.x_dim = x_dim
-        self.z_dim = z_dim
-        self.y_dim = y_dim
+    def __init__(self, root=None):
         self.path_data = "cifar10_data.pickle"
         self.path_targets = "cifar10_targets.pickle"
         m5hashes = {
@@ -251,12 +236,24 @@ class CIFAR10Loader(MNISTLoader):
             y_test = np.eye(10)[y_test.reshape(-1)]
         return X_train, y_train, X_test, y_test
 
+    def load_generator(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
+        return architectures.load_mnist_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-class CIFAR100Loader(MNISTLoader):
-    def __init__(self, x_dim=(3, 32, 32), z_dim=(64, ), y_dim=(10, ), root=None):
-        self.x_dim = x_dim
-        self.z_dim = z_dim
-        self.y_dim = y_dim
+    def load_adversary(self, x_dim=(3, 32, 32), y_dim=10, adv_type="Discriminator"):
+        return architectures.load_mnist_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
+
+    def load_encoder(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
+        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=z_dim, y_dim=y_dim)
+
+    def load_autoencoder(self, z_dim=64, y_dim=10):
+        return architectures.load_mnist_autoencoder(z_dim=z_dim, y_dim=y_dim)
+
+    def load_decoder(self, z_dim=64, y_dim=10):
+        return architectures.load_mnist_decoder(z_dim=z_dim, y_dim=y_dim)
+
+
+class CIFAR100Loader(CIFAR10Loader):
+    def __init__(self, root=None):
         self.path_data = "cifar100_data.pickle"
         self.path_targets = "cifar100_targets.pickle"
         m5hashes = {
