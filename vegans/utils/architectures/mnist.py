@@ -1,10 +1,11 @@
+import torch
 import pickle
 
 import numpy as np
 import torch.nn as nn
 
 from vegans.utils.utils import get_input_dim
-from vegans.utils.layers import LayerReshape
+from vegans.utils.layers import LayerReshape, LayerPrintSize
 
 
 class MyGenerator(nn.Module):
@@ -158,12 +159,15 @@ class MyEncoder(nn.Module):
             nn.MaxPool2d(kernel_size=5, stride=2, padding=2),
             nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, stride=1, padding=1),
             nn.Flatten(),
-            nn.Linear(in_features=256, out_features=np.prod(z_dim))
         )
+        sample_input = torch.rand([2, *enc_in_dim])
+        flattened_nodes = tuple(self.hidden_part(sample_input).shape)[1]
+        self.linear = nn.Linear(in_features=flattened_nodes, out_features=np.prod(z_dim))
         self.output = nn.Identity()
 
     def forward(self, x):
         x = self.hidden_part(x)
+        x = self.linear(x)
         return self.output(x)
 
 def load_mnist_encoder(x_dim, z_dim, y_dim=None):
@@ -191,7 +195,7 @@ def load_mnist_encoder(x_dim, z_dim, y_dim=None):
 
 
 class MyDecoder(nn.Module):
-    def __init__(self, dec_in_dim):
+    def __init__(self, x_dim, dec_in_dim):
         super().__init__()
         self.hidden_part = nn.Sequential(
             nn.Linear(in_features=np.prod(dec_in_dim), out_features=np.prod([1, 8, 8])),
@@ -202,7 +206,7 @@ class MyDecoder(nn.Module):
             nn.ConvTranspose2d(in_channels=64, out_channels=32, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(num_features=32),
             nn.LeakyReLU(0.2),
-            nn.ConvTranspose2d(in_channels=32, out_channels=1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(in_channels=32, out_channels=x_dim[0], kernel_size=3, stride=1, padding=1),
         )
         self.output = nn.Sigmoid()
 
@@ -210,7 +214,7 @@ class MyDecoder(nn.Module):
         x = self.hidden_part(x)
         return self.output(x)
 
-def load_mnist_decoder(z_dim, y_dim=None):
+def load_mnist_decoder(x_dim, z_dim, y_dim=None):
     """ Load some mnist architecture for the decoder.
 
     Parameters
@@ -226,7 +230,7 @@ def load_mnist_decoder(z_dim, y_dim=None):
         Architectures for decoder.
     """
     dec_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim) if y_dim is not None else z_dim
-    return MyDecoder(dec_in_dim=dec_in_dim)
+    return MyDecoder(x_dim=x_dim, dec_in_dim=dec_in_dim)
 
 
 class MyAutoEncoder(nn.Module):

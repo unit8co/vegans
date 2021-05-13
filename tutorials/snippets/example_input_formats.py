@@ -10,8 +10,7 @@ from vegans.utils.layers import LayerReshape
 def call_gan_training(generator, adversary):
     gan_model = VanillaGAN(
         generator=generator, adversary=adversary,
-        z_dim=z_dim, x_dim=im_dim, folder="MyModels/GAN",
-        optim_kwargs={"Generator": {"lr": lr_gen}, "Adversary": {"lr": lr_adv}}
+        z_dim=z_dim, x_dim=x_dim, folder="MyModels/GAN",
     )
     # gan_model.summary(save=True)
     gan_model.fit(
@@ -32,17 +31,13 @@ def call_gan_training(generator, adversary):
 
 if __name__ == '__main__':
 
-    datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
-    lr_gen = 0.0001
-    lr_adv = 0.00005
+    loader = loading.MNISTLoader()
+    X_train, y_train, X_test, y_test = loader.load()
+    X_train = X_train[:500]
     epochs = 1
     batch_size = 64
 
-    X_train = X_train.reshape((-1, 1, 32, 32))[:1000]
-    X_test = X_test.reshape((-1, 1, 32, 32))
-    im_dim = X_train.shape[1:]
-
+    x_dim = X_train.shape[1:]
 
     #########################################################################
     # Convolutional network: Sequential
@@ -62,7 +57,7 @@ if __name__ == '__main__':
     )
 
     adversary = nn.Sequential(
-        nn.Conv2d(in_channels=im_dim[0], out_channels=32, kernel_size=4, stride=2, padding=1),
+        nn.Conv2d(in_channels=x_dim[0], out_channels=32, kernel_size=4, stride=2, padding=1),
         nn.ReLU(),
         nn.Conv2d(in_channels=32, out_channels=8, kernel_size=4, stride=2, padding=1),
         nn.ReLU(),
@@ -127,7 +122,7 @@ if __name__ == '__main__':
             return y_pred
 
     generator = MyGenerator(z_dim=z_dim)
-    adversary = MyAdversary(x_dim=im_dim)
+    adversary = MyAdversary(x_dim=x_dim)
     call_gan_training(generator, adversary)
 
 
@@ -135,7 +130,7 @@ if __name__ == '__main__':
     # Flat network: Sequential
     #########################################################################
     z_dim = 2
-    im_dim = X_train.shape[1:]
+    x_dim = X_train.shape[1:]
 
     generator = nn.Sequential(
         nn.Linear(z_dim, 128),
@@ -149,13 +144,13 @@ if __name__ == '__main__':
         nn.Linear(512, 1024),
         nn.LeakyReLU(0.2),
         nn.BatchNorm1d(1024),
-        nn.Linear(1024, int(np.prod(im_dim))),
-        LayerReshape(im_dim),
+        nn.Linear(1024, int(np.prod(x_dim))),
+        LayerReshape(x_dim),
         nn.Sigmoid()
     )
     adversary = nn.Sequential(
         nn.Flatten(),
-        nn.Linear(int(np.prod(im_dim)), 512),
+        nn.Linear(int(np.prod(x_dim)), 512),
         nn.LeakyReLU(0.2),
         nn.Linear(512, 256),
         nn.LeakyReLU(0.2),
@@ -184,8 +179,8 @@ if __name__ == '__main__':
                 nn.Linear(512, 1024),
                 nn.LeakyReLU(0.2),
                 nn.BatchNorm1d(1024),
-                nn.Linear(1024, int(np.prod(im_dim))),
-                LayerReshape(im_dim)
+                nn.Linear(1024, int(np.prod(x_dim))),
+                LayerReshape(x_dim)
             )
             self.output = nn.Sigmoid()
 
@@ -199,7 +194,7 @@ if __name__ == '__main__':
             super().__init__()
             self.hidden_part = nn.Sequential(
                 nn.Flatten(),
-                nn.Linear(int(np.prod(im_dim)), 512),
+                nn.Linear(int(np.prod(x_dim)), 512),
                 nn.LeakyReLU(0.2),
                 nn.Linear(512, 256),
                 nn.LeakyReLU(0.2),
@@ -213,5 +208,5 @@ if __name__ == '__main__':
             return y_pred
 
     generator = MyGenerator(z_dim=z_dim)
-    adversary = MyAdversary(x_dim=im_dim)
+    adversary = MyAdversary(x_dim=x_dim)
     call_gan_training(generator, adversary)
