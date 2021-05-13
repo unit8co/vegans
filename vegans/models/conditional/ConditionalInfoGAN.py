@@ -27,6 +27,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
+from vegans.utils.layers import LayerReshape
 from torch.nn import CrossEntropyLoss, BCELoss
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.utils.utils import get_input_dim, concatenate, NormalNegativeLogLikelihood
@@ -165,12 +166,14 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
         if self.c_dim_continuous != (0,):
             self.mu = nn.Sequential(
                 nn.Flatten(),
-                nn.Linear(np.prod(self.encoder.output_size), np.sum(self.c_dim_continuous))
+                nn.Linear(np.prod(self.encoder.output_size), np.sum(self.c_dim_continuous)),
+                LayerReshape(self.c_dim_continuous)
             ).to(self.device)
             self.log_variance = nn.Sequential(
                 nn.Flatten(),
                 nn.Linear(np.prod(self.encoder.output_size), np.sum(self.c_dim_continuous)),
-                nn.ReLU()
+                nn.ReLU(),
+                LayerReshape(self.c_dim_continuous)
             ).to(self.device)
 
         self.lambda_z = lambda_z
@@ -179,11 +182,11 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel):
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
-            if self.encoder.output_size == self.c_dim:
-                raise ValueError(
-                    "Encoder output size is equal to c_dim, but for InfoGAN the encoder last layers for mu, sigma and discrete values " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
+            # if self.encoder.output_size == self.c_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to c_dim, but for InfoGAN the encoder last layers for mu, sigma and discrete values " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
 
     def _default_optimizer(self):
         return torch.optim.Adam
