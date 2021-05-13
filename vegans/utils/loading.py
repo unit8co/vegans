@@ -119,23 +119,26 @@ class DatasetLoader(ABC):
 
 class ExampleLoader(DatasetLoader):
 
+    def __init__(self):
+        pass
+
     def _load_from_disk(self, path_to_file):
         raise NotImplementedError("No corresponding dataset to this DatasetLoader. Used exclusively to load architectures.")
 
     def load_generator(self, x_dim, z_dim, y_dim=None):
-        return architectures.load_example_generator(x_dim, z_dim, y_dim=y_dim)
+        return architectures.load_example_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_adversary(self, x_dim, z_dim, y_dim=None):
-        return architectures.load_example_adversary(x_dim, z_dim, y_dim=y_dim, adv_type=adv_type)
+    def load_adversary(self, x_dim, y_dim=None, adv_type="Discriminator"):
+        return architectures.load_example_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
 
     def load_encoder(self, x_dim, z_dim, y_dim=None):
-        return architectures.load_example_encoder(x_dim, z_dim, y_dim=y_dim)
+        return architectures.load_example_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_autoencoder(self, x_dim, z_dim, y_dim=None):
-        return architectures.load_example_autoencoder(x_dim, z_dim, y_dim=y_dim)
+    def load_autoencoder(self, x_dim, y_dim=None):
+        return architectures.load_example_autoencoder(x_dim=x_dim, y_dim=y_dim)
 
     def load_decoder(self, x_dim, z_dim, y_dim=None):
-        return architectures.load_example_decoder(x_dim, z_dim, y_dim=y_dim)
+        return architectures.load_example_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
 
 class MNISTLoader(DatasetLoader):
@@ -191,13 +194,13 @@ class MNISTLoader(DatasetLoader):
         return architectures.load_mnist_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
 
     def load_encoder(self, x_dim=(1, 32, 32), z_dim=32, y_dim=10):
-        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=z_dim, y_dim=y_dim)
+        return architectures.load_mnist_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_autoencoder(self, z_dim=32, y_dim=10):
-        return architectures.load_mnist_autoencoder(z_dim=z_dim, y_dim=y_dim)
+    def load_autoencoder(self, x_dim=(1, 32, 32), y_dim=10):
+        return architectures.load_mnist_autoencoder(x_dim=x_dim, y_dim=y_dim)
 
-    def load_decoder(self, z_dim=32, y_dim=10):
-        return architectures.load_mnist_decoder(z_dim=z_dim, y_dim=y_dim)
+    def load_decoder(self, x_dim=(1, 32, 32), z_dim=32, y_dim=10):
+        return architectures.load_mnist_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
 
 class FashionMNISTLoader(MNISTLoader):
@@ -278,7 +281,7 @@ class CIFAR100Loader(CIFAR10Loader):
 
 
 class CelebALoader(DatasetLoader):
-    def __init__(self, x_dim=(3, 218, 178), z_dim=(128, ), y_dim=(10, ), root=None, batch_size=32, max_loaded_images=5000, **kwargs):
+    def __init__(self, root=None, batch_size=32, max_loaded_images=5000, crop_size=128, output_shape=64, **kwargs):
         """
         Parameters
         ----------
@@ -289,11 +292,10 @@ class CelebALoader(DatasetLoader):
         kwargs
             Other input arguments to torchvision.utils.data.DataLoader
         """
-        self.x_dim = x_dim
-        self.z_dim = z_dim
-        self.y_dim = y_dim
         self.batch_size = batch_size
         self.max_loaded_images = max_loaded_images
+        self.crop_size = crop_size
+        self.output_shape = output_shape
         self.kwargs = kwargs
         m5hashes = {
             "targets": "55dfc34188defde688032331b34f9286"
@@ -303,14 +305,15 @@ class CelebALoader(DatasetLoader):
 
     def _load_from_disk(self):
         class DataSet():
-            def __init__(self, root, max_loaded_images, load_attributes):
+            def __init__(self, root, max_loaded_images, crop_size, output_shape):
                 self.root = root
                 self.datapath = os.path.join(root, "CelebA/images/")
                 self.attributepath = os.path.join(root, "CelebA/list_attr_celeba.csv")
                 self.nr_samples = 202599
                 self.max_loaded_images = max_loaded_images
-                self.image_shape = (3, 218, 178)
-                self.load_attributes = load_attributes
+                self.original_shape = (3, 218, 178)
+                self.crop_size = crop_size
+                self.output_shape = output_shape
                 try:
                     self.image_names = os.listdir(self.datapath)
                 except FileNotFoundError:
@@ -338,14 +341,11 @@ class CelebALoader(DatasetLoader):
             def _load_data(self, start):
                 end = start + self.max_loaded_images
 
-                if self.load_attributes:
-                    attributes = pd.read_csv(self.attributepath).iloc[start:start+end, :]
-                    attributes = self._transform_targets(targets=attributes)
-                else:
-                    attributes = None
+                attributes = pd.read_csv(self.attributepath).iloc[start:start+end, :]
+                attributes = self._transform_targets(targets=attributes)
 
                 batch_image_names = self.image_names[start:end]
-                images = np.array([np.array(Image.open(self.datapath+im_name)) for im_name in batch_image_names])
+                images = [Image.open(self.datapath+im_name) for im_name in batch_image_names]
                 images = self._transform_data(data=images)
                 return images, attributes
 
@@ -354,30 +354,49 @@ class CelebALoader(DatasetLoader):
                 return targets
 
             def _transform_data(self, data):
-                data = invert_channel_order(images=data)
-                return data.reshape((-1, *self.image_shape)) / 255
+                for i, image in enumerate(data):
+                    left_x = (image.size[0] - self.crop_size) // 2
+                    upper_y = (image.size[1] - self.crop_size) // 2
+                    image = image.crop([left_x, upper_y, left_x + self.crop_size, upper_y + self.crop_size])
+                    image = image.resize((self.output_shape, self.output_shape), Image.BILINEAR)
+                    data[i] = np.array(image)
+                data = invert_channel_order(images=np.stack(data, axis=0))
+                max_value = np.max(data)
+                return data / max_value
 
         self._check_dataset_integrity_or_raise(
             path=os.path.join(self._root, "CelebA/list_attr_celeba.csv"), expected_hash=self._metadata.m5hashes["targets"]
         )
-        train_dataloader = DataLoader(DataSet(
-                root=self._root, max_loaded_images=self.max_loaded_images, load_attributes=self.y_dim is not None
-            ), batch_size=self.batch_size, **self.kwargs
+        train_dataloader = DataLoader(
+            DataSet(
+                root=self._root, max_loaded_images=self.max_loaded_images,
+                crop_size=self.crop_size, output_shape=self.output_shape
+            ),
+            batch_size=self.batch_size, **self.kwargs
         )
-
         return train_dataloader
 
-    def load_generator(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
-        return architectures.load_mnist_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    def load_generator(self, x_dim=None, z_dim=(16, 4, 4), y_dim=40):
+        if x_dim is None:
+            x_dim = (3, self.output_shape, self.output_shape)
+        return architectures.load_celeba_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_adversary(self, x_dim=(3, 32, 32), y_dim=10, adv_type="Discriminator"):
-        return architectures.load_mnist_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
+    def load_adversary(self, x_dim=None, y_dim=40, adv_type="Discriminator"):
+        if x_dim is None:
+            x_dim = (3, self.output_shape, self.output_shape)
+        return architectures.load_celeba_adversary(x_dim=x_dim, y_dim=y_dim, adv_type=adv_type)
 
-    def load_encoder(self, x_dim=(3, 32, 32), z_dim=64, y_dim=10):
-        return architectures.load_mnist_encoder(x_dim=self.x_dim, z_dim=z_dim, y_dim=y_dim)
+    def load_encoder(self, x_dim=None, z_dim=(16, 4, 4), y_dim=40):
+        if x_dim is None:
+            x_dim = (3, self.output_shape, self.output_shape)
+        return architectures.load_celeba_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
-    def load_autoencoder(self, z_dim=64, y_dim=10):
-        return architectures.load_mnist_autoencoder(z_dim=z_dim, y_dim=y_dim)
+    def load_autoencoder(self, x_dim=None, y_dim=40):
+        if x_dim is None:
+            x_dim = (3, self.output_shape, self.output_shape)
+        raise NotImplementedError("Autoencoder architecture not defined for `CelebALoader.`")
 
-    def load_decoder(self, z_dim=64, y_dim=10):
-        return architectures.load_mnist_decoder(z_dim=z_dim, y_dim=y_dim)
+    def load_decoder(self, x_dim=None, z_dim=(16, 4, 4), y_dim=40):
+        if x_dim is None:
+            x_dim = (3, self.output_shape, self.output_shape)
+        return architectures.load_celeba_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)

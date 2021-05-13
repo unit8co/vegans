@@ -73,15 +73,13 @@ class MyAdversary(nn.Module):
         x = self.feature_part(x)
         return self.output(x)
 
-def load_example_adversary(x_dim, z_dim, y_dim=None, adv_type="Critic"):
+def load_example_adversary(x_dim, y_dim=None, adv_type="Critic"):
     """ Load some example architecture for the adversary.
 
     Parameters
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
     y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 
@@ -240,15 +238,13 @@ class MyAutoEncoder(nn.Module):
         x = self.hidden_part(x)
         return self.output(x)
 
-def load_example_autoencoder(x_dim, z_dim, y_dim=None):
+def load_example_autoencoder(x_dim, y_dim=None):
     """ Load some example architecture for the auto-encoder.
 
     Parameters
     ----------
     x_dim : integer, list
         Indicating the number of dimensions for the real data.
-    z_dim : integer, list
-        Indicating the number of dimensions for the latent space.
     y_dim : integer, list, optional
         Indicating the number of dimensions for the labels.
 

@@ -30,6 +30,7 @@ import torch.nn as nn
 from torch.nn import BCELoss, L1Loss
 from torch.nn import MSELoss as L2Loss
 
+from vegans.utils.layers import LayerReshape
 from vegans.utils.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
@@ -139,11 +140,13 @@ class BicycleGAN(AbstractGenerativeModel):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
@@ -157,11 +160,11 @@ class BicycleGAN(AbstractGenerativeModel):
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
-            if self.encoder.output_size == self.z_dim:
-                raise ValueError(
-                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
 
     def _default_optimizer(self):
         return torch.optim.Adam
