@@ -24,10 +24,10 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    loader = loading.CelebALoader(batch_size=32, max_loaded_images=3000)
+    loader = loading.CelebALoader(batch_size=16, max_loaded_images=1000, output_shape=32)
     train_dataloader = loader.load()
 
-    epochs = 1
+    epochs = 3
 
     X_train, y_train = iter(train_dataloader).next()
     x_dim = X_train.numpy().shape[1:]
@@ -48,8 +48,8 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        ConditionalBicycleGAN,
-        ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        #ConditionalBicycleGAN, ConditionalKLGAN
+        ConditionalLRGAN, ConditionalLSGAN,
         ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
         ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
         ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
@@ -101,8 +101,7 @@ if __name__ == '__main__':
         else:
             raise NotImplementedError("{} no yet implemented in logical gate.".format(model.__name__))
 
-        gan_model.summary(save=False)
-        raise
+        gan_model.summary(save=True)
         gan_model.fit(
             X_train=train_dataloader,
             y_train=None,
@@ -111,9 +110,9 @@ if __name__ == '__main__':
             batch_size=None,
             epochs=epochs,
             steps=None,
-            print_every="0.2e",
+            print_every=500,
             save_model_every=None,
-            save_images_every="0.2e",
+            save_images_every="0.1e",
             save_losses_every=10,
             enable_tensorboard=False
         )
@@ -123,14 +122,13 @@ if __name__ == '__main__':
         title = "Epochs: {}, z_dim: {}, Time trained: {} minutes\nParams: {}\n\n".format(
             epochs, z_dim, training_time, gan_model.get_number_params()
         )
-        fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
-        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
+        fig, axs = utils.plot_images(images=samples, show=False)
         fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"generated_images.png")
+        plt.savefig(gan_model.folder+"/generated_images.png")
 
         fig, axs = utils.plot_losses(losses=losses, show=False)
         fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"losses.png")
+        plt.savefig(gan_model.folder+"/losses.png")
         # gan_model.save()

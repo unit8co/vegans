@@ -11,6 +11,19 @@ from vegans.utils.layers import LayerReshape, LayerPrintSize
 class MyGenerator(nn.Module):
     def __init__(self, x_dim, gen_in_dim):
         super().__init__()
+        if len(gen_in_dim) == 1:
+            out_shape = (128, 8, 8)
+            self.linear_part = nn.Sequential(
+                nn.Linear(in_features=gen_in_dim[0], out_features=1024),
+                nn.LeakyReLU(0.1),
+                nn.Linear(in_features=1024, out_features=np.prod(out_shape)),
+                nn.LeakyReLU(0.1),
+                LayerReshape(shape=out_shape)
+            )
+            gen_in_dim = out_shape
+        else:
+            self.linear_part = nn.Identity()
+
         self.hidden_part = nn.Sequential(
             nn.ConvTranspose2d(in_channels=gen_in_dim[0], out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(num_features=128),
@@ -46,6 +59,7 @@ class MyGenerator(nn.Module):
         self.output = nn.Sigmoid()
 
     def forward(self, x):
+        x = self.linear_part(x)
         x = self.hidden_part(x)
         return self.output(x)
 
@@ -66,7 +80,7 @@ def load_celeba_generator(x_dim, z_dim, y_dim=None):
     """
     z_dim = [z_dim] if isinstance(z_dim, int) else z_dim
     y_dim = tuple([y_dim]) if isinstance(y_dim, int) else y_dim
-    if len(z_dim) > 1:
+    if len(z_dim) == 3:
         assert z_dim[1] % 2 == 0, "z_dim[1] must be divisible by 2. Given: {}.".format(z_dim[1])
         assert x_dim[1] % 2 == 0, "`x_dim[1]` must be divisible by 2. Given: {}.".format(x_dim[1])
         assert x_dim[1] % z_dim[1] == 0, "`x_dim[1]` must be divisible by `z_dim[1]`. Given: {} and {}.".format(x_dim[1], z_dim[1])
@@ -74,6 +88,7 @@ def load_celeba_generator(x_dim, z_dim, y_dim=None):
         assert z_dim[1] == z_dim[2], "`z_dim[1]` must be equal to `z_dim[2]`. Given: {} and {}.".format(z_dim[1], z_dim[2])
 
     gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim) if y_dim is not None else z_dim
+
     return MyGenerator(x_dim=x_dim, gen_in_dim=gen_in_dim)
 
 
@@ -93,23 +108,25 @@ class MyAdversary(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(num_features=64),
-            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=4, stride=2, padding=1),
-            nn.BatchNorm2d(num_features=32),
-            nn.Conv2d(in_channels=32, out_channels=1, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(num_features=256),
             nn.Flatten()
         )
         current_output = self.hidden_part(torch.randn(size=(2, *adv_in_dim))).shape
-        self.hidden_part.add_module("Linear", nn.Linear(in_features=current_output[1], out_features=64))
-        self.hidden_part.add_module("ReLU", nn.ReLU())
-        self.hidden_part.add_module("LastLinear", nn.Linear(in_features=64, out_features=1))
+        self.linear_part = nn.Sequential(
+            nn.Linear(in_features=current_output[1], out_features=1024),
+            nn.ReLU(),
+            nn.Linear(in_features=1024, out_features=1),
+        )
         self.output = last_layer_activation()
 
     def forward(self, x):
         x = self.hidden_part(x)
+        x = self.linear_part(x)
         return self.output(x)
 
 def load_celeba_adversary(x_dim, y_dim=None, adv_type="Critic"):

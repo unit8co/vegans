@@ -341,23 +341,9 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Logging during training
     #########################################################################
     def _log_images(self, images, step, writer):
-        assert len(self.x_dim) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversary / encoder.input_size = {}.".format(self.x_dim)
-        )
-        if writer is not None:
-            grid = make_grid(images)
-            writer.add_image('images', grid, step)
-
-        fig, axs = self._build_images(images)
-        for i, ax in enumerate(np.ravel(axs)):
-            try:
-                lbl = torch.argmax(self.fixed_labels[i], axis=0).item()
-                ax.set_title("Label: {}".format(lbl))
-            except ValueError:
-                pass
-        plt.savefig(os.path.join(self.folder+"/images/image_{}.png".format(step)))
-        plt.close()
-        print("Images logged.")
+        if self.images_produced:
+            labels = [torch.argmax(lbl, axis=0).item() for lbl in self.fixed_labels]
+            super()._log_images(images=images, step=step, writer=writer, labels=labels)
 
     def _log_losses(self, X_batch, Z_batch, y_batch, mode):
         self._losses = self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
