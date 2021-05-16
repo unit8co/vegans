@@ -10,6 +10,7 @@ import numpy as np
 from vegans.GAN import AAE, BicycleGAN, LRGAN, VAEGAN
 from vegans.utils.layers import LayerReshape
 
+# gan, adv_dim, enc_dim
 networks_flat = [
     (AAE, 10, 10),
     (BicycleGAN, 16, 10+1),
