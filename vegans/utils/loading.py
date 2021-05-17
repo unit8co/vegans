@@ -74,7 +74,11 @@ class DatasetLoader(ABC):
         """
         Ensures that the dataset exists and its MD5 checksum matches the expected hash.
         """
-        actual_hash = str(subprocess.check_output(["md5sum", path]).split()[0], 'utf-8')
+        try: # Linux
+            actual_hash = str(subprocess.check_output(["md5sum", path]).split()[0], 'utf-8')
+        except FileNotFoundError: # Mac
+            actual_hash = str(subprocess.check_output(["md5", path]).split()[-1], 'utf-8')
+
         if actual_hash != expected_hash:
             raise ValueError("Expected hash for {}: {}, got: {}.".format(path, expected_hash, actual_hash))
 
