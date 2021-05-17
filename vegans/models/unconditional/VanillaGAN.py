@@ -26,24 +26,6 @@ from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 class VanillaGAN(AbstractGAN1v1):
     """
-    VanillaGAN
-    ----------
-    Implements the original Generative adversarial network[1].
-
-    Uses the binary cross-entropy for evaluating the realness of real and fake images.
-    The discriminator tries to output 1 for real images and 0 for fake images, whereas the
-    generator tries to force the discriminator to output 1 for fake images.
-
-    Losses:
-        - Generator: Binary cross-entropy
-        - Discriminator: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-
-    References
-    ----------
-    .. [1] https://papers.nips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf
-
     Parameters
     ----------
     generator: nn.Module

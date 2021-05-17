@@ -36,26 +36,6 @@ from vegans.models.conditional.AbstractConditionalGenerativeModel import Abstrac
 
 class InfoGAN(AbstractGenerativeModel):
     """
-    Implements the InfoGAN[1].
-
-    It introduces an encoder network which maps the generator output back to the latent
-    input space. This should help to prevent mode collapse and improve image variety.
-
-    Losses:
-        - Generator: Binary cross-entropy + Normal Log-Likelihood + Multinomial Log-Likelihood
-        - Discriminator: Binary cross-entropy
-        - Encoder: Normal Log-Likelihood + Multinomial Log-Likelihood
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - c_dim_discrete: Number of discrete multinomial dimensions (might be list of independent multinomial spaces).
-        - c_dim_continuous: Number of continuous normal dimensions.
-        - lambda_z: Weight for the reconstruction loss for the latent z dimensions.
-
-    References
-    ----------
-    .. [1] https://dl.acm.org/doi/10.5555/3157096.3157340
-
     Parameters
     ----------
     generator: nn.Module
@@ -258,9 +238,10 @@ class InfoGAN(AbstractGenerativeModel):
             losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None, c=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c)
         encoded = self.encode(x=fake_images)
 
         if self.c_dim_discrete[0] != 0:
@@ -300,9 +281,10 @@ class InfoGAN(AbstractGenerativeModel):
             "Generator_Continuous": self.lambda_z*continuous_encoder_loss
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c).detach()
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images=None, c=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c).detach()
         encoded = self.encode(x=fake_images)
 
         if self.c_dim_discrete[0] != 0:
@@ -334,9 +316,10 @@ class InfoGAN(AbstractGenerativeModel):
             "Encoder_Continuous": continuous_encoder_loss
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        c = self.sample_c(n=len(Z_batch))
-        fake_images = self.generate(z=Z_batch, c=c).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            c = self.sample_c(n=len(Z_batch))
+            fake_images = self.generate(z=Z_batch, c=c).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 

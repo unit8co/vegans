@@ -209,7 +209,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
     # Actions during training
     #########################################################################
     def fit(self, X_train, y_train, X_test=None, y_test=None, epochs=5, batch_size=32, steps=None,
-            print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
+            print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=False):
         """ Trains the model, iterating over all contained networks.
 
         Parameters
@@ -311,53 +311,14 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         self.eval()
         self._clean_up(writers=[writer_train, writer_test])
 
-    def _calculate_feature_loss(self, X_real, X_fake, y_batch):
-        """Calculates feature loss if `self.feature_layer` is not None.
-
-        Every network takes the `feature_layer` argument in its constructor.
-        If it is not None, a layer of the discriminator / critic should be specified.
-        A feature loss will be calculated which is the MSE between the output for real
-        and fake samples of the specified `self.feature_layer`.
-
-        Parameters
-        ----------
-        X_real : torch.Tensor
-            Real samples.
-        X_fake : torch.Tensor
-            Fake samples.
-        y_batch : torch.Tensor
-            Labels of the X_real.
-        """
-        X_real = utils.concatenate(tensor1=X_real, tensor2=y_batch).float()
-        X_fake = utils.concatenate(tensor1=X_fake, tensor2=y_batch).float()
-
-        X_real_features = self.feature_layer(X_real)
-        X_fake_features = self.feature_layer(X_fake)
-        feature_loss = MSELoss()(X_real_features, X_fake_features)
-        return feature_loss
-
 
     #########################################################################
     # Logging during training
     #########################################################################
     def _log_images(self, images, step, writer):
-        assert len(self.x_dim) > 1, (
-            "Called _log_images in AbstractGenerativeModel for adversary / encoder.input_size = {}.".format(self.x_dim)
-        )
-        if writer is not None:
-            grid = make_grid(images)
-            writer.add_image('images', grid, step)
-
-        fig, axs = self._build_images(images)
-        for i, ax in enumerate(np.ravel(axs)):
-            try:
-                lbl = torch.argmax(self.fixed_labels[i], axis=0).item()
-                ax.set_title("Label: {}".format(lbl))
-            except ValueError:
-                pass
-        plt.savefig(os.path.join(self.folder+"/images/image_{}.png".format(step)))
-        plt.close()
-        print("Images logged.")
+        if self.images_produced:
+            labels = [torch.argmax(lbl, axis=0).item() for lbl in self.fixed_labels]
+            super()._log_images(images=images, step=step, writer=writer, labels=labels)
 
     def _log_losses(self, X_batch, Z_batch, y_batch, mode):
         self._losses = self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
@@ -415,7 +376,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         """
         return utils.concatenate(tensor1=tensor1, tensor2=tensor2)
 
-    def generate(self, y, z=None):
+    def generate(self, y=None, z=None):
         """ Generate output with generator.
 
         Parameters
@@ -432,7 +393,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         """
         return self(y=y, z=z)
 
-    def predict(self, x, y):
+    def predict(self, x, y=None):
         """ Use the critic / discriminator to predict if input is real / fake.
 
         Parameters
@@ -447,15 +408,29 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
         np.array
             Array with one output per x indicating the realness of an input.
         """
+        if y is None:
+            x_dim = tuple(x.shape[1:])
+            assert x_dim == self.adv_in_dim, (
+                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
+            )
+            return self._X_transformer(x)
+
         inpt = self.concatenate(x, y).float().to(self.device)
         return self._X_transformer(inpt)
 
-    def __call__(self, y, z=None):
-        if z is None:
+    def __call__(self, y=None, z=None):
+        if y is None and z is None:
+            raise ValueError("Either `y` or `z` must be not None.")
+        elif y is None:
+            inpt = z
+            if not isinstance(z, torch.Tensor):
+                y = torch.from_numpy(y).to(self.device)
+        else:
             z = self.sample(n=len(y))
-        if not isinstance(y, torch.Tensor):
-            y = torch.from_numpy(y).to(self.device)
-        inpt = self.concatenate(z, y).float().to(self.device)
+            if not isinstance(y, torch.Tensor):
+                y = torch.from_numpy(y).to(self.device)
+            inpt = self.concatenate(z, y).float().to(self.device)
+
         sample = self._Z_transformer(inpt)
         if self.training:
             return sample

@@ -50,10 +50,11 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
-        ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
-        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
+        # ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
+        # ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalAAE
     ]
 
     for model in models:
