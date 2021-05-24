@@ -1,11 +1,12 @@
 """
-Full credit for this module goes to github user: sksq96.
+Full credit for this module goes to github user `sksq96` (Shubham Chandel)
+and the other authors of the `pytorch-summary` package.
 
-Check out his implementation on github: https://github.com/sksq96/pytorch-summary.
+Check out their implementation on github: https://github.com/sksq96/pytorch-summary.
 
 Unfortunately the package is currently (2021-05-04) no longer under development and a conda version does not exist.
-This would block us from creating a conda distribution. His package is published under the MIT License, so we fork
-his project (2021-05-04) and use it in this module here.
+This would block us from creating a conda distribution. Their package is published under the MIT License, so we fork
+their code (2021-05-04) and use it in this module here.
 """
 
 import torch
