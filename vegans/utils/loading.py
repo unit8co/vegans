@@ -16,6 +16,7 @@ from vegans.utils.utils import invert_channel_order
 import vegans.utils.architectures as architectures
 
 _SOURCE = "https://vegans-data.s3.eu-west-3.amazonaws.com/"
+_DEFAULT_ROOT = '.vegans/datasets/'
 
 class DatasetMetaData():
     def __init__(self, directory, m5hashes):
@@ -39,7 +40,7 @@ class DatasetLoader(ABC):
     def __init__(self, metadata, root=None):
         self._metadata = metadata
         if root is None:
-            self._root = Path(os.path.join(Path.home(), Path('.vegans/datasets/')))
+            self._root = Path(os.path.join(Path.home(), Path(_DEFAULT_ROOT)))
         else:
             self._root = root
         self.path = self._get_path_dataset()
