@@ -90,7 +90,7 @@ class AAE(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./AAE",
+            folder="./veganModels/AAE",
             secure=True):
 
         self.adv_type = adv_type
@@ -117,9 +117,6 @@ class AAE(AbstractGenerativeModel):
             assert self.generator.output_size == self.x_dim, (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":

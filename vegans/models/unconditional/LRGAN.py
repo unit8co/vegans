@@ -86,7 +86,7 @@ class LRGAN(AbstractGANGAE):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./LRGAN",
+            folder="./veganModels/LRGAN",
             secure=True):
 
         super().__init__(

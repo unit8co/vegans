@@ -90,7 +90,7 @@ class ConditionalLRGAN(AbstractConditionalGANGAE, LRGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CLRGAN",
+            folder="./veganModels/cLRGAN",
             secure=True):
 
 

@@ -93,7 +93,7 @@ class VAEGAN(AbstractGANGAE):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./VAEGAN",
+            folder="./veganModels/VAEGAN",
             secure=True):
 
 

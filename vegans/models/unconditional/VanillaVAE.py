@@ -76,7 +76,7 @@ class VanillaVAE(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./VanillaVAE",
+            folder="./veganModels/VanillaVAE",
             secure=True):
 
         self.decoder = Decoder(decoder, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
@@ -112,9 +112,6 @@ class VanillaVAE(AbstractGenerativeModel):
             assert (self.decoder.output_size == self.x_dim), (
                 "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
             )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = {"Autoencoder": MSELoss()}

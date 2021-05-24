@@ -101,7 +101,7 @@ class ConditionalBicycleGAN(AbstractConditionalGANGAE, BicycleGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CBicycleGAN",
+            folder="./veganModels/cBicycleGAN",
             secure=True):
 
         super().__init__(

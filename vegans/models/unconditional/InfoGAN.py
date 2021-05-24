@@ -96,7 +96,7 @@ class InfoGAN(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./InfoGAN",
+            folder="./veganModels/InfoGAN",
             secure=True):
 
         c_dim_discrete = [c_dim_discrete] if isinstance(c_dim_discrete, int) else c_dim_discrete
@@ -152,9 +152,6 @@ class InfoGAN(AbstractGenerativeModel):
                 "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
                 "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
             )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = {

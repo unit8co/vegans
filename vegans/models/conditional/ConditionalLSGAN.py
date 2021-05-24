@@ -74,7 +74,7 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1, LSGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CLSGAN",
+            folder="./veganModels/cLSGAN",
             secure=True):
 
         super().__init__(

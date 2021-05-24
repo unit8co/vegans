@@ -84,7 +84,7 @@ class WassersteinGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./WassersteinGAN",
+            folder="./veganModels/WassersteinGAN",
             secure=True):
 
         super().__init__(
@@ -99,9 +99,6 @@ class WassersteinGAN(AbstractGAN1v1):
         )
         self._clip_val = clip_val
         self.hyperparameters["clip_val"] = clip_val
-
-    def _default_optimizer(self):
-        return torch.optim.RMSprop
 
     def _default_optimizer(self):
         return torch.optim.RMSprop

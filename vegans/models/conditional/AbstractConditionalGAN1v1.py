@@ -65,7 +65,7 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./AbstractGAN1v1",
+            folder="./veganModels/cAbstractGAN1v1",
             secure=True):
 
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)

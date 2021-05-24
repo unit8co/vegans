@@ -53,8 +53,7 @@ if __name__ == '__main__':
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__)
-        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "folder": folder}
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim}
 
         if model.__name__ in ["AAE"]:
             discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, adv_type="Discriminator", which="example")

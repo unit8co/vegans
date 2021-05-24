@@ -70,7 +70,7 @@ class AbstractConditionalGANGAE(AbstractConditionalGenerativeModel, AbstractGANG
             feature_layer=None,
             fixed_noise_size=32,
             device=None,
-            folder=None,
+            folder="./veganModels/cAbstractConditionalGANGAE",
             ngpu=0,
             secure=True,
             _called_from_conditional=False):

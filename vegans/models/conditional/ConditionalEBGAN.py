@@ -83,7 +83,7 @@ class ConditionalEBGAN(AbstractConditionalGAN1v1, EBGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CEBGAN",
+            folder="./veganModels/cEBGAN",
             secure=True):
 
         super().__init__(

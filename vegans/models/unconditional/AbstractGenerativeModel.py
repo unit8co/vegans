@@ -155,6 +155,9 @@ class AbstractGenerativeModel(ABC):
             optimizers[name] = dict_optim[name](params=network.parameters(), **dict_optim_kwargs[name])
         return optimizers
 
+    def _default_optimizer(self):
+        return torch.optim.Adam
+
     def _check_dict_keys(self, param_dict, where):
         """ Checks if `param_dict` has the correct form.
 
@@ -199,10 +202,6 @@ class AbstractGenerativeModel(ABC):
         )
         assert isinstance(self.neural_nets, dict), "'neural_nets' attribute of AbstractGenerativeModel must be dictionary."
         self._check_dict_keys(self.optimizers, where="_define_optimizer_kwargs")
-
-    @abstractmethod
-    def _default_optimizer(self):
-        pass
 
     @abstractmethod
     def _define_loss(self):
