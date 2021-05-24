@@ -127,7 +127,8 @@ class VAEGAN(AbstractGANGAE):
             #     )
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
-              
+            )
+
 
     def _define_loss(self):
         loss_functions = super()._define_loss()
