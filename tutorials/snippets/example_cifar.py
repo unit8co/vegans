@@ -56,16 +56,14 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
-        # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
+        ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
+        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
+        ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__.replace("Conditional", "c"))
-        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim, "folder": folder}
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
             discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
@@ -145,4 +143,3 @@ if __name__ == '__main__':
         )
         fig.tight_layout()
         plt.savefig(gan_model.folder+"losses.png")
-        # gan_model.save()

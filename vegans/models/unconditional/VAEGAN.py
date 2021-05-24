@@ -26,34 +26,12 @@ import torch
 import numpy as np
 import torch.nn as nn
 
-from torch.nn import MSELoss, BCELoss, L1Loss
-from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversary
-from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
-from vegans.utils.utils import WassersteinLoss
+from torch.nn import L1Loss
+from vegans.utils.networks import Encoder, Generator, Adversary
+from vegans.models.unconditional.AbstractGANGAE import AbstractGANGAE
 
-class VAEGAN(AbstractGenerativeModel):
+class VAEGAN(AbstractGANGAE):
     """
-    VAEGAN
-    ------
-    Implements the Variational Autoencoder Generative Adversarial Network[1].
-
-    Trains on Kullback-Leibler loss for the latent space and attaches a adversary to get better quality output.
-    The Decoder acts as the generator.
-
-    Losses:
-        - Encoder: Kullback-Leibler
-        - Generator / Decoder: Binary cross-entropy
-        - Adversary: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.
-        - lambda_x: Weight for the reconstruction loss of the real x dimensions.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1512.09300.pdf
-
     Parameters
     ----------
     generator: nn.Module
@@ -115,20 +93,14 @@ class VAEGAN(AbstractGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./VAEGAN",
+            folder="./veganModels/VAEGAN",
             secure=True):
 
-        self.adv_type = adv_type
-        self.encoder = Encoder(encoder, input_size=x_dim, device=device, ngpu=ngpu, secure=secure)
-        self.generator = Generator(generator, input_size=z_dim, device=device, ngpu=ngpu, secure=secure)
-        self.adversary = Adversary(adversary, input_size=x_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
-        self.neural_nets = {
-            "Generator": self.generator, "Encoder": self.encoder, "Adversary": self.adversary
-        }
 
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
+            generator=generator, adversary=adversary, encoder=encoder,
+            x_dim=x_dim, z_dim=z_dim, optim=optim, optim_kwargs=optim_kwargs, adv_type=adv_type, feature_layer=feature_layer,
+            fixed_noise_size=fixed_noise_size, device=device, ngpu=ngpu, folder=folder, secure=secure
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
@@ -143,58 +115,31 @@ class VAEGAN(AbstractGenerativeModel):
         self.lambda_x = lambda_x
         self.hyperparameters["lambda_KL"] = lambda_KL
         self.hyperparameters["lambda_x"] = lambda_x
-        self.hyperparameters["adv_type"] = adv_type
 
         if self.secure:
-            if self.encoder.output_size == self.z_dim:
-                raise ValueError(
-                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
-            assert (self.generator.output_size == self.x_dim), (
-                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
+            assert self.encoder.output_size != self.z_dim, (
+                "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+                "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
     def _define_loss(self):
-        if self.adv_type == "Discriminator":
-            loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss(), "Reconstruction": L1Loss()}
-        elif self.adv_type == "Critic":
-            loss_functions = {"Generator": WassersteinLoss(), "Adversary": WassersteinLoss(), "Reconstruction": L1Loss()}
-        else:
-            raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
+        loss_functions = super()._define_loss()
+        loss_functions.update({"Reconstruction": L1Loss()})
         return loss_functions
 
 
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x):
-        return self.encoder(x)
-
-    def calculate_losses(self, X_batch, Z_batch, who=None):
-        if who == "Generator":
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Encoder":
-            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch)
-        elif who == "Adversary":
-            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch)
-        else:
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch)
-            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch))
-            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
-        return losses
-
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(Z_batch_encoded.detach())
-        fake_images_z = self.generate(Z_batch)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded.detach())
+        if fake_images_z is None:
+            fake_images_z = self.generate(Z_batch)
 
         if self.feature_layer is None:
             fake_predictions_x = self.predict(x=fake_images_x)
@@ -221,13 +166,14 @@ class VAEGAN(AbstractGenerativeModel):
             "Reconstruction": gen_loss_reconstruction
         }
 
-    def _calculate_encoder_loss(self, X_batch, Z_batch):
+    def _calculate_encoder_loss(self, X_batch, Z_batch, fake_images_x=None):
         encoded_output = self.encode(x=X_batch)
         mu = self.mu(encoded_output)
         log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+        if fake_images_x is None:
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded)
 
-        fake_images_x = self.generate(z=Z_batch_encoded)
         fake_predictions_x = self.predict(x=fake_images_x)
 
         enc_loss_fake_x = self.loss_functions["Generator"](
@@ -246,14 +192,15 @@ class VAEGAN(AbstractGenerativeModel):
             "Reconstruction": self.lambda_x*enc_loss_reconstruction
         }
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        encoded_output = self.encode(x=X_batch)
-        mu = self.mu(encoded_output)
-        log_variance = self.log_variance(encoded_output)
-        Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
-
-        fake_images_x = self.generate(z=Z_batch_encoded).detach()
-        fake_images_z = self.generate(z=Z_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images_x=None, fake_images_z=None):
+        if fake_images_x is None:
+            encoded_output = self.encode(x=X_batch)
+            mu = self.mu(encoded_output)
+            log_variance = self.log_variance(encoded_output)
+            Z_batch_encoded = mu + torch.exp(log_variance)*Z_batch
+            fake_images_x = self.generate(z=Z_batch_encoded).detach()
+        if fake_images_z is None:
+            fake_images_z = self.generate(Z_batch).detach()
 
         fake_predictions_x = self.predict(x=fake_images_x)
         fake_predictions_z = self.predict(x=fake_images_z)
@@ -277,13 +224,3 @@ class VAEGAN(AbstractGenerativeModel):
             "Adversary_real": adv_loss_real,
             "RealFakeRatio": adv_loss_real / adv_loss_fake_x
         }
-
-    def _step(self, who=None):
-        if who is not None:
-            self.optimizers[who].step()
-            if who == "Adversary":
-                if self.adv_type == "Critic":
-                    for p in self.adversary.parameters():
-                        p.data.clamp_(-0.01, 0.01)
-        else:
-            [optimizer.step() for _, optimizer in self.optimizers.items()]

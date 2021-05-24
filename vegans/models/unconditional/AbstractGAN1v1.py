@@ -105,8 +105,9 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch))
         return losses
 
-    def _calculate_generator_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch)
+    def _calculate_generator_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch)
         if self.feature_layer is None:
             fake_predictions = self.predict(x=fake_images)
             gen_loss = self.loss_functions["Generator"](
@@ -116,8 +117,9 @@ class AbstractGAN1v1(AbstractGenerativeModel):
             gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)
         return {"Generator": gen_loss}
 
-    def _calculate_adversary_loss(self, X_batch, Z_batch):
-        fake_images = self.generate(z=Z_batch).detach()
+    def _calculate_adversary_loss(self, X_batch, Z_batch, fake_images=None):
+        if fake_images is None:
+            fake_images = self.generate(z=Z_batch).detach()
         fake_predictions = self.predict(x=fake_images)
         real_predictions = self.predict(x=X_batch)
 
