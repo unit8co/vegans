@@ -145,4 +145,3 @@ if __name__ == '__main__':
         )
         fig.tight_layout()
         plt.savefig(gan_model.folder+"losses.png")
-        # gan_model.save()

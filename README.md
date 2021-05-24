@@ -307,9 +307,11 @@ All this results should be taken with a grain of salt. They were not extensively
     - Type annotations
     - Documentation website
     - build fancy examples
+
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
   
   - Interpolation
+
 
 
 
