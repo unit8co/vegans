@@ -140,6 +140,7 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel, VAEGAN):
         self.hyperparameters["adv_type"] = adv_type
 
         if self.secure:
+            # TODO: Remove those lines or use them again, but not commented
             # if self.encoder.output_size == self.z_dim:
             #     raise ValueError(
             #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +

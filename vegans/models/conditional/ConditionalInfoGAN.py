@@ -159,6 +159,7 @@ class ConditionalInfoGAN(AbstractConditionalGenerativeModel, InfoGAN):
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
+            # TODO: Remove those lines or use them again, but not commented
             # if self.encoder.output_size == self.c_dim:
             #     raise ValueError(
             #         "Encoder output size is equal to c_dim, but for InfoGAN the encoder last layers for mu, sigma and discrete values " +

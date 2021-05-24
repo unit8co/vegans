@@ -148,6 +148,7 @@ class ConditionalBicycleGAN(AbstractConditionalGenerativeModel, BicycleGAN):
             assert (self.generator.output_size == self.x_dim), (
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
+            # TODO: Remove those lines or use them again, but not commented
             # if self.encoder.output_size == self.z_dim:
             #     raise ValueError(
             #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
