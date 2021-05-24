@@ -10,7 +10,7 @@ from vegans.utils.layers import LayerReshape
 def call_gan_training(generator, adversary):
     gan_model = VanillaGAN(
         generator=generator, adversary=adversary,
-        z_dim=z_dim, x_dim=x_dim, folder="MyModels/GAN",
+        z_dim=z_dim, x_dim=im_dim, folder="./veganModels/GAN",
     )
     # gan_model.summary(save=True)
     gan_model.fit(

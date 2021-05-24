@@ -84,7 +84,7 @@ class WassersteinGANGP(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./WassersteinGANGP",
+            folder="./veganModels/WassersteinGANGP",
             secure=True):
 
         super().__init__(

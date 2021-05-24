@@ -54,12 +54,11 @@ if __name__ == '__main__':
         # ConditionalInfoGAN, ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
         # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN, ConditionalVanillaVAE,
         # ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalAAE
+        ConditionalLRGAN
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__.replace("Conditional", "c"))
-        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim, "folder": folder}
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
             discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")

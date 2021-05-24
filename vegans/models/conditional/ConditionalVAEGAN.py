@@ -27,13 +27,11 @@ import numpy as np
 import torch.nn as nn
 
 from vegans.utils.layers import LayerReshape
-from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import WassersteinLoss
 from vegans.models.unconditional.VAEGAN import VAEGAN
 from vegans.utils.networks import Encoder, Generator, Adversary
-from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
+from vegans.models.conditional.AbstractConditionalGANGAE import AbstractConditionalGANGAE
 
-class ConditionalVAEGAN(AbstractConditionalGenerativeModel, VAEGAN):
+class ConditionalVAEGAN(AbstractConditionalGANGAE, VAEGAN):
     """
     Parameters
     ----------
@@ -100,27 +98,13 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel, VAEGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CVAEGAN",
+            folder="./veganModels/cVAEGAN",
             secure=True):
 
-        enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
-        adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
-        if secure:
-            AbstractConditionalGenerativeModel._check_conditional_network_input(encoder, in_dim=x_dim, y_dim=y_dim, name="Encoder")
-            AbstractConditionalGenerativeModel._check_conditional_network_input(generator, in_dim=z_dim, y_dim=y_dim, name="Generator")
-            AbstractConditionalGenerativeModel._check_conditional_network_input(adversary, in_dim=x_dim, y_dim=y_dim, name="Adversary")
-        self.adv_type = adv_type
-        self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.adversary = Adversary(adversary, input_size=adv_in_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
-        self.neural_nets = {
-            "Generator": self.generator, "Encoder": self.encoder, "Adversary": self.adversary
-        }
-
         super().__init__(
-            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, feature_layer=feature_layer,
-            fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
+            generator=generator, adversary=adversary, encoder=encoder,
+            x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, optim=optim, optim_kwargs=optim_kwargs, adv_type=adv_type,
+            feature_layer=feature_layer, fixed_noise_size=fixed_noise_size, device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
@@ -149,34 +133,11 @@ class ConditionalVAEGAN(AbstractConditionalGenerativeModel, VAEGAN):
             assert (self.generator.output_size == self.x_dim), (
                 "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
+            
 
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x, y=None):
-        if y is None:
-            x_dim = tuple(x.shape[1:])
-            assert x_dim == self.adv_in_dim, (
-                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
-            )
-            return VAEGAN.encode(self, x=x)
-
-        inpt = self.concatenate(x, y).float()
-        return VAEGAN.encode(self, x=inpt)
-
-    def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
-        if who == "Generator":
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        elif who == "Encoder":
-            losses = self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        elif who == "Adversary":
-            losses = self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-        else:
-            losses = self._calculate_generator_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch)
-            losses.update(self._calculate_encoder_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch))
-            losses.update(self._calculate_adversary_loss(X_batch=X_batch, Z_batch=Z_batch, y_batch=y_batch))
-        return losses
-
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         encoded_output = self.encode(x=X_batch, y=y_batch)
         mu = self.mu(encoded_output)

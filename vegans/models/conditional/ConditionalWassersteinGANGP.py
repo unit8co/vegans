@@ -88,7 +88,7 @@ class ConditionalWassersteinGANGP(AbstractConditionalGAN1v1, WassersteinGANGP):
             lmbda_grad=10,
             device=None,
             ngpu=None,
-            folder="./CWassersteinGANGP",
+            folder="./veganModels/cWassersteinGANGP",
             secure=True):
 
         super().__init__(

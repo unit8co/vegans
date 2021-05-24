@@ -46,15 +46,15 @@ if __name__ == '__main__':
     # Training
     #########################################################################
     models = [
-        AAE, BicycleGAN, EBGAN,
-        InfoGAN, KLGAN, LRGAN, LSGAN,
-        VAEGAN, VanillaGAN,
-        VanillaVAE , WassersteinGAN, WassersteinGANGP,
+        # AAE, BicycleGAN, EBGAN,
+        # InfoGAN, KLGAN, LRGAN, LSGAN,
+        # VAEGAN, VanillaGAN,
+        # VanillaVAE , WassersteinGAN, WassersteinGANGP,
+        LRGAN
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__)
-        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "folder": folder}
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim}
 
         if model.__name__ in ["AAE"]:
             discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")

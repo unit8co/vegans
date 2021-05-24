@@ -21,7 +21,6 @@ from vegans.GAN import (
 )
 from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVAE
 
-
 if __name__ == '__main__':
 
     loader = loading.CelebALoader(batch_size=16, max_loaded_images=1000, output_shape=32)
@@ -56,8 +55,7 @@ if __name__ == '__main__':
     ]
 
     for model in models:
-        folder = "MyModels/{}".format(model.__name__.replace("Conditional", "c"))
-        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim, "folder": folder}
+        kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
             discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")

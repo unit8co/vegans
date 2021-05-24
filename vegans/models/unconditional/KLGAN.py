@@ -77,7 +77,7 @@ class KLGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./KLGAN",
+            folder="./veganModels/KLGAN",
             secure=True):
 
         self.eps = eps
@@ -90,9 +90,6 @@ class KLGAN(AbstractGAN1v1):
             device=device, folder=folder, ngpu=ngpu, secure=secure
         )
         self.hyperparameters["eps"] = eps
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = {"Adversary": torch.nn.BCELoss(), "Generator": KLLoss(self.eps)}

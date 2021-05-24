@@ -79,7 +79,7 @@ class ConditionalKLGAN(AbstractConditionalGAN1v1, KLGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CKLGAN",
+            folder="./veganModels/cKLGAN",
             secure=True):
 
         self.eps = eps
