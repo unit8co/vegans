@@ -11,7 +11,6 @@ requirements = [
   "pandas==1.1.5",
   "torch==1.8.1",
   "tensorboard==2.5.0",
-  "torchsummary==1.5.1",
   "torchvision==0.9.1"
 ]
 
