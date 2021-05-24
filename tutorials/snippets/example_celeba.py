@@ -21,7 +21,6 @@ from vegans.GAN import (
 )
 from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVAE
 
-
 if __name__ == '__main__':
 
     datapath = "./data/"

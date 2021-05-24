@@ -1,2 +1,5 @@
 pytest==6.2.3
 tox==3.23.0
+jupyterlab==1.0.0
+sphinx==3.5.4
+sphinx-rtd-theme==0.5.2
