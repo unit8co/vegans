@@ -155,6 +155,9 @@ class AbstractGenerativeModel(ABC):
             optimizers[name] = dict_optim[name](params=network.parameters(), **dict_optim_kwargs[name])
         return optimizers
 
+    def _default_optimizer(self):
+        return torch.optim.Adam
+
     def _check_dict_keys(self, param_dict, where):
         """ Checks if `param_dict` has the correct form.
 
@@ -199,10 +202,6 @@ class AbstractGenerativeModel(ABC):
         )
         assert isinstance(self.neural_nets, dict), "'neural_nets' attribute of AbstractGenerativeModel must be dictionary."
         self._check_dict_keys(self.optimizers, where="_define_optimizer_kwargs")
-
-    @abstractmethod
-    def _default_optimizer(self):
-        pass
 
     @abstractmethod
     def _define_loss(self):
@@ -381,7 +380,7 @@ class AbstractGenerativeModel(ABC):
     # Actions during training
     #########################################################################
     def fit(self, X_train, X_test=None, epochs=5, batch_size=32, steps=None,
-        print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=True):
+        print_every="1e", save_model_every=None, save_images_every=None, save_losses_every="1e", enable_tensorboard=False):
         """ Trains the model, iterating over all contained networks.
 
         Parameters
@@ -719,7 +718,11 @@ class AbstractGenerativeModel(ABC):
         """
         if name is None:
             name = "model.torch"
-        torch.save(self, os.path.join(self.folder, name))
+        if self.folder is not None:
+            torch.save(self, os.path.join(self.folder, name))
+        else:
+            torch.save(self, os.path.join("", name))
+
         print("Model saved to {}.".format(os.path.join(self.folder, name)))
 
     @staticmethod

@@ -25,24 +25,6 @@ from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 class EBGAN(AbstractGAN1v1):
     """
-    EBGAN
-    -----
-    Implements the Energy based GAN[1].
-
-    Uses an auto-encoder as the adversary structure.
-
-    Losses:
-        - Generator: L2 (Mean Squared Error)
-        - Autoencoder: L2 (Mean Squared Error)
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - m: Cut off for the hinge loss. Look at reference for more information.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1609.03126.pdf
-
     Parameters
     ----------
     generator: nn.Module
@@ -95,7 +77,7 @@ class EBGAN(AbstractGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./EBGAN",
+            folder="./veganModels/EBGAN",
             secure=True):
 
         super().__init__(
@@ -114,9 +96,6 @@ class EBGAN(AbstractGAN1v1):
             )
         self.m = m
         self.hyperparameters["m"] = m
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = {"Generator": torch.nn.MSELoss(), "Adversary": torch.nn.MSELoss()}
@@ -137,7 +116,7 @@ class EBGAN(AbstractGAN1v1):
         if self.feature_layer is None:
             fake_predictions = self.predict(x=fake_images)
             gen_loss = self.loss_functions["Generator"](
-                fake_images, fake_predictions
+                fake_predictions, fake_images
             )
         else:
             gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images)

@@ -10,7 +10,6 @@ def test_Dataset():
     data = utils.DataSet(X)
     assert len(data) == len(X)
 
-
 def test_load_mnist():
     datapath = "./data/"
     X_train, y_train, X_test, y_test = loading.load_data(datapath, which="MNIST", download=True)

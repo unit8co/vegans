@@ -14,6 +14,7 @@ You need python 3.7 or above. Then:
 ## How to use
 The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
 
+- Check out the [documentation](https://unit8co.github.io/vegans/) or [quickstart guide](https://unit8co.github.io/vegans/quickstart.html)
 - Read through this README.md file
 - Check out the [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) (00 to 04)
 - If you want to create your own GAN algorithms, check out the notebooks 05 to 07
@@ -295,21 +296,31 @@ All this results should be taken with a grain of salt. They were not extensively
   
 - Other
 
-  - New links to correct github files
-
-    
-
   - Core Improvements:
-
     - Hide feature_layer, secure in **kwargs
-    - Generalize conditional networks and only let them handle correct concatenation
-    - Abstraction for GDE networks (1v1+1)
     - Make it more PEP conform
-    - Make \_default\_optimizer not abstract
-    
-  - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
+    - ~~Make \_default\_optimizer not abstract~~
+    - Windows installation issues
+    - ~~CI workflow~~
+    - Create protected branches
+    - Conda installation
+    - Type annotations
+    - ~~Documentation website~~
+    - build fancy examples
 
+  - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
+  
   - Interpolation
+
+
+
+
+
+
+
+
+
+
 
 
 

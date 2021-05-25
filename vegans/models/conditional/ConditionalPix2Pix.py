@@ -25,24 +25,6 @@ from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditio
 
 class ConditionalPix2Pix(AbstractConditionalGAN1v1):
     """
-    ConditionalPix2Pix
-    ------------------
-    Implements the Pix2Pix GAN[1].
-
-    Uses the binary cross-entropy norm for evaluating the realness of real and fake images.
-    Also enforces a L1 pixel wise penalty on the generated images.
-
-    Losses:
-        - Generator: Binary cross-entropy + L1 (Mean Absolute Error)
-        - Discriminator: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_x: Weight for the reconstruction loss for the real x dimensions.
-    References
-    ----------
-    .. [1] https://arxiv.org/abs/1611.07004
-
     Parameters
     ----------
     generator: nn.Module
@@ -99,7 +81,7 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CPix2Pix",
+            folder="./veganModels/cPix2Pix",
             secure=True):
 
         super().__init__(
@@ -111,9 +93,6 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
         )
         self.lambda_x = 10
         self.hyperparameters["lambda_x"] = self.lambda_x
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = {"Generator": BCELoss(), "Adversary": BCELoss(), "L1": L1Loss()}
@@ -127,7 +106,9 @@ class ConditionalPix2Pix(AbstractConditionalGAN1v1):
                 fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
             )
         else:
-            gen_loss_original = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
+            fake_concat = self.concatenate(fake_images, y_batch)
+            real_concat = self.concatenate(X_batch, y_batch)
+            gen_loss_original = self._calculate_feature_loss(X_real=real_concat, X_fake=fake_concat)
         gen_loss_pixel_wise = self.loss_functions["L1"](
             X_batch, fake_images
         )

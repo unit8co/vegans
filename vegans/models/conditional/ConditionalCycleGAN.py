@@ -34,25 +34,6 @@ from vegans.models.conditional.AbstractConditionalGenerativeModel import Abstrac
 
 class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
     """
-    CycleGAN
-    --------
-    Implements the CycleGAN[1], a method for unpaired image to image translation tasks.
-
-    It consists of two generative adversarial network. one responsible for mapping input from space X to space Y.
-    The other produces output in space X from space Y.
-
-    Losses:
-        - GeneratorX_Y and GeneratorY_X: Binary cross-entropy + cycle consistency
-        - DiscriminatorX_Y and DiscriminatorY_X: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_x: Weight for the reconstruction loss of the real x dimensions.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/abs/1703.10593
-
     Parameters
     ----------
     generatorX_Y: nn.Module
@@ -113,7 +94,7 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CCycleGAN",
+            folder="./veganModels/cCycleGAN",
             secure=True):
 
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
@@ -153,9 +134,6 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
             assert (self.generatorY_X.output_size == self.x_dim), (
                 "GeneratorY_X output shape must be equal to x_dim. {} vs. {}.".format(self.generatorY_X.output_size, self.x_dim)
             )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":

@@ -26,33 +26,13 @@ import numpy as np
 import torch.nn as nn
 
 from vegans.utils.utils import get_input_dim
-from torch.nn import MSELoss, BCELoss, L1Loss
 from vegans.utils.utils import WassersteinLoss
-from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversary
+from vegans.models.unconditional.AAE import AAE
+from vegans.utils.networks import Encoder, Generator, Adversary
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
-class ConditionalAAE(AbstractConditionalGenerativeModel):
+class ConditionalAAE(AbstractConditionalGenerativeModel, AAE):
     """
-    ConditionalAAE
-    --------------
-    Implements the conditional variant of the  Adversarial Autoencoder[1].
-
-    Instead of using the Kullback Leibler divergence to improve the latent space distribution
-    we use a discriminator to determine the "realness" of the latent vector.
-
-    Losses:
-        - Encoder: Kullback-Leibler
-        - Decoder: Binary cross-entropy
-        - Adversary: Binary cross-entropy
-    Default optimizer:
-        - torch.optim.Adam
-    Custom parameter:
-        - lambda_z: Weight for the discriminator loss computing the realness of the latent z dimension.
-
-    References
-    ----------
-    .. [1] https://arxiv.org/pdf/1511.05644.pdf
-
     Parameters
     ----------
     generator: nn.Module
@@ -115,7 +95,7 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CAAE",
+            folder="./veganModels/cAAE",
             secure=True):
 
         enc_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
@@ -128,7 +108,6 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
         self.adv_type = adv_type
         self.encoder = Encoder(encoder, input_size=enc_in_dim, device=device, ngpu=ngpu, secure=secure)
         self.generator = Generator(generator, input_size=gen_in_dim, device=device, ngpu=ngpu, secure=secure)
-        self.autoencoder = Autoencoder(self.encoder, self.generator)
         self.adversary = Adversary(adversary, input_size=adv_in_dim, device=device, ngpu=ngpu, adv_type=adv_type, secure=secure)
         self.neural_nets = {
             "Generator": self.generator, "Encoder": self.encoder, "Adversary": self.adversary
@@ -142,6 +121,7 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
         self.lambda_z = lambda_z
         self.hyperparameters["lambda_z"] = lambda_z
         self.hyperparameters["adv_type"] = adv_type
+        self.adv_in_dim = adv_in_dim
 
         if self.secure:
             assert (self.encoder.output_size == self.z_dim), (
@@ -151,25 +131,20 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
                 "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
 
-    def _default_optimizer(self):
-        return torch.optim.Adam
-
-    def _define_loss(self):
-        if self.adv_type == "Discriminator":
-            loss_functions = {"Generator": MSELoss(), "Adversary": BCELoss()}
-        elif self.adv_type == "Critic":
-            loss_functions = {"Generator": MSELoss(), "Adversary": WassersteinLoss()}
-        else:
-            raise NotImplementedError("'adv_type' must be one of Discriminator or Critic.")
-        return loss_functions
-
 
     #########################################################################
     # Actions during training
     #########################################################################
-    def encode(self, x, y):
+    def encode(self, x, y=None):
+        if y is None:
+            x_dim = tuple(x.shape[1:])
+            assert x_dim == self.adv_in_dim, (
+                "If `y` is None, x must have correct shape. Given: {}. Expected: {}.".format(x_dim, self.adv_in_dim)
+            )
+            return AAE.encode(self, x=x)
+
         inpt = self.concatenate(x, y).float()
-        return self.encoder(inpt)
+        return AAE.encode(self, x=inpt)
 
     def calculate_losses(self, X_batch, Z_batch, y_batch, who=None):
         if who == "Generator":
@@ -187,62 +162,21 @@ class ConditionalAAE(AbstractConditionalGenerativeModel):
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         encoded_output = self.encode(x=X_batch, y=y_batch).detach()
         fake_images = self.generate(y=y_batch, z=encoded_output)
-        gen_loss = self.loss_functions["Generator"](
-            fake_images, X_batch
-        )
-        return {
-            "Generator": gen_loss,
-        }
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return AAE._calculate_generator_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)
 
     def _calculate_encoder_loss(self, X_batch, Z_batch, y_batch):
         encoded_output = self.encode(x=X_batch, y=y_batch)
         fake_images = self.generate(y=y_batch, z=encoded_output)
-
-        if self.feature_layer is None:
-            fake_predictions = self.predict(x=encoded_output, y=y_batch)
-            enc_loss_fake = self.loss_functions["Generator"](
-                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-            )
-        else:
-            enc_loss_fake = self._calculate_feature_loss(X_real=Z_batch, X_fake=encoded_output, y_batch=y_batch)
-        enc_loss_reconstruction = self.loss_functions["Generator"](
-            fake_images, X_batch
+        fake_concat = self.concatenate(encoded_output, y_batch)
+        real_concat = self.concatenate(Z_batch, y_batch)
+        return AAE._calculate_encoder_loss(
+            self, X_batch=X_batch, Z_batch=real_concat, fake_images=fake_images, encoded_output=fake_concat
         )
-
-        enc_loss = enc_loss_fake + enc_loss_reconstruction
-        return {
-            "Encoder": enc_loss,
-            "Encoder_x": enc_loss_fake,
-            "Encoder_fake": enc_loss_reconstruction,
-        }
 
     def _calculate_adversary_loss(self, X_batch, Z_batch, y_batch):
         encoded_output = self.encode(x=X_batch, y=y_batch).detach()
-
-        fake_predictions = self.predict(y=y_batch, x=encoded_output)
-        real_predictions = self.predict(x=Z_batch, y=y_batch)
-
-        adv_loss_fake = self.loss_functions["Adversary"](
-            fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
-        )
-        adv_loss_real = self.loss_functions["Adversary"](
-            real_predictions, torch.ones_like(real_predictions, requires_grad=False)
-        )
-
-        adv_loss = 1/3*(adv_loss_real + adv_loss_fake)
-        return {
-            "Adversary": adv_loss,
-            "Adversary_fake": adv_loss_fake,
-            "Adversary_real": adv_loss_real,
-            "RealFakeRatio": adv_loss_real / adv_loss_fake
-        }
-
-    def _step(self, who=None):
-        if who is not None:
-            self.optimizers[who].step()
-            if who == "Adversary":
-                if self.adv_type == "Critic":
-                    for p in self.adversary.parameters():
-                        p.data.clamp_(-0.01, 0.01)
-        else:
-            [optimizer.step() for _, optimizer in self.optimizers.items()]
+        fake_concat = self.concatenate(encoded_output, y_batch)
+        real_concat = self.concatenate(Z_batch, y_batch)
+        return AAE._calculate_adversary_loss(self, X_batch=None, Z_batch=real_concat, encoded_output=fake_concat)

@@ -65,7 +65,7 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./AbstractGAN1v1",
+            folder="./veganModels/cAbstractGAN1v1",
             secure=True):
 
         adv_in_dim = get_input_dim(dim1=x_dim, dim2=y_dim)
@@ -104,30 +104,12 @@ class AbstractConditionalGAN1v1(AbstractConditionalGenerativeModel, AbstractGAN1
 
     def _calculate_generator_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch)
-        if self.feature_layer is None:
-            fake_predictions = self.predict(x=fake_images, y=y_batch)
-            gen_loss = self.loss_functions["Generator"](
-                fake_predictions, torch.ones_like(fake_predictions, requires_grad=False)
-            )
-        else:
-            gen_loss = self._calculate_feature_loss(X_real=X_batch, X_fake=fake_images, y_batch=y_batch)
-        return {"Generator": gen_loss}
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return AbstractGAN1v1._calculate_generator_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)
 
     def _calculate_adversary_loss(self, X_batch, Z_batch, y_batch):
         fake_images = self.generate(y=y_batch, z=Z_batch).detach()
-        fake_predictions = self.predict(x=fake_images, y=y_batch)
-        real_predictions = self.predict(x=X_batch, y=y_batch)
-
-        adv_loss_fake = self.loss_functions["Adversary"](
-            fake_predictions, torch.zeros_like(fake_predictions, requires_grad=False)
-        )
-        adv_loss_real = self.loss_functions["Adversary"](
-            real_predictions, torch.ones_like(real_predictions, requires_grad=False)
-        )
-        adv_loss = 0.5*(adv_loss_fake + adv_loss_real)
-        return {
-            "Adversary": adv_loss,
-            "Adversary_fake": adv_loss_fake,
-            "Adversary_real": adv_loss_real,
-            "RealFakeRatio": adv_loss_real / adv_loss_fake
-        }
+        fake_concat = self.concatenate(fake_images, y_batch)
+        real_concat = self.concatenate(X_batch, y_batch)
+        return AbstractGAN1v1._calculate_adversary_loss(self, X_batch=real_concat, Z_batch=None, fake_images=fake_concat)
