@@ -6,7 +6,7 @@ with open(path.join(this_directory, 'README.md'), 'r') as f:
     long_description = f.read()
 
 requirements = [
-  "matplotlib==3.4.1",
+  "matplotlib==3.3.4",
   "numpy==1.19.5",
   "pandas==1.1.5",
   "torch==1.8.1",
