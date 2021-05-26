@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example-name: [example-quickstart, 00_univariate-gaussian.ipynb, 01_multivariate-gaussian.ipynb]
+        example-name: [example-quickstart.py, 00_univariate-gaussian.ipynb, 01_multivariate-gaussian.ipynb]
     steps:
       - name: "1. Clone repository"
         uses: actions/checkout@v2
@@ -60,9 +60,9 @@ jobs:
       - name: Install requirements
         run: pip install vegans
 
-      - name: "3. Run examples ${{matrix.example-name}}"
+      - name: "3. Run examples ${{ matrix.example-name }}"
         run: |
-          python ./tutorials/snippets/example_quickstart.py
+          python ./tutorials/snippets/${{ matrix.example-name }}
 
 
 
