@@ -3,8 +3,10 @@
 Vegans is still in an early development phase and we cannot always guarantee backwards compatibility. Changes that may **break code which uses a previous release of Darts** are marked with a "&#x1F534;".
 
 ## [Unreleased](https://github.com/unit8co/vegans/tree/develop)
+[Full Changelog](https://github.com/unit8co/darts/compare/0.3.0...develop)
 
-[Full Changelog](https://github.com/unit8co/vegans/compare/develop)
+
+## [0.3.0](https://github.com/unit8co/vegans/tree/v0.3.0) (2021-05-25)
 
 ### For users of the library:
 **Added**
@@ -14,9 +16,6 @@ Vegans is still in an early development phase and we cannot always guarantee bac
 - The new default folder is no longer "./{{ architecture_name }}", but "./veganModels/{{ architecture_name}}"
 
 ### For developers of the library:
-**Added**
--
-
 **Changed**
 - Conditional networks no longer define their own loss functions and calculations but reuse the implementation of their unconditional counterpart if possible. This saves a lot of duplicated code and helps to implement new conditional models even quicker.
 - CI pipelines added for tests and doc creation
