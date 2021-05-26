@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example-name: [example-quickstart.py, 00_univariate-gaussian.ipynb, 01_multivariate-gaussian.ipynb]
+        example-name: [snippets/example-quickstart.py, notebooks/00_univariate-gaussian.ipynb, notebooks/01_multivariate-gaussian.ipynb]
     steps:
       - name: "1. Clone repository"
         uses: actions/checkout@v2
@@ -62,7 +62,7 @@ jobs:
 
       - name: "3. Run examples ${{ matrix.example-name }}"
         run: |
-          python ./tutorials/snippets/${{ matrix.example-name }}
+          python ./tutorials/${{ matrix.example-name }}
 
 
 
