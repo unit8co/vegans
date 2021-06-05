@@ -14,6 +14,7 @@ You need python 3.7 or above. Then:
 ## How to use
 The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:
 
+- Check out the [documentation](https://unit8co.github.io/vegans/) or [quickstart guide](https://unit8co.github.io/vegans/quickstart.html)
 - Read through this README.md file
 - Check out the [notebooks](https://github.com/unit8co/vegans/tree/master/tutorials/notebooks) (00 to 04)
 - If you want to create your own GAN algorithms, check out the notebooks 05 to 07
@@ -64,18 +65,16 @@ from vegans.GAN import VanillaGAN
 import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 
-# Data preparation
-datapath =  "./data/" # root path to data, if does not exist will be downloaded into this folder
-X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
-X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
-X_test = X_test.reshape((-1, 1, 32, 32))
+# Data preparation (Load your own data or example MNIST)
+loader = loading.MNISTLoader()
+X_train, _, X_test, _ = loader.load()
 x_dim = X_train.shape[1:] # [height, width, nr_channels]
 z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
-generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, which="example")
-discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, adv_type="Discriminator", which="example")
+generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=None)
+discriminator = loader.load_adversary(x_dim=x_dim, y_dim=None)
 
 gan = VanillaGAN(
     generator=generator, adversary=discriminator,
@@ -88,13 +87,11 @@ gan.fit(X_train, enable_tensorboard=False)
 
 # Vizualise results
 images, losses = gan.get_training_results()
-images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
 utils.plot_images(images)
 utils.plot_losses(losses)
 
 # Sample new images, you can also pass a specific noise vector
 samples = gan.generate(n=36)
-samples = samples.reshape(-1, *samples.shape[2:]) # remove nr_channels for plotting
 utils.plot_images(samples)
 ```
 
@@ -107,14 +104,9 @@ import vegans.utils.utils as utils
 import vegans.utils.loading as loading
 from vegans.GAN import ConditionalVanillaGAN
 
-# Data preparation
-datapath =  "./data/" # root path to data, if does not exist will be downloaded into this folder
-X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
-X_train = X_train.reshape((-1, 1, 32, 32)) # required shape
-X_test = X_test.reshape((-1, 1, 32, 32))
-nb_classes = len(set(y_train))
-y_train = np.eye(nb_classes)[y_train.reshape(-1)]
-y_test = np.eye(nb_classes)[y_test.reshape(-1)]
+# Data preparation (Load your own data or example MNIST)
+loader = loading.MNISTLoader()
+X_train, y_train, X_test, y_test = loader.load()
 
 x_dim = X_train.shape[1:] # [nr_channels, height, width]
 y_dim = y_train.shape[1:]
@@ -122,8 +114,8 @@ z_dim = 64
 
 # Define your own architectures here. You can use a Sequential model or an object
 # inheriting from torch.nn.Module. Here, a default model for mnist is loaded.
-generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="mnist")
+generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim)
 
 gan = ConditionalVanillaGAN(
     generator=generator, adversary=discriminator,
@@ -145,17 +137,16 @@ gan.fit(
     batch_size=32, # optional
     steps={"Generator": 1, "Adversary": 2}, # optional, train generator once and discriminator twice on every mini-batch
     print_every="0.1e", # optional, prints progress 10 times per epoch
-    					# (might also be integer input indicating number of mini-batches)
+    # (might also be integer input indicating number of mini-batches)
     save_model_every=None, # optional
     save_images_every=None, # optional
-    save_losses_every="0.1e", # optional, save losses 10 times per epoch in internal losses dictionary used to generate
-    						  # plots during and after training
+    save_losses_every="0.1e", # optional, save losses in internal losses dictionary used to generate
+    # plots during and after training
     enable_tensorboard=False # optional, if true all progress is additionally saved in tensorboard subdirectory
 )
 
 # Vizualise results
 images, losses = gan.get_training_results()
-images = images.reshape(-1, *images.shape[2:]) # remove nr_channels for plotting
 utils.plot_images(images, labels=np.argmax(gan.fixed_labels.cpu().numpy(), axis=1))
 utils.plot_losses(losses)
 
@@ -296,7 +287,6 @@ All this results should be taken with a grain of salt. They were not extensively
 - Other
 
   - Core Improvements:
-
     - Hide feature_layer, secure in **kwargs
     - Make it more PEP conform
     - ~~Make \_default\_optimizer not abstract~~
@@ -305,11 +295,23 @@ All this results should be taken with a grain of salt. They were not extensively
     - Create protected branches
     - Conda installation
     - Type annotations
-    - Documentation website
+    - ~~Documentation website~~
     - build fancy examples
+
   - Perceptual Loss [here](https://arxiv.org/pdf/1603.08155.pdf)
   
   - Interpolation
+
+
+
+
+
+
+
+
+
+
+
 
 
 

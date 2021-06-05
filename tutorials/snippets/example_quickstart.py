@@ -7,7 +7,7 @@ import vegans.utils.loading as loading
 from vegans.utils.utils import plot_images
 from vegans.GAN import ConditionalVanillaGAN
 
-loader = loading.MNISTLoader()
+loader = loading.MNISTLoader(root=None)
 X_train, y_train, X_test, y_test = loader.load()
 
 x_dim = X_train.shape[1:]

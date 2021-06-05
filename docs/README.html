@@ -195,6 +195,7 @@ However researchers may also find the GenerativeModel base class useful for quic
 <h2>How to use<a class="headerlink" href="#how-to-use" title="Permalink to this headline">¶</a></h2>
 <p>The basic idea is that the user provides discriminator / critic and generator networks (additionally an encoder if needed), and the library takes care of training them in a selected GAN setting. To get familiar with the library:</p>
 <ul class="simple">
+<li><p>Check out the <a class="reference external" href="https://unit8co.github.io/vegans/">documentation</a> or <a class="reference external" href="https://unit8co.github.io/vegans/quickstart.html">quickstart guide</a></p></li>
 <li><p>Read through this README.md file</p></li>
 <li><p>Check out the <a class="reference external" href="https://github.com/unit8co/vegans/tree/master/tutorials/notebooks">notebooks</a> (00 to 04)</p></li>
 <li><p>If you want to create your own GAN algorithms, check out the notebooks 05 to 07</p></li>
@@ -236,18 +237,16 @@ However researchers may also find the GenerativeModel base class useful for quic
 <span class="kn">import</span> <span class="nn">vegans.utils.utils</span> <span class="k">as</span> <span class="nn">utils</span>
 <span class="kn">import</span> <span class="nn">vegans.utils.loading</span> <span class="k">as</span> <span class="nn">loading</span>
 
-<span class="c1"># Data preparation</span>
-<span class="n">datapath</span> <span class="o">=</span>  <span class="s2">&quot;./data/&quot;</span> <span class="c1"># root path to data, if does not exist will be downloaded into this folder</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span> <span class="c1"># required shape</span>
-<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
+<span class="c1"># Data preparation (Load your own data or example MNIST)</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">MNISTLoader</span><span class="p">()</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="n">x_dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># [height, width, nr_channels]</span>
 <span class="n">z_dim</span> <span class="o">=</span> <span class="mi">64</span>
 
 <span class="c1"># Define your own architectures here. You can use a Sequential model or an object</span>
 <span class="c1"># inheriting from torch.nn.Module. Here, a default model for mnist is loaded.</span>
-<span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
-<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
 <span class="n">gan</span> <span class="o">=</span> <span class="n">VanillaGAN</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span>
@@ -260,13 +259,11 @@ However researchers may also find the GenerativeModel base class useful for quic
 
 <span class="c1"># Vizualise results</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">get_training_results</span><span class="p">()</span>
-<span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">plot_losses</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
 
 <span class="c1"># Sample new images, you can also pass a specific noise vector</span>
 <span class="n">samples</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span>
-<span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -279,14 +276,9 @@ However researchers may also find the GenerativeModel base class useful for quic
 <span class="kn">import</span> <span class="nn">vegans.utils.loading</span> <span class="k">as</span> <span class="nn">loading</span>
 <span class="kn">from</span> <span class="nn">vegans.GAN</span> <span class="kn">import</span> <span class="n">ConditionalVanillaGAN</span>
 
-<span class="c1"># Data preparation</span>
-<span class="n">datapath</span> <span class="o">=</span>  <span class="s2">&quot;./data/&quot;</span> <span class="c1"># root path to data, if does not exist will be downloaded into this folder</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">datapath</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span> <span class="c1"># required shape</span>
-<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
-<span class="n">nb_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
-<span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="c1"># Data preparation (Load your own data or example MNIST)</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">MNISTLoader</span><span class="p">()</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
 <span class="n">x_dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="c1"># [nr_channels, height, width]</span>
 <span class="n">y_dim</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -294,8 +286,8 @@ However researchers may also find the GenerativeModel base class useful for quic
 
 <span class="c1"># Define your own architectures here. You can use a Sequential model or an object</span>
 <span class="c1"># inheriting from torch.nn.Module. Here, a default model for mnist is loaded.</span>
-<span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
-<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
 
 <span class="n">gan</span> <span class="o">=</span> <span class="n">ConditionalVanillaGAN</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span>
@@ -317,17 +309,16 @@ However researchers may also find the GenerativeModel base class useful for quic
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="c1"># optional</span>
     <span class="n">steps</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Generator&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Adversary&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span> <span class="c1"># optional, train generator once and discriminator twice on every mini-batch</span>
     <span class="n">print_every</span><span class="o">=</span><span class="s2">&quot;0.1e&quot;</span><span class="p">,</span> <span class="c1"># optional, prints progress 10 times per epoch</span>
-    					<span class="c1"># (might also be integer input indicating number of mini-batches)</span>
+    <span class="c1"># (might also be integer input indicating number of mini-batches)</span>
     <span class="n">save_model_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
     <span class="n">save_images_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># optional</span>
-    <span class="n">save_losses_every</span><span class="o">=</span><span class="s2">&quot;0.1e&quot;</span><span class="p">,</span> <span class="c1"># optional, save losses 10 times per epoch in internal losses dictionary used to generate</span>
-    						  <span class="c1"># plots during and after training</span>
+    <span class="n">save_losses_every</span><span class="o">=</span><span class="s2">&quot;0.1e&quot;</span><span class="p">,</span> <span class="c1"># optional, save losses in internal losses dictionary used to generate</span>
+    <span class="c1"># plots during and after training</span>
     <span class="n">enable_tensorboard</span><span class="o">=</span><span class="kc">False</span> <span class="c1"># optional, if true all progress is additionally saved in tensorboard subdirectory</span>
 <span class="p">)</span>
 
 <span class="c1"># Vizualise results</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">losses</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">get_training_results</span><span class="p">()</span>
-<span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span> <span class="c1"># remove nr_channels for plotting</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gan</span><span class="o">.</span><span class="n">fixed_labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">plot_losses</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
 
@@ -475,7 +466,7 @@ Alternatively, can run example <a class="reference external" href="https://githu
 <li><p>Create protected branches</p></li>
 <li><p>Conda installation</p></li>
 <li><p>Type annotations</p></li>
-<li><p>Documentation website</p></li>
+<li><p>~~Documentation website~~</p></li>
 <li><p>build fancy examples</p></li>
 </ul>
 </li>
