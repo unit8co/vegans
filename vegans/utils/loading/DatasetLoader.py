@@ -31,7 +31,7 @@ class DatasetLoader(ABC):
     def __init__(self, metadata, root=None):
         self._metadata = metadata
         if root is None:
-            self._root = Path(os.path.join(Path.home(), Path(_DEFAULT_ROOT)))
+            self._root = Path.home() / _DEFAULT_ROOT
         else:
             self._root = root
         self.path = self._get_path_dataset()

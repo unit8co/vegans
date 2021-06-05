@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        example-name: [snippets/example-quickstart.py, notebooks/00_univariate-gaussian.ipynb, notebooks/01_multivariate-gaussian.ipynb]
+        example-name: [snippets/example_quickstart.py]
     steps:
       - name: "1. Clone repository"
         uses: actions/checkout@v2
