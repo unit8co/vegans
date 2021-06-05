@@ -1,6 +1,6 @@
 import torch
 
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.utils.networks import Generator, Adversary
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel

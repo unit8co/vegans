@@ -30,7 +30,7 @@ import torch.nn as nn
 from vegans.utils.layers import LayerReshape
 from vegans.models.unconditional.InfoGAN import InfoGAN
 from vegans.utils.networks import Generator, Adversary, Encoder
-from vegans.utils.utils import get_input_dim, NormalNegativeLogLikelihood
+from vegans.utils import get_input_dim, NormalNegativeLogLikelihood
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 
 class ConditionalInfoGAN(AbstractConditionalGenerativeModel, InfoGAN):

@@ -24,7 +24,7 @@ import numpy as np
 import torch.nn as nn
 
 from vegans.utils.layers import LayerReshape
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.models.unconditional.VanillaVAE import VanillaVAE
 from vegans.utils.networks import Encoder, Decoder, Autoencoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel

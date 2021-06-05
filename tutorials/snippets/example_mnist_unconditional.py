@@ -1,5 +1,5 @@
 import numpy as np
-import vegans.utils.utils as utils
+import vegans.utils as utils
 import vegans.utils.loading as loading
 import matplotlib.pyplot as plt
 

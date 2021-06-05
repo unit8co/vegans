@@ -8,7 +8,7 @@ import pytest
 import numpy as np
 
 from vegans.GAN import ConditionalAAE, ConditionalBicycleGAN, ConditionalLRGAN, ConditionalVAEGAN
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.utils.layers import LayerReshape
 
 networks_flat = [
