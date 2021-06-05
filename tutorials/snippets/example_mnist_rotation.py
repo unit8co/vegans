@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     loader = loading.MNISTLoader()
     X_train, _, X_test, _ = loader.load()
-    X_train = X_train[:500]
+    # X_train = X_train[:500]
     y_train = np.array([np.rot90(im) for im in X_train[:, 0, :, :]]).reshape((-1, 1, 32, 32))
     y_test = np.array([np.rot90(im) for im in X_test[:, 0, :, :]]).reshape((-1, 1, 32, 32))
     epochs = 1

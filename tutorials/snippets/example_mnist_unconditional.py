@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     loader = loading.MNISTLoader()
     X_train, _, X_test, _ = loader.load()
-    X_train = X_train[:500]
+    # X_train = X_train
     epochs = 1
     batch_size = 32
 

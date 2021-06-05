@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     loader = loading.CIFAR10Loader()
     X_train, y_train, X_test, y_test = loader.load()
-    X_train, y_train = X_train[:300], y_train[:300]
+    # X_train, y_train = X_train[:300], y_train[:300]
 
     epochs = 1
     batch_size = 32
