@@ -100,7 +100,6 @@ if __name__ == '__main__':
             raise NotImplementedError("{} no yet implemented in logical gate.".format(model.__name__))
 
         gan_model.summary(save=True)
-        raise
         gan_model.fit(
             X_train=train_dataloader,
             y_train=None,
