@@ -5,8 +5,8 @@ import torch
 import numpy as np
 
 from torch import nn
-from torchsummary import summary
 from torch.nn import Module, Sequential
+from vegans.utils.torchsummary import summary
 
 
 class NeuralNetwork(Module):

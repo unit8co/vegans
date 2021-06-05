@@ -16,8 +16,6 @@ References
 .. [1] https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf
 """
 
-import torch
-
 from vegans.models.unconditional.LSGAN import LSGAN
 from vegans.models.conditional.AbstractConditionalGAN1v1 import AbstractConditionalGAN1v1
 
@@ -76,7 +74,7 @@ class ConditionalLSGAN(AbstractConditionalGAN1v1, LSGAN):
             fixed_noise_size=32,
             device=None,
             ngpu=None,
-            folder="./CLSGAN",
+            folder="./veganModels/cLSGAN",
             secure=True):
 
         super().__init__(

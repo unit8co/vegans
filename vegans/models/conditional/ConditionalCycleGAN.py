@@ -94,7 +94,7 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
             fixed_noise_size=32,
             device=None,
             ngpu=0,
-            folder="./CCycleGAN",
+            folder="./veganModels/cCycleGAN",
             secure=True):
 
         gen_in_dim = get_input_dim(dim1=z_dim, dim2=y_dim)
@@ -134,9 +134,6 @@ class ConditionalCycleGAN(AbstractConditionalGenerativeModel):
             assert (self.generatorY_X.output_size == self.x_dim), (
                 "GeneratorY_X output shape must be equal to x_dim. {} vs. {}.".format(self.generatorY_X.output_size, self.x_dim)
             )
-
-    def _default_optimizer(self):
-        return torch.optim.Adam
 
     def _define_loss(self):
         if self.adv_type == "Discriminator":
