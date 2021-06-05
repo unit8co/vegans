@@ -1,0 +1,742 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.utils package &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="copyright" title="Copyright" href="copyright.html" />
+    <link rel="next" title="vegans.utils.loading package" href="vegans.utils.loading.html" />
+    <link rel="prev" title="vegans.models.unconditional package" href="vegans.models.unconditional.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="vegans.html">vegans package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="vegans.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="vegans.models.html">vegans.models package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">vegans.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans.GAN">vegans.GAN module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">vegans</a> &raquo;</li>
+        
+          <li><a href="vegans.html">vegans package</a> &raquo;</li>
+        
+      <li>vegans.utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vegans.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vegans-utils-package">
+<h1>vegans.utils package<a class="headerlink" href="#vegans-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vegans.utils.loading.html">vegans.utils.loading package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="vegans.utils.loading.architectures.html">vegans.utils.loading.architectures package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.architectures.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.celeba">vegans.utils.loading.architectures.celeba module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.example">vegans.utils.loading.architectures.example module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.mnist">vegans.utils.loading.architectures.mnist module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CIFAR100Loader">vegans.utils.loading.CIFAR100Loader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CIFAR10Loader">vegans.utils.loading.CIFAR10Loader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CelebALoader">vegans.utils.loading.CelebALoader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.DatasetLoader">vegans.utils.loading.DatasetLoader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.ExampleLoader">vegans.utils.loading.ExampleLoader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.FashionMNISTLoader">vegans.utils.loading.FashionMNISTLoader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.MNISTLoader">vegans.utils.loading.MNISTLoader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vegans.utils.layers">
+<span id="vegans-utils-layers-module"></span><h2>vegans.utils.layers module<a class="headerlink" href="#module-vegans.utils.layers" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.layers.LayerInception">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.layers.</span></code><code class="sig-name descname"><span class="pre">LayerInception</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerInception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerInception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Implementation of the inception layer architecture.</p>
+<p>Uses a network in network (NIN) architecture to make networks wider
+and deeper.</p>
+<dl class="py method">
+<dt id="vegans.utils.layers.LayerInception.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerInception.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerInception.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.layers.LayerInception.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.layers.LayerInception.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.layers.LayerPrintSize">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.layers.</span></code><code class="sig-name descname"><span class="pre">LayerPrintSize</span></code><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerPrintSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerPrintSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Prints the size of a layer without performing any operation.</p>
+<p>Mainly used for debugging to find the layer shape at a certain depth of the network.</p>
+<dl class="py method">
+<dt id="vegans.utils.layers.LayerPrintSize.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerPrintSize.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerPrintSize.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.layers.LayerPrintSize.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.layers.LayerPrintSize.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.layers.LayerReshape">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.layers.</span></code><code class="sig-name descname"><span class="pre">LayerReshape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerReshape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerReshape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Reshape a tensor.</p>
+<p>Might be used in a densely connected network in the last layer to produce an image output.</p>
+<dl class="py method">
+<dt id="vegans.utils.layers.LayerReshape.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerReshape.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerReshape.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.layers.LayerReshape.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.layers.LayerReshape.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.layers.LayerResidualConvBlock">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.layers.</span></code><code class="sig-name descname"><span class="pre">LayerResidualConvBlock</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_layers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerResidualConvBlock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerResidualConvBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Implementation of the inception layer architecture.</p>
+<p>Uses a network in network (NIN) architecture to make networks wider
+and deeper.</p>
+<dl class="py method">
+<dt id="vegans.utils.layers.LayerResidualConvBlock.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/layers.html#LayerResidualConvBlock.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.layers.LayerResidualConvBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.layers.LayerResidualConvBlock.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.layers.LayerResidualConvBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.networks">
+<span id="vegans-utils-networks-module"></span><h2>vegans.utils.networks module<a class="headerlink" href="#module-vegans.utils.networks" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.networks.Adversary">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">Adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.networks.NeuralNetwork" title="vegans.utils.networks.NeuralNetwork"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.networks.NeuralNetwork</span></code></a></p>
+<p>Implements adversary architecture.</p>
+<p>Might either be a discriminator (output [0, 1]) or critic (output [-Inf, Inf]).</p>
+<dl class="py method">
+<dt id="vegans.utils.networks.Adversary.predict">
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Adversary.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Adversary.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.networks.Adversary.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.Adversary.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.networks.Autoencoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">Autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.networks.Autoencoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Autoencoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Autoencoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.networks.Autoencoder.get_number_params">
+<code class="sig-name descname"><span class="pre">get_number_params</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Autoencoder.get_number_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Autoencoder.get_number_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of parameters in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary containing the number of parameters per network.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.networks.Autoencoder.summary">
+<code class="sig-name descname"><span class="pre">summary</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Autoencoder.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Autoencoder.summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.networks.Autoencoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.Autoencoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.networks.Decoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">Decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.networks.NeuralNetwork" title="vegans.utils.networks.NeuralNetwork"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.networks.NeuralNetwork</span></code></a></p>
+<dl class="py attribute">
+<dt id="vegans.utils.networks.Decoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.Decoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.networks.Encoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">Encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.networks.NeuralNetwork" title="vegans.utils.networks.NeuralNetwork"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.networks.NeuralNetwork</span></code></a></p>
+<dl class="py attribute">
+<dt id="vegans.utils.networks.Encoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.Encoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.networks.Generator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">Generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#Generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.networks.NeuralNetwork" title="vegans.utils.networks.NeuralNetwork"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.networks.NeuralNetwork</span></code></a></p>
+<dl class="py attribute">
+<dt id="vegans.utils.networks.Generator.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.Generator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.networks.NeuralNetwork">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.networks.</span></code><code class="sig-name descname"><span class="pre">NeuralNetwork</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#NeuralNetwork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.NeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Basic abstraction for single networks.</p>
+<p>These networks form the building blocks for the generative adversarial networks.
+Mainly responsible for consistency checks.</p>
+<dl class="py method">
+<dt id="vegans.utils.networks.NeuralNetwork.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#NeuralNetwork.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.NeuralNetwork.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.networks.NeuralNetwork.get_number_params">
+<code class="sig-name descname"><span class="pre">get_number_params</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#NeuralNetwork.get_number_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.NeuralNetwork.get_number_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.networks.NeuralNetwork.summary">
+<code class="sig-name descname"><span class="pre">summary</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/networks.html#NeuralNetwork.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.networks.NeuralNetwork.summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.networks.NeuralNetwork.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.networks.NeuralNetwork.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.plot2DModel">
+<span id="vegans-utils-plot2dmodel-module"></span><h2>vegans.utils.plot2DModel module<a class="headerlink" href="#module-vegans.utils.plot2DModel" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="vegans.utils.plot2DModel.onclick">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.plot2DModel.</span></code><code class="sig-name descname"><span class="pre">onclick</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/plot2DModel.html#onclick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.plot2DModel.onclick" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.plot2DModel.plot_2d_grid">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.plot2DModel.</span></code><code class="sig-name descname"><span class="pre">plot_2d_grid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/plot2DModel.html#plot_2d_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.plot2DModel.plot_2d_grid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.plot2DModel.plot_on_click">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.plot2DModel.</span></code><code class="sig-name descname"><span class="pre">plot_on_click</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/plot2DModel.html#plot_on_click"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.plot2DModel.plot_on_click" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.torchsummary">
+<span id="vegans-utils-torchsummary-module"></span><h2>vegans.utils.torchsummary module<a class="headerlink" href="#module-vegans.utils.torchsummary" title="Permalink to this headline">¶</a></h2>
+<p>Full credit for this module goes to github user <cite>sksq96</cite> (Shubham Chandel)
+and the other authors of the <cite>pytorch-summary</cite> package.</p>
+<p>Check out their implementation on github: <a class="reference external" href="https://github.com/sksq96/pytorch-summary">https://github.com/sksq96/pytorch-summary</a>.</p>
+<p>Unfortunately the package is currently (2021-05-04) no longer under development and a conda version does not exist.
+This would block us from creating a conda distribution. Their package is published under the MIT License, so we fork
+their code (2021-05-04) and use it in this module here.</p>
+<dl class="py function">
+<dt id="vegans.utils.torchsummary.summary">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.torchsummary.</span></code><code class="sig-name descname"><span class="pre">summary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">device(type='cuda',</span> <span class="pre">index=0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/torchsummary.html#summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.torchsummary.summary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.torchsummary.summary_string">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.torchsummary.</span></code><code class="sig-name descname"><span class="pre">summary_string</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">device(type='cuda',</span> <span class="pre">index=0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/torchsummary.html#summary_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.torchsummary.summary_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.utils">
+<span id="vegans-utils-utils-module"></span><h2>vegans.utils.utils module<a class="headerlink" href="#module-vegans.utils.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.utils.DataSet">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">DataSet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#DataSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.DataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.utils.KLLoss">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">KLLoss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#KLLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.KLLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.utils.KLLoss.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#KLLoss.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.KLLoss.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Kullback-Leibler loss for GANs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input</strong> (<em>torch.Tensor</em>) – Input tensor. Output of a critic.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>KL divergence</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.utils.NormalNegativeLogLikelihood">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">NormalNegativeLogLikelihood</span></code><a class="reference internal" href="_modules/vegans/utils/utils.html#NormalNegativeLogLikelihood"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.NormalNegativeLogLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.utils.WassersteinLoss">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">WassersteinLoss</span></code><a class="reference internal" href="_modules/vegans/utils/utils.html#WassersteinLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.WassersteinLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.utils.WassersteinLoss.__call__">
+<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#WassersteinLoss.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.WassersteinLoss.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Wasserstein loss / divergence.</p>
+<p>Also known as earthmover distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>torch.Tensor</em>) – Input tensor. Output of a critic.</p></li>
+<li><p><strong>target</strong> (<em>torch.Tensor</em>) – Label, either 1 or -1. Zeros are translated to -1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Wasserstein divergence</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.concatenate">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">concatenate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#concatenate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.concatenate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concatenates two 2D or 4D tensors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor1</strong> (<em>torch.Tensor</em>) – 2D or 4D tensor.</p></li>
+<li><p><strong>tensor2</strong> (<em>torch.Tensor</em>) – 2D or 4D tensor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Cncatenation of tensor1 and tensor2.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>NotImplementedError</strong> – If tensors do not have 2 or 4 dimensions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.create_gif">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">create_gif</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#create_gif"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.create_gif" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a GIF from images contained on the source path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_path</strong> (<em>string</em>) – Path pointing to the source directory with .png files.</p></li>
+<li><p><strong>target_path</strong> (<em>string</em><em>, </em><em>optional</em>) – Name of the created GIF.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.get_input_dim">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">get_input_dim</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#get_input_dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.get_input_dim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of input dimension from two inputs.</p>
+<p>Tensors often need to be concatenated in different ways, especially for conditional algorithms
+leveraging label information. This function returns the output dimensions of a tensor after the concatenation of
+two 2D tensors (two vectors), two 4D tensors (two images) or one 2D tensor with another 4D Tensor (vector with image).
+For both tensors the first dimension will be number of samples which is not considered in this function.
+Therefore <cite>dim1</cite> and <cite>dim2</cite> are both either 1D or 3D Tensors indicating the vector or
+image dimensions (nr_channles, height, width).
+In a usual use case <cite>dim1</cite> is either the latent z dimension (often a vector) or a sample from the sample space
+(might be an image). <cite>dim2</cite> often represents the conditional y dimension that is concatenated with the noise
+or a sample vefore passing it to a neural network.</p>
+<p>This function ca be used to get the input dimension for the generator, adversary, encoder or decoder in a
+conditional use case.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim1</strong> (<em>int</em><em>, </em><em>iterable</em>) – Dimension of input 1.</p></li>
+<li><p><strong>dim2</strong> (<em>int</em><em>, </em><em>iterable</em>) – Dimension of input 2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output dimension after concatenation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.invert_channel_order">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">invert_channel_order</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#invert_channel_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.invert_channel_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.plot_images">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">plot_images</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#plot_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.plot_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a number of input images with optional label</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>images</strong> (<em>np.array</em>) – Must be of shape [nr_samples, height, width] or [nr_samples, height, width, 3].</p></li>
+<li><p><strong>labels</strong> (<em>np.array</em><em>, </em><em>optional</em>) – Array of labels used in the title.</p></li>
+<li><p><strong>show</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, <cite>plt.show</cite> is called to visualise the images directly.</p></li>
+<li><p><strong>n</strong> (<em>None</em><em>, </em><em>optional</em>) – Number of images to be drawn, maximum is 36.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Created figure and axis objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plt.figure, plt.axis</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.utils.plot_losses">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.utils.</span></code><code class="sig-name descname"><span class="pre">plot_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">losses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/utils.html#plot_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.utils.plot_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots losses for generator and discriminator on a common plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>losses</strong> (<em>dict</em>) – <p>Dictionary containing the losses for some networks. The structure of the dictionary is:
+<a href="#id1"><span class="problematic" id="id2">``</span></a>`
+{</p>
+<blockquote>
+<div><p>mode1: {loss_type1_1: losses1_1, loss_type1_2: losses1_2, …},
+mode2: {loss_type2_1: losses2_1, loss_type2_2: losses2_2, …},
+…</p>
+</div></blockquote>
+<p>where <cite>mode</cite> is probably one of “Train” or “Test”, loss_type might be “Generator”, “Adversary”, “Encoder”, …
+and losses are lists of loss values collected during training.</p>
+</p></li>
+<li><p><strong>show</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, <cite>plt.show</cite> is called to visualise the images directly.</p></li>
+<li><p><strong>share</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, axis ticks are shared between plots.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Created figure and axis objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plt.figure, plt.axis</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vegans.utils" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="vegans.utils.loading.html" class="btn btn-neutral float-right" title="vegans.utils.loading package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="vegans.models.unconditional.html" class="btn btn-neutral float-left" title="vegans.models.unconditional package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

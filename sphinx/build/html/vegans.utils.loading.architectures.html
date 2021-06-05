@@ -1,0 +1,875 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.utils.loading.architectures package &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="copyright" title="Copyright" href="copyright.html" />
+    <link rel="prev" title="vegans.utils.loading package" href="vegans.utils.loading.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="vegans.html">vegans package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="vegans.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="vegans.models.html">vegans.models package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="vegans.utils.html">vegans.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans.GAN">vegans.GAN module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">vegans</a> &raquo;</li>
+        
+          <li><a href="vegans.html">vegans package</a> &raquo;</li>
+        
+          <li><a href="vegans.utils.html">vegans.utils package</a> &raquo;</li>
+        
+          <li><a href="vegans.utils.loading.html">vegans.utils.loading package</a> &raquo;</li>
+        
+      <li>vegans.utils.loading.architectures package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vegans.utils.loading.architectures.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vegans-utils-loading-architectures-package">
+<h1>vegans.utils.loading.architectures package<a class="headerlink" href="#vegans-utils-loading-architectures-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vegans.utils.loading.architectures.celeba">
+<span id="vegans-utils-loading-architectures-celeba-module"></span><h2>vegans.utils.loading.architectures.celeba module<a class="headerlink" href="#module-vegans.utils.loading.architectures.celeba" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.celeba.MyAdversary">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">MyAdversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adv_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_layer_activation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyAdversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyAdversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.celeba.MyAdversary.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyAdversary.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyAdversary.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.celeba.MyAdversary.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyAdversary.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.celeba.MyDecoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">MyDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.celeba.MyDecoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyDecoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyDecoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.celeba.MyDecoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyDecoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.celeba.MyEncoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">MyEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.celeba.MyEncoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.celeba.MyEncoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyEncoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.celeba.MyGenerator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">MyGenerator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.celeba.MyGenerator.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#MyGenerator.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyGenerator.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.celeba.MyGenerator.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.MyGenerator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.celeba.load_celeba_adversary">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">load_celeba_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Critic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#load_celeba_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.load_celeba_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some celeba architecture for the adversary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for adversary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.celeba.load_celeba_decoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">load_celeba_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#load_celeba_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.load_celeba_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for decoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.celeba.load_celeba_encoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">load_celeba_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#load_celeba_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.load_celeba_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some celeba architecture for the encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for encoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.celeba.load_celeba_generator">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.celeba.</span></code><code class="sig-name descname"><span class="pre">load_celeba_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/celeba.html#load_celeba_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.celeba.load_celeba_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some celeba architecture for the generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>None</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for generator,.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.architectures.example">
+<span id="vegans-utils-loading-architectures-example-module"></span><h2>vegans.utils.loading.architectures.example module<a class="headerlink" href="#module-vegans.utils.loading.architectures.example" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.example.MyAdversary">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">MyAdversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adv_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyAdversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAdversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.example.MyAdversary.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyAdversary.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAdversary.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.example.MyAdversary.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAdversary.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.example.MyAutoEncoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">MyAutoEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adv_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyAutoEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAutoEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.example.MyAutoEncoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyAutoEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAutoEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.example.MyAutoEncoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyAutoEncoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.example.MyDecoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">MyDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.example.MyDecoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyDecoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyDecoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.example.MyDecoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyDecoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.example.MyEncoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">MyEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.example.MyEncoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.example.MyEncoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyEncoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.example.MyGenerator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">MyGenerator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gen_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.example.MyGenerator.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#MyGenerator.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyGenerator.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.example.MyGenerator.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.example.MyGenerator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.example.load_example_adversary">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">load_example_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Critic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#load_example_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.load_example_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some example architecture for the adversary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for adversary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.example.load_example_autoencoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">load_example_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#load_example_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.load_example_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some example architecture for the auto-encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for autoencoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.example.load_example_decoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">load_example_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#load_example_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.load_example_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some example architecture for the decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>None</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for decoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.example.load_example_encoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">load_example_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#load_example_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.load_example_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some example architecture for the encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>None</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for encoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.example.load_example_generator">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.example.</span></code><code class="sig-name descname"><span class="pre">load_example_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/example.html#load_example_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.example.load_example_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some example architecture for the generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for generator,.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.architectures.mnist">
+<span id="vegans-utils-loading-architectures-mnist-module"></span><h2>vegans.utils.loading.architectures.mnist module<a class="headerlink" href="#module-vegans.utils.loading.architectures.mnist" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.mnist.MyAdversary">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">MyAdversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adv_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyAdversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAdversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.mnist.MyAdversary.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyAdversary.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAdversary.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.mnist.MyAdversary.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAdversary.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.mnist.MyAutoEncoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">MyAutoEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ae_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyAutoEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAutoEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.mnist.MyAutoEncoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyAutoEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAutoEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.mnist.MyAutoEncoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyAutoEncoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.mnist.MyDecoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">MyDecoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.mnist.MyDecoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyDecoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyDecoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.mnist.MyDecoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyDecoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.mnist.MyEncoder">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">MyEncoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_in_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.mnist.MyEncoder.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyEncoder.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyEncoder.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.mnist.MyEncoder.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyEncoder.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.architectures.mnist.MyGenerator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">MyGenerator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gen_in_dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.architectures.mnist.MyGenerator.forward">
+<code class="sig-name descname"><span class="pre">forward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#MyGenerator.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyGenerator.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="vegans.utils.loading.architectures.mnist.MyGenerator.training">
+<code class="sig-name descname"><span class="pre">training</span></code><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.MyGenerator.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.mnist.load_mnist_adversary">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">load_mnist_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Critic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#load_mnist_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.load_mnist_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the adversary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for adversary.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.mnist.load_mnist_autoencoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">load_mnist_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#load_mnist_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.load_mnist_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the auto-encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for autoencoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.mnist.load_mnist_decoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">load_mnist_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#load_mnist_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.load_mnist_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for decoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.mnist.load_mnist_encoder">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">load_mnist_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#load_mnist_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.load_mnist_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the encoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the real data.</p></li>
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>integer</em><em>, </em><em>list</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for encoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="vegans.utils.loading.architectures.mnist.load_mnist_generator">
+<code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.architectures.mnist.</span></code><code class="sig-name descname"><span class="pre">load_mnist_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/architectures/mnist.html#load_mnist_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.architectures.mnist.load_mnist_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load some mnist architecture for the generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z_dim</strong> (<em>integer</em><em>, </em><em>list</em>) – Indicating the number of dimensions for the latent space.</p></li>
+<li><p><strong>y_dim</strong> (<em>None</em><em>, </em><em>optional</em>) – Indicating the number of dimensions for the labels.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Architectures for generator,.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.architectures">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vegans.utils.loading.architectures" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="vegans.utils.loading.html" class="btn btn-neutral float-left" title="vegans.utils.loading package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

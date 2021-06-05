@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.models.conditional.ConditionalBicycleGAN &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="copyright" title="Copyright" href="../../../../copyright.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vegans.models.conditional.ConditionalBicycleGAN</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vegans.models.conditional.ConditionalBicycleGAN</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ConditionalBicycleGAN</span>
+<span class="sd">---------------------</span>
+<span class="sd">Implements the BicycleGAN[1], a combination of the VAEGAN and the LRGAN.</span>
+
+<span class="sd">It utilizes both steps of the Variational Autoencoder (Kullback-Leibler Loss) and uses the same</span>
+<span class="sd">encoder architecture for the latent regression of generated images.</span>
+
+<span class="sd">Losses:</span>
+<span class="sd">    - Generator: Binary cross-entropy + L1-latent-loss + L1-reconstruction-loss</span>
+<span class="sd">    - Discriminator: Binary cross-entropy</span>
+<span class="sd">    - Encoder: Kullback-Leibler Loss + L1-latent-loss + L1-reconstruction-loss</span>
+<span class="sd">Default optimizer:</span>
+<span class="sd">    - torch.optim.Adam</span>
+<span class="sd">Custom parameter:</span>
+<span class="sd">    - lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</span>
+<span class="sd">    - lambda_x: Weight for the reconstruction loss of the real x dimensions.</span>
+<span class="sd">    - lambda_z: Weight for the reconstruction loss of the latent z dimensions.</span>
+
+<span class="sd">References</span>
+<span class="sd">----------</span>
+<span class="sd">.. [1] https://arxiv.org/pdf/1711.11586.pdf</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">vegans.utils.layers</span> <span class="kn">import</span> <span class="n">LayerReshape</span>
+<span class="kn">from</span> <span class="nn">vegans.models.unconditional.BicycleGAN</span> <span class="kn">import</span> <span class="n">BicycleGAN</span>
+<span class="kn">from</span> <span class="nn">vegans.utils.networks</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Adversary</span><span class="p">,</span> <span class="n">Encoder</span>
+<span class="kn">from</span> <span class="nn">vegans.models.conditional.AbstractConditionalGANGAE</span> <span class="kn">import</span> <span class="n">AbstractConditionalGANGAE</span>
+
+<div class="viewcode-block" id="ConditionalBicycleGAN"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.ConditionalBicycleGAN.ConditionalBicycleGAN">[docs]</a><span class="k">class</span> <span class="nc">ConditionalBicycleGAN</span><span class="p">(</span><span class="n">AbstractConditionalGANGAE</span><span class="p">,</span> <span class="n">BicycleGAN</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    generator: nn.Module</span>
+<span class="sd">        Generator architecture. Produces output in the real space.</span>
+<span class="sd">    adversary: nn.Module</span>
+<span class="sd">        Adversary architecture. Produces predictions for real and fake samples to differentiate them.</span>
+<span class="sd">    encoder: nn.Module</span>
+<span class="sd">        Encoder architecture. Produces predictions in the latent space.</span>
+<span class="sd">    x_dim : list, tuple</span>
+<span class="sd">        Number of the output dimensions of the generator and input dimension of the discriminator / critic.</span>
+<span class="sd">        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</span>
+<span class="sd">    z_dim : int, list, tuple</span>
+<span class="sd">        Number of the latent dimensions for the generator input. Might have dimensions of an image.</span>
+<span class="sd">    y_dim : int, list, tuple</span>
+<span class="sd">        Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.</span>
+<span class="sd">        [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.</span>
+<span class="sd">    optim : dict or torch.optim</span>
+<span class="sd">        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network</span>
+<span class="sd">        name keys and torch.optim as value, i.e. {&quot;Generator&quot;: torch.optim.Adam}.</span>
+<span class="sd">    optim_kwargs : dict</span>
+<span class="sd">        Optimizer keyword arguments used for each network. Must be a dictionary with network</span>
+<span class="sd">        name keys and dictionary with keyword arguments as value, i.e. {&quot;Generator&quot;: {&quot;lr&quot;: 0.0001}}.</span>
+<span class="sd">    lambda_KL: float</span>
+<span class="sd">        Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</span>
+<span class="sd">    lambda_x: float</span>
+<span class="sd">        Weight for the reconstruction loss of the real x dimensions.</span>
+<span class="sd">    lambda_z: float</span>
+<span class="sd">        Weight for the reconstruction loss of the latent z dimensions.</span>
+<span class="sd">    adv_type: &quot;Discriminator&quot;, &quot;Critic&quot; or &quot;Autoencoder&quot;</span>
+<span class="sd">        Indicating which adversarial architecture will be used.</span>
+<span class="sd">    feature_layer : torch.nn.*</span>
+<span class="sd">        Output layer used to compute the feature loss. Should be from either the discriminator or critic.</span>
+<span class="sd">        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced</span>
+<span class="sd">        [here](https://arxiv.org/abs/1606.03498v1).</span>
+<span class="sd">    fixed_noise_size : int</span>
+<span class="sd">        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images</span>
+<span class="sd">        subdirectory, the tensorboard images tab and the samples in get_training_results().</span>
+<span class="sd">    device : string</span>
+<span class="sd">        Device used while training the model. Either &quot;cpu&quot; or &quot;cuda&quot;.</span>
+<span class="sd">    ngpu : int</span>
+<span class="sd">        Number of gpus used during training if device == &quot;cuda&quot;.</span>
+<span class="sd">    folder : string</span>
+<span class="sd">        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and</span>
+<span class="sd">        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name</span>
+<span class="sd">        already exists a time stamp is appended to make it unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions before training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">generator</span><span class="p">,</span>
+            <span class="n">adversary</span><span class="p">,</span>
+            <span class="n">encoder</span><span class="p">,</span>
+            <span class="n">x_dim</span><span class="p">,</span>
+            <span class="n">z_dim</span><span class="p">,</span>
+            <span class="n">y_dim</span><span class="p">,</span>
+            <span class="n">optim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">optim_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">lambda_KL</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">lambda_x</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">lambda_z</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span>
+            <span class="n">feature_layer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">fixed_noise_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">ngpu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;./veganModels/cBicycleGAN&quot;</span><span class="p">,</span>
+            <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">adversary</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
+            <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">optim</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="o">=</span><span class="n">optim_kwargs</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="n">adv_type</span><span class="p">,</span>
+            <span class="n">feature_layer</span><span class="o">=</span><span class="n">feature_layer</span><span class="p">,</span> <span class="n">fixed_noise_size</span><span class="o">=</span><span class="n">fixed_noise_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">output_size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)),</span>
+            <span class="n">LayerReshape</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_variance</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">output_size</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)),</span>
+            <span class="n">LayerReshape</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lambda_KL</span> <span class="o">=</span> <span class="n">lambda_KL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lambda_x</span> <span class="o">=</span> <span class="n">lambda_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lambda_z</span> <span class="o">=</span> <span class="n">lambda_z</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="p">[</span><span class="s2">&quot;lambda_KL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_KL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="p">[</span><span class="s2">&quot;lambda_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="p">[</span><span class="s2">&quot;lambda_z&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lambda_z</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">secure</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">output_size</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">&quot;Generator output shape must be equal to x_dim. </span><span class="si">{}</span><span class="s2"> vs. </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">output_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># TODO: Remove those lines or use them again, but not commented</span>
+            <span class="c1"># if self.encoder.output_size == self.z_dim:</span>
+            <span class="c1">#     raise ValueError(</span>
+            <span class="c1">#         &quot;Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma &quot; +</span>
+            <span class="c1">#         &quot;are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder.&quot;</span>
+            <span class="c1">#     )</span>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions during training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="nf">_calculate_generator_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">):</span>
+        <span class="n">encoded_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">log_variance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_variance</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">Z_batch_encoded</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_variance</span><span class="p">)</span><span class="o">*</span><span class="n">Z_batch</span>
+        <span class="n">fake_images_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">Z_batch_encoded</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_concat_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fake_images_x</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_images_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_concat_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fake_images_z</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">real_concat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BicycleGAN</span><span class="o">.</span><span class="n">_calculate_generator_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="o">=</span><span class="n">real_concat</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">fake_images_x</span><span class="o">=</span><span class="n">fake_concat_x</span><span class="p">,</span> <span class="n">fake_images_z</span><span class="o">=</span><span class="n">fake_concat_z</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_encoder_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">):</span>
+        <span class="n">encoded_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">log_variance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_variance</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">Z_batch_encoded</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_variance</span><span class="p">)</span><span class="o">*</span><span class="n">Z_batch</span>
+        <span class="n">fake_images_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">Z_batch_encoded</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_concat_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fake_images_x</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">real_concat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BicycleGAN</span><span class="o">.</span><span class="n">_calculate_encoder_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="o">=</span><span class="n">real_concat</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">fake_images_x</span><span class="o">=</span><span class="n">fake_concat_x</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_adversary_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">):</span>
+        <span class="n">encoded_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">log_variance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_variance</span><span class="p">(</span><span class="n">encoded_output</span><span class="p">)</span>
+        <span class="n">Z_batch_encoded</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_variance</span><span class="p">)</span><span class="o">*</span><span class="n">Z_batch</span>
+        <span class="n">fake_images_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">Z_batch_encoded</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_concat_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fake_images_x</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">fake_images_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="n">fake_concat_z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">fake_images_z</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">real_concat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BicycleGAN</span><span class="o">.</span><span class="n">_calculate_adversary_loss</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="o">=</span><span class="n">real_concat</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">fake_images_x</span><span class="o">=</span><span class="n">fake_concat_x</span><span class="p">,</span> <span class="n">fake_images_z</span><span class="o">=</span><span class="n">fake_concat_z</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="../../../../copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
