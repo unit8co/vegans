@@ -23,7 +23,7 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    loader = loading.CelebALoader(batch_size=16, max_loaded_images=1000, output_shape=32)
+    loader = loading.CelebALoader(batch_size=16, max_loaded_images=1000, output_shape=64)
     train_dataloader = loader.load()
 
     epochs = 3
@@ -100,6 +100,7 @@ if __name__ == '__main__':
             raise NotImplementedError("{} no yet implemented in logical gate.".format(model.__name__))
 
         gan_model.summary(save=True)
+        raise
         gan_model.fit(
             X_train=train_dataloader,
             y_train=None,
