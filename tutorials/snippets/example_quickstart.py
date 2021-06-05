@@ -9,6 +9,7 @@ from vegans.GAN import ConditionalVanillaGAN
 
 loader = loading.MNISTLoader(root=None)
 X_train, y_train, X_test, y_test = loader.load()
+X_train, y_train = X_train[:500], y_train[:500]
 
 x_dim = X_train.shape[1:]
 y_dim = y_train.shape[1:]
