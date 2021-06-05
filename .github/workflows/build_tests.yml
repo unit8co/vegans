@@ -57,6 +57,9 @@ jobs:
         with:
           python-version: 3.8
 
+      - name: Install requirements
+        run: pip install -r requirments/core.txt
+
       - name: "3. Run examples ${{ matrix.example-name }}"
         run: |
           PYTHONPATH=./ python ./tutorials/${{ matrix.example-name }}
