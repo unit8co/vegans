@@ -1,6 +1,7 @@
 import torch
-
+import numpy as np
 from torch.utils.data import Dataset
+
 
 class DataSet(Dataset):
     def __init__(self, X, y=None):
