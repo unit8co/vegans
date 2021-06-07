@@ -3,7 +3,7 @@ import pytest
 import shutil
 
 import numpy as np
-import vegans.utils.utils as utils
+import vegans.utils as utils
 import vegans.utils.loading as loading
 
 from vegans.GAN import ConditionalVanillaGAN, ConditionalBicycleGAN, ConditionalVanillaVAE

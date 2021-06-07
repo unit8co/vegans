@@ -30,7 +30,7 @@ import torch.nn as nn
 from vegans.utils.layers import LayerReshape
 from torch.nn import CrossEntropyLoss, BCELoss
 from vegans.utils.networks import Generator, Adversary, Encoder
-from vegans.utils.utils import get_input_dim, concatenate, NormalNegativeLogLikelihood
+from vegans.utils import get_input_dim, concatenate, NormalNegativeLogLikelihood
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 

@@ -1,7 +1,7 @@
 import torch
 
 from torch.nn import BCELoss
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 

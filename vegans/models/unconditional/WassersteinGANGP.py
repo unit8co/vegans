@@ -26,7 +26,7 @@ import torch
 
 import numpy as np
 
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import WassersteinLoss
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 

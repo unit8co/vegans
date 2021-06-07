@@ -144,6 +144,6 @@ Parameter Group 0
     weight_decay: 0
 )}
 device: ---> cuda
-loss_functions: ---> {'Generator': BCELoss(), 'Adversary': BCELoss(), 'Discrete': CrossEntropyLoss(), 'Continuous': <vegans.utils.utils.NormalNegativeLogLikelihood object at 0x7fca48ea9b90>}
+loss_functions: ---> {'Generator': BCELoss(), 'Adversary': BCELoss(), 'Discrete': CrossEntropyLoss(), 'Continuous': <vegans.utils.NormalNegativeLogLikelihood object at 0x7fca48ea9b90>}
 y_dim: ---> (10,)
 lambda_z: ---> 10

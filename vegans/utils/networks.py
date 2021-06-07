@@ -82,7 +82,7 @@ class NeuralNetwork(Module):
                 "\t\tONLY RELEVANT IF CONDITIONAL NETWORK IS USED:\n" +
                 "\t\tIf you are trying to use a conditional model please make sure you adjusted the input size\n" +
                 "\t\tof the first layer in this architecture for the label vector / image.\n"
-                "\t\tIn this case, use vegans.utils.utils.get_input_dim(in_dim, y_dim) and adjust this architecture's\n" +
+                "\t\tIn this case, use vegans.utils.get_input_dim(in_dim, y_dim) and adjust this architecture's\n" +
                 "\t\tfirst layer input accordingly. See the conditional examples on github for help."
             )
         return True

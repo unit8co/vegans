@@ -20,7 +20,7 @@ References
 
 import torch
 
-from vegans.utils.utils import KLLoss
+from vegans.utils import KLLoss
 from vegans.models.unconditional.AbstractGAN1v1 import AbstractGAN1v1
 
 class KLGAN(AbstractGAN1v1):

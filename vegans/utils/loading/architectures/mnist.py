@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 import torch.nn as nn
 
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.utils.layers import LayerReshape, LayerPrintSize
 
 

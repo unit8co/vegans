@@ -4,7 +4,7 @@
 
 import numpy as np
 import vegans.utils.loading as loading
-from vegans.utils.utils import plot_images
+from vegans.utils import plot_images
 from vegans.GAN import ConditionalVanillaGAN
 
 loader = loading.MNISTLoader(root=None)
