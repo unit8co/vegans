@@ -76,8 +76,8 @@ class NeuralNetwork(Module):
             pass
         else:
             raise TypeError(
-                "\n\tInput mismatch for {}:\n".format(self.name) +
-                "\t\tFirst input layer 'in_features' or 'in_channels': {}. self.input_size: {}.\n\n".format(
+                "\n\tInput mismatch for **{}**:\n".format(self.name) +
+                "\t\tExpected (first layer 'in_features'/'in_channels'): {}. Given input_size (z_dim/x_dim (+y_dim)): {}.\n\n".format(
                     first_input, self.input_size) +
                 "\t\tONLY RELEVANT IF CONDITIONAL NETWORK IS USED:\n" +
                 "\t\tIf you are trying to use a conditional model please make sure you adjusted the input size\n" +
@@ -174,7 +174,8 @@ class Encoder(NeuralNetwork):
             except TypeError:
                 last_layer_type = type(NeuralNetwork._get_iterative_layers(network=network, input_type="Object")[-1])
             assert last_layer_type in valid_last_layer, (
-                "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer)
+                "Last layer activation function of Encoder needs to be one of '{}'.".format(valid_last_layer) +
+                "Given: {}.".format(last_layer_type)
             )
         super().__init__(network, input_size=input_size, name="Encoder", device=device, ngpu=ngpu, secure=secure)
 

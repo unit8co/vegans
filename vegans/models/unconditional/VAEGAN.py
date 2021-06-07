@@ -27,7 +27,7 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import L1Loss
-from vegans.utils.networks import Encoder, Generator, Adversary
+from vegans.utils.layers import LayerReshape
 from vegans.models.unconditional.AbstractGANGAE import AbstractGANGAE
 
 class VAEGAN(AbstractGANGAE):
@@ -104,11 +104,13 @@ class VAEGAN(AbstractGANGAE):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
@@ -117,10 +119,16 @@ class VAEGAN(AbstractGANGAE):
         self.hyperparameters["lambda_x"] = lambda_x
 
         if self.secure:
-            assert self.encoder.output_size != self.z_dim, (
-                "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            # TODO
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
+            assert (self.generator.output_size == self.x_dim), (
+                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
             )
+
 
     def _define_loss(self):
         loss_functions = super()._define_loss()

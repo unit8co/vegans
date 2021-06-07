@@ -7,7 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   vegans.utils.architectures
+   vegans.utils.loading
 
 Submodules
 ----------
@@ -16,14 +16,6 @@ vegans.utils.layers module
 --------------------------
 
 .. automodule:: vegans.utils.layers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-vegans.utils.loading module
----------------------------
-
-.. automodule:: vegans.utils.loading
    :members:
    :undoc-members:
    :show-inheritance:
@@ -40,6 +32,14 @@ vegans.utils.plot2DModel module
 -------------------------------
 
 .. automodule:: vegans.utils.plot2DModel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+vegans.utils.torchsummary module
+--------------------------------
+
+.. automodule:: vegans.utils.torchsummary
    :members:
    :undoc-members:
    :show-inheritance:

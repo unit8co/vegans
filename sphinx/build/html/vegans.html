@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>vegans package &mdash; vegans 0.2.1 documentation</title>
+  <title>vegans package &mdash; vegans  documentation</title>
   
 
   
@@ -88,7 +88,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="README.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">vegans package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
@@ -103,7 +103,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
 </ul>
 
             
@@ -184,6 +183,7 @@
 <li class="toctree-l3"><a class="reference internal" href="vegans.models.conditional.html">vegans.models.conditional package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#module-vegans.models.conditional.AbstractConditionalGAN1v1">vegans.models.conditional.AbstractConditionalGAN1v1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#module-vegans.models.conditional.AbstractConditionalGANGAE">vegans.models.conditional.AbstractConditionalGANGAE module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#module-vegans.models.conditional.AbstractConditionalGenerativeModel">vegans.models.conditional.AbstractConditionalGenerativeModel module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#module-vegans.models.conditional.ConditionalAAE">vegans.models.conditional.ConditionalAAE module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.conditional.html#module-vegans.models.conditional.ConditionalBicycleGAN">vegans.models.conditional.ConditionalBicycleGAN module</a></li>
@@ -206,6 +206,7 @@
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.AAE">vegans.models.unconditional.AAE module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.AbstractGAN1v1">vegans.models.unconditional.AbstractGAN1v1 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.AbstractGANGAE">vegans.models.unconditional.AbstractGANGAE module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.AbstractGenerativeModel">vegans.models.unconditional.AbstractGenerativeModel module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.BicycleGAN">vegans.models.unconditional.BicycleGAN module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="vegans.models.unconditional.html#module-vegans.models.unconditional.EBGAN">vegans.models.unconditional.EBGAN module</a></li>
@@ -228,22 +229,26 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="vegans.utils.html">vegans.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="vegans.utils.architectures.html">vegans.utils.architectures package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#module-vegans.utils.architectures.celeba">vegans.utils.architectures.celeba module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#module-vegans.utils.architectures.cifar">vegans.utils.architectures.cifar module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#module-vegans.utils.architectures.example">vegans.utils.architectures.example module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#module-vegans.utils.architectures.mnist">vegans.utils.architectures.mnist module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="vegans.utils.architectures.html#module-vegans.utils.architectures">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.utils.loading.html">vegans.utils.loading package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CIFAR100Loader">vegans.utils.loading.CIFAR100Loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CIFAR10Loader">vegans.utils.loading.CIFAR10Loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.CelebALoader">vegans.utils.loading.CelebALoader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.DatasetLoader">vegans.utils.loading.DatasetLoader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.ExampleLoader">vegans.utils.loading.ExampleLoader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.FashionMNISTLoader">vegans.utils.loading.FashionMNISTLoader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading.MNISTLoader">vegans.utils.loading.MNISTLoader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vegans.utils.loading.html#module-vegans.utils.loading">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.layers">vegans.utils.layers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.loading">vegans.utils.loading module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.networks">vegans.utils.networks module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.plot2DModel">vegans.utils.plot2DModel module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.torchsummary">vegans.utils.torchsummary module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils.utils">vegans.utils.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vegans.utils.html#module-vegans.utils">Module contents</a></li>
 </ul>
@@ -276,7 +281,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; <a href="copyright.html">Copyright</a> 2021, Unit8.
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
 
     </p>
   </div>

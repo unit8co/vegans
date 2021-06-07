@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.utils.loading package &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="copyright" title="Copyright" href="copyright.html" />
+    <link rel="next" title="vegans.utils.loading.architectures package" href="vegans.utils.loading.architectures.html" />
+    <link rel="prev" title="vegans.utils package" href="vegans.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="vegans.html">vegans package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="vegans.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="vegans.models.html">vegans.models package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="vegans.utils.html">vegans.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans.GAN">vegans.GAN module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="vegans.html#module-vegans">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">vegans</a> &raquo;</li>
+        
+          <li><a href="vegans.html">vegans package</a> &raquo;</li>
+        
+          <li><a href="vegans.utils.html">vegans.utils package</a> &raquo;</li>
+        
+      <li>vegans.utils.loading package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/vegans.utils.loading.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="vegans-utils-loading-package">
+<h1>vegans.utils.loading package<a class="headerlink" href="#vegans-utils-loading-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="vegans.utils.loading.architectures.html">vegans.utils.loading.architectures package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.architectures.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.celeba">vegans.utils.loading.architectures.celeba module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.example">vegans.utils.loading.architectures.example module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures.mnist">vegans.utils.loading.architectures.mnist module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vegans.utils.loading.architectures.html#module-vegans.utils.loading.architectures">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vegans.utils.loading.CIFAR100Loader">
+<span id="vegans-utils-loading-cifar100loader-module"></span><h2>vegans.utils.loading.CIFAR100Loader module<a class="headerlink" href="#module-vegans.utils.loading.CIFAR100Loader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.CIFAR100Loader.CIFAR100Loader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.CIFAR100Loader.</span></code><code class="sig-name descname"><span class="pre">CIFAR100Loader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR100Loader.html#CIFAR100Loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR100Loader.CIFAR100Loader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader" title="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.CIFAR10Loader.CIFAR10Loader</span></code></a></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR100Loader.CIFAR100Loader._preprocess">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">_preprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR100Loader.html#CIFAR100Loader._preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR100Loader.CIFAR100Loader._preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocess mnist by normalizing and padding.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.CIFAR10Loader">
+<span id="vegans-utils-loading-cifar10loader-module"></span><h2>vegans.utils.loading.CIFAR10Loader module<a class="headerlink" href="#module-vegans.utils.loading.CIFAR10Loader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.CIFAR10Loader.</span></code><code class="sig-name descname"><span class="pre">CIFAR10Loader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.MNISTLoader.MNISTLoader" title="vegans.utils.loading.MNISTLoader.MNISTLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.MNISTLoader.MNISTLoader</span></code></a></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader._preprocess">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">_preprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader._preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader._preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocess mnist by normalizing and padding.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_adversary">
+<code class="sig-name descname"><span class="pre">load_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader.load_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working adversary architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_autoencoder">
+<code class="sig-name descname"><span class="pre">load_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader.load_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working autoencoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_decoder">
+<code class="sig-name descname"><span class="pre">load_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader.load_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_encoder">
+<code class="sig-name descname"><span class="pre">load_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader.load_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working encoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_generator">
+<code class="sig-name descname"><span class="pre">load_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CIFAR10Loader.html#CIFAR10Loader.load_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CIFAR10Loader.CIFAR10Loader.load_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.CelebALoader">
+<span id="vegans-utils-loading-celebaloader-module"></span><h2>vegans.utils.loading.CelebALoader module<a class="headerlink" href="#module-vegans.utils.loading.CelebALoader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.CelebALoader.</span></code><code class="sig-name descname"><span class="pre">CelebALoader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_loaded_images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.DatasetLoader.DatasetLoader" title="vegans.utils.loading.DatasetLoader.DatasetLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.DatasetLoader.DatasetLoader</span></code></a></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_loaded_images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int</em>) – batch size during training.</p></li>
+<li><p><strong>max_loaded_images</strong> (<em>int</em>) – Number of examples loaded into memory, before new batch is loaded.</p></li>
+<li><p><strong>kwargs</strong> – Other input arguments to torchvision.utils.data.DataLoader</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.load_adversary">
+<code class="sig-name descname"><span class="pre">load_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.load_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.load_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working adversary architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.load_autoencoder">
+<code class="sig-name descname"><span class="pre">load_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.load_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.load_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working autoencoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.load_decoder">
+<code class="sig-name descname"><span class="pre">load_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(16,</span> <span class="pre">4,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.load_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.load_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.load_encoder">
+<code class="sig-name descname"><span class="pre">load_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(16,</span> <span class="pre">4,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.load_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.load_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working encoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.CelebALoader.CelebALoader.load_generator">
+<code class="sig-name descname"><span class="pre">load_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(16,</span> <span class="pre">4,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/CelebALoader.html#CelebALoader.load_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.CelebALoader.CelebALoader.load_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.DatasetLoader">
+<span id="vegans-utils-loading-datasetloader-module"></span><h2>vegans.utils.loading.DatasetLoader module<a class="headerlink" href="#module-vegans.utils.loading.DatasetLoader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.DatasetLoader.</span></code><code class="sig-name descname"><span class="pre">DatasetLoader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Class that downloads a dataset and caches it locally.
+Assumes that the file can be downloaded (i.e. publicly available via an URI)</p>
+<dl class="simple">
+<dt>So far available are:</dt><dd><ul class="simple">
+<li><p>MNIST: Handwritten digits with labels. Can be downloaded via <cite>download=True</cite>.</p></li>
+<li><p>FashionMNIST: Clothes with labels. Can be downloaded via <cite>download=True</cite>.</p></li>
+<li><dl class="simple">
+<dt>CelebA: Pictures of celebrities with attributes. Must be downloaded from <a class="reference external" href="https://www.kaggle.com/jessicali9530/celeba-dataset">https://www.kaggle.com/jessicali9530/celeba-dataset</a></dt><dd><p>and moved into <cite>root</cite> folder.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>CIFAR: Pictures of objects with labels. Must be downloaded from <a class="reference external" href="http://www.cs.toronto.edu/~kriz/cifar.html">http://www.cs.toronto.edu/~kriz/cifar.html</a></dt><dd><p>and moved into <cite>root</cite> folder.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader._check_dataset_integrity_or_raise">
+<code class="sig-name descname"><span class="pre">_check_dataset_integrity_or_raise</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_hash</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader._check_dataset_integrity_or_raise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader._check_dataset_integrity_or_raise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensures that the dataset exists and its MD5 checksum matches the expected hash.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader._load_from_disk">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">_load_from_disk</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader._load_from_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader._load_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a Path to the file and a DataLoaderMetadata object, returns train and test sets as numpy arrays.
+One can assume that the file exists and its MD5 checksum has been verified before this function is called</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load">
+<code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset in memory, as numpy arrays.
+Downloads the dataset if it is not present _is_already_downloaded</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load_adversary">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load_adversary</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working adversary architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load_autoencoder">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load_autoencoder</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working autoencoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load_decoder">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load_decoder</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load_encoder">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load_encoder</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working encoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetLoader.load_generator">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">load_generator</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetLoader.load_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetLoader.load_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="vegans.utils.loading.DatasetLoader.DatasetMetaData">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.DatasetLoader.</span></code><code class="sig-name descname"><span class="pre">DatasetMetaData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m5hashes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/DatasetLoader.html#DatasetMetaData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.DatasetLoader.DatasetMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.ExampleLoader">
+<span id="vegans-utils-loading-exampleloader-module"></span><h2>vegans.utils.loading.ExampleLoader module<a class="headerlink" href="#module-vegans.utils.loading.ExampleLoader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.ExampleLoader.</span></code><code class="sig-name descname"><span class="pre">ExampleLoader</span></code><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.DatasetLoader.DatasetLoader" title="vegans.utils.loading.DatasetLoader.DatasetLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.DatasetLoader.DatasetLoader</span></code></a></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader.load_adversary">
+<code class="sig-name descname"><span class="pre">load_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader.load_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader.load_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working adversary architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader.load_autoencoder">
+<code class="sig-name descname"><span class="pre">load_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader.load_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader.load_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working autoencoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader.load_decoder">
+<code class="sig-name descname"><span class="pre">load_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader.load_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader.load_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader.load_encoder">
+<code class="sig-name descname"><span class="pre">load_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader.load_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader.load_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working encoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.ExampleLoader.ExampleLoader.load_generator">
+<code class="sig-name descname"><span class="pre">load_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/ExampleLoader.html#ExampleLoader.load_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.ExampleLoader.ExampleLoader.load_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.FashionMNISTLoader">
+<span id="vegans-utils-loading-fashionmnistloader-module"></span><h2>vegans.utils.loading.FashionMNISTLoader module<a class="headerlink" href="#module-vegans.utils.loading.FashionMNISTLoader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.FashionMNISTLoader.FashionMNISTLoader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.FashionMNISTLoader.</span></code><code class="sig-name descname"><span class="pre">FashionMNISTLoader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/FashionMNISTLoader.html#FashionMNISTLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.FashionMNISTLoader.FashionMNISTLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.MNISTLoader.MNISTLoader" title="vegans.utils.loading.MNISTLoader.MNISTLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.MNISTLoader.MNISTLoader</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading.MNISTLoader">
+<span id="vegans-utils-loading-mnistloader-module"></span><h2>vegans.utils.loading.MNISTLoader module<a class="headerlink" href="#module-vegans.utils.loading.MNISTLoader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.utils.loading.MNISTLoader.</span></code><code class="sig-name descname"><span class="pre">MNISTLoader</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.utils.loading.DatasetLoader.DatasetLoader" title="vegans.utils.loading.DatasetLoader.DatasetLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.utils.loading.DatasetLoader.DatasetLoader</span></code></a></p>
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader._preprocess">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">_preprocess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader._preprocess"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader._preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocess mnist by normalizing and padding.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader.load_adversary">
+<code class="sig-name descname"><span class="pre">load_adversary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader.load_adversary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader.load_adversary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working adversary architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader.load_autoencoder">
+<code class="sig-name descname"><span class="pre">load_autoencoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader.load_autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader.load_autoencoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working autoencoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader.load_decoder">
+<code class="sig-name descname"><span class="pre">load_decoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader.load_decoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader.load_decoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader.load_encoder">
+<code class="sig-name descname"><span class="pre">load_encoder</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader.load_encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader.load_encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working encoder architecture</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.utils.loading.MNISTLoader.MNISTLoader.load_generator">
+<code class="sig-name descname"><span class="pre">load_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/utils/loading/MNISTLoader.html#MNISTLoader.load_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.utils.loading.MNISTLoader.MNISTLoader.load_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a working generator architecture</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.utils.loading">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vegans.utils.loading" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="vegans.utils.loading.architectures.html" class="btn btn-neutral float-right" title="vegans.utils.loading.architectures package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="vegans.utils.html" class="btn btn-neutral float-left" title="vegans.utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

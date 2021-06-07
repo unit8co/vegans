@@ -25,17 +25,11 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="mnist", download=True)
-
+    loader = loading.MNISTLoader()
+    X_train, y_train, X_test, y_test = loader.load()
+    # X_train, y_train = X_train[:500], y_train[:500]
     epochs = 1
     batch_size = 32
-
-    X_train = X_train.reshape((-1, 1, 32, 32))[:500]
-    X_test = X_test.reshape((-1, 1, 32, 32))
-    nb_classes = len(set(y_train))
-    y_train = np.eye(nb_classes)[y_train.reshape(-1)]
-    y_test = np.eye(nb_classes)[y_test.reshape(-1)]
 
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
@@ -44,12 +38,13 @@ if __name__ == '__main__':
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="mnist")
-    critic = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="mnist")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
+    # loader = loading.ExampleLoader()
+    generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator")
+    critic = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Critic")
+    encoder = loader.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    autoencoder = loader.load_autoencoder(x_dim=x_dim, y_dim=y_dim)
+    decoder = loader.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
     #########################################################################
     # Training
@@ -66,13 +61,13 @@ if __name__ == '__main__':
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
-            discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
+            discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
             gan_model = model(
                 generator=generator, adversary=discriminator_aee, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalBicycleGAN", "ConditionalVAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
@@ -87,8 +82,8 @@ if __name__ == '__main__':
             c_dim_discrete = [5]
             c_dim_continuous = 5
             c_dim = sum(c_dim_discrete) + c_dim_continuous
-            generator_conditional = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=sum(y_dim)+c_dim, which="mnist")
-            encoder_helper = loading.load_encoder(x_dim=(x_dim[0]+sum(y_dim), *x_dim[1:]), z_dim=32, which="mnist")
+            generator_conditional = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=sum(y_dim)+c_dim)
+            encoder_helper = loader.load_encoder(x_dim=(x_dim[0]+sum(y_dim), *x_dim[1:]), z_dim=32)
             gan_model = model(
                 generator=generator_conditional, adversary=discriminator, encoder=encoder_helper,
                 c_dim_discrete=c_dim_discrete, c_dim_continuous=c_dim_continuous, **kwargs
@@ -105,7 +100,7 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalVanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="mnist")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
@@ -141,17 +136,11 @@ if __name__ == '__main__':
         )
         fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
         fig, axs = utils.plot_images(images=samples, labels=fixed_labels, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
         plt.savefig(gan_model.folder+"/generated_images.png")
         fig, axs = utils.plot_losses(losses=losses, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
         plt.savefig(gan_model.folder+"/losses.png")
         # gan_model.save()

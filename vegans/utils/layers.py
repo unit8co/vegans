@@ -22,7 +22,7 @@ class LayerReshape(Module):
     """
     def __init__(self, shape):
         super().__init__()
-        self.shape = shape
+        self.shape = (shape, ) if isinstance(shape, int) else shape
 
     def forward(self, x):
         x = torch.reshape(input=x, shape=(-1, *self.shape))

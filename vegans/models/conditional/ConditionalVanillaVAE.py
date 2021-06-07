@@ -23,6 +23,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
+from vegans.utils.layers import LayerReshape
 from vegans.utils.utils import get_input_dim
 from vegans.models.unconditional.VanillaVAE import VanillaVAE
 from vegans.utils.networks import Encoder, Decoder, Autoencoder
@@ -103,22 +104,24 @@ class ConditionalVanillaVAE(AbstractConditionalGenerativeModel, VanillaVAE):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
         self.hyperparameters["lambda_KL"] = lambda_KL
 
         if self.secure:
-            if self.encoder.output_size == self.z_dim:
-                raise ValueError(
-                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
             assert (self.decoder.output_size == self.x_dim), (
                 "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.decoder.output_size, self.x_dim)
             )

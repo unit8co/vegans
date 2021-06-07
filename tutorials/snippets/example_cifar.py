@@ -24,33 +24,27 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="cifar", download=True)
+    loader = loading.CIFAR10Loader()
+    X_train, y_train, X_test, y_test = loader.load()
+    # X_train, y_train = X_train[:300], y_train[:300]
 
-    epochs = 3
+    epochs = 1
     batch_size = 32
-
-    X_train = X_train.reshape((-1, 3, 32, 32))
-    X_test = X_test.reshape((-1, 3, 32, 32))
-    nb_classes = len(set(y_train))
-    y_train = np.eye(nb_classes)[y_train.reshape(-1)]
-    y_test = np.eye(nb_classes)[y_test.reshape(-1)]
 
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
     z_dim = 64
-    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
-    adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
 
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="example")
-    critic = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="example")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    loader = loading.ExampleLoader()
+    generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator")
+    critic = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Critic")
+    encoder = loader.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    autoencoder = loader.load_autoencoder(x_dim=x_dim, y_dim=y_dim)
+    decoder = loader.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
     #########################################################################
     # Training
@@ -66,13 +60,13 @@ if __name__ == '__main__':
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
-            discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
+            discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
             gan_model = model(
                 generator=generator, adversary=discriminator_aee, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalBicycleGAN", "ConditionalVAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
@@ -94,7 +88,7 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalVanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
@@ -129,17 +123,13 @@ if __name__ == '__main__':
             epochs, z_dim, training_time, gan_model.get_number_params()
         )
         fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
-        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig, axs = utils.plot_images(images=samples, labels=fixed_labels, show=False)
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"generated_images.png")
+        plt.savefig(gan_model.folder+"/generated_images.png")
+
         fig, axs = utils.plot_losses(losses=losses, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"losses.png")
+        plt.savefig(gan_model.folder+"/losses.png")
+        # gan_model.save()

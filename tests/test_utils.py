@@ -10,14 +10,6 @@ def test_Dataset():
     data = utils.DataSet(X)
     assert len(data) == len(X)
 
-def test_load_mnist():
-    datapath = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(datapath, which="MNIST", download=True)
-    assert X_train.shape == (60000, 32, 32)
-    assert np.max(X_train) == 1
-    assert X_test.shape == (10000, 32, 32)
-    assert np.max(X_test) == 1
-
 def test_WassersteinLoss():
     labels = torch.from_numpy(np.array([1, 1, 0, 0, 1, 0])).float()
     predictions = torch.from_numpy(np.array([5, 3, -2, 3, 8, -2])).float()

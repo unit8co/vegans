@@ -13,8 +13,8 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
-from vegans.utils.utils import plot_losses
 from torch.utils.tensorboard import SummaryWriter
+from vegans.utils.utils import plot_losses, plot_images
 
 class AbstractGenerativeModel(ABC):
     """The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should
@@ -559,20 +559,20 @@ class AbstractGenerativeModel(ABC):
         )
         self.current_timer = time.perf_counter()
 
-    def _log_images(self, images, step, writer):
+    def _log_images(self, images, step, writer, labels=None):
         if self.images_produced:
             if writer is not None:
                 grid = make_grid(images)
                 writer.add_image('images', grid, step)
 
-            fig, axs = self._build_images(images)
+            fig, axs = self._build_images(images, labels=labels)
             if fig is not None:
-                plt.savefig(os.path.join(self.folder, "images/image_{}.png".format(step)))
+                path = os.path.join(self.folder, "images/image_{}.png".format(step))
+                plt.savefig(path)
                 plt.close()
-            print("Images logged.")
+                print("Images saved as {}.".format(path))
 
-    @staticmethod
-    def _build_images(images):
+    def _build_images(self, images, labels=None):
         """ Build matplotlib figure containing all images.
 
         Parameters
@@ -586,20 +586,10 @@ class AbstractGenerativeModel(ABC):
             Objects containing the figure as well as all separate axis objects.
         """
         images = images.detach().cpu().numpy()
-        if images.shape[1] == 1:
-            images = images[:, 0, :, :]
-        elif images.shape[1] == 3:
-            images = images.reshape((-1, images.shape[2], images.shape[3], 3))
-        else:
-            return None, None
-        nrows = int(np.sqrt(len(images)))
-        ncols = len(images) // nrows
-        fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 10))
-
-        for i, (ax, image) in enumerate(zip(np.ravel(axs), images)):
-            ax.imshow(image)
-            ax.axis("off")
-        return fig, axs
+        if self.images_produced:
+            fig, axs = plot_images(images=images, labels=labels, show=False)
+            return fig, axs
+        return None, None
 
     def _log_losses(self, X_batch, Z_batch, mode):
         self._losses = self.calculate_losses(X_batch=X_batch, Z_batch=Z_batch)

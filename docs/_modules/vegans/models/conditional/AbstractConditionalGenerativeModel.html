@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.models.conditional.AbstractConditionalGenerativeModel &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="copyright" title="Copyright" href="../../../../copyright.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vegans.models.conditional.AbstractConditionalGenerativeModel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vegans.models.conditional.AbstractConditionalGenerativeModel</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">MSELoss</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">make_grid</span>
+<span class="kn">from</span> <span class="nn">vegans.utils.utils</span> <span class="kn">import</span> <span class="n">get_input_dim</span>
+<span class="kn">from</span> <span class="nn">vegans.utils.networks</span> <span class="kn">import</span> <span class="n">NeuralNetwork</span>
+<span class="kn">from</span> <span class="nn">vegans.models.unconditional.AbstractGenerativeModel</span> <span class="kn">import</span> <span class="n">AbstractGenerativeModel</span>
+
+
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractConditionalGenerativeModel</span><span class="p">(</span><span class="n">AbstractGenerativeModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The AbstractConditionalGenerativeModel is the most basic building block of vegans for conditional models. All conditional GAN</span>
+<span class="sd">    implementation should at least inherit from this class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_dim : list, tuple</span>
+<span class="sd">        Number of the output dimensions of the generator and input dimension of the discriminator / critic.</span>
+<span class="sd">        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</span>
+<span class="sd">    z_dim : int, list, tuple</span>
+<span class="sd">        Number of the latent dimensions for the generator input. Might have dimensions of an image.</span>
+<span class="sd">    y_dim : int, list, tuple</span>
+<span class="sd">        Number of dimensions for the target label. Might have dimensions of image for image to image translation, i.e.</span>
+<span class="sd">        [nr_channels, nr_height_pixels, nr_width_pixels] or an integer representing a number of classes.</span>
+<span class="sd">    optim : dict or torch.optim</span>
+<span class="sd">        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network</span>
+<span class="sd">        name keys and torch.optim as value, i.e. {&quot;Generator&quot;: torch.optim.Adam}.</span>
+<span class="sd">    optim_kwargs : dict</span>
+<span class="sd">        Optimizer keyword arguments used for each network. Must be a dictionary with network</span>
+<span class="sd">        name keys and dictionary with keyword arguments as value, i.e. {&quot;Generator&quot;: {&quot;lr&quot;: 0.0001}}.</span>
+<span class="sd">    feature_layer : torch.nn.*</span>
+<span class="sd">        Output layer used to compute the feature loss. Should be from either the discriminator or critic.</span>
+<span class="sd">        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced</span>
+<span class="sd">        [here](https://arxiv.org/abs/1606.03498v1).</span>
+<span class="sd">    fixed_noise_size : int</span>
+<span class="sd">        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images</span>
+<span class="sd">        subdirectory, the tensorboard images tab and the samples in get_training_results().</span>
+<span class="sd">    device : string</span>
+<span class="sd">        Device used while training the model. Either &quot;cpu&quot; or &quot;cuda&quot;.</span>
+<span class="sd">    ngpu : int</span>
+<span class="sd">        Number of gpus used during training if device == &quot;cuda&quot;.</span>
+<span class="sd">    folder : string</span>
+<span class="sd">        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and</span>
+<span class="sd">        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name</span>
+<span class="sd">        already exists a time stamp is appended to make it unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions before training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">,</span> <span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="p">,</span> <span class="n">feature_layer</span><span class="p">,</span> <span class="n">fixed_noise_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">secure</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adv_in_dim</span> <span class="o">=</span> <span class="n">get_input_dim</span><span class="p">(</span><span class="n">dim1</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_in_dim</span> <span class="o">=</span> <span class="n">get_input_dim</span><span class="p">(</span><span class="n">dim1</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">dim2</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
+        <span class="n">AbstractGenerativeModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">optim</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="o">=</span><span class="n">optim_kwargs</span><span class="p">,</span> <span class="n">feature_layer</span><span class="o">=</span><span class="n">feature_layer</span><span class="p">,</span>
+            <span class="n">fixed_noise_size</span><span class="o">=</span><span class="n">fixed_noise_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">y_dim</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="n">y_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="p">[</span><span class="s2">&quot;y_dim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel._set_up_training"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel._set_up_training">[docs]</a>    <span class="k">def</span> <span class="nf">_set_up_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span>
+        <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create the dataloaders, SummaryWriters for tensorboard and transform the saving indicators.</span>
+
+<span class="sd">        This function creates all data needed during training like the data loaders and save steps.</span>
+<span class="sd">        It also creates the hyperparameter dictionary and the `steps` dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">,</span> <span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">,</span> <span class="n">save_periods</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_set_up_training</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span>
+            <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="p">,</span> <span class="n">enable_tensorboard</span>
+        <span class="p">)</span>
+        <span class="n">iter_dataloader</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">iter_dataloader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise_size</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">y_train2</span> <span class="o">=</span> <span class="n">iter_dataloader</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_train2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise_size</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">,</span> <span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">,</span> <span class="n">save_periods</span></div>
+
+    <span class="k">def</span> <span class="nf">_assert_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;X_train must be either have 2 or 4 shape dimensions. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot;Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width).&quot;</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">[:],</span> <span class="p">(</span>
+            <span class="s2">&quot;Wrong input shape for adversary / encoder. Given: </span><span class="si">{}</span><span class="s2">. Needed: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">(</span>
+                <span class="s2">&quot;X_train and X_test must have same dimensions. Given: </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span>
+                    <span class="s2">&quot;Same number if X_test and y_test needed.Given: </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span>
+            <span class="s2">&quot;Same number if X_train and y_train needed.Given: </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;y_train must be either have 2 or 4 shape dimensions. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot;Try to use y_train.reshape(-1, 1) or y_train.reshape(-1, 1, height, width).&quot;</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_dim</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">(</span>
+            <span class="s2">&quot;Wrong input shape for y_train. Given: </span><span class="si">{}</span><span class="s2">. Needed: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;If y_train is an image (Image-to-Image translation task) it must have the same shape as X_train&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot; to be concatenated before passing it to the discriminator. x_shape: </span><span class="si">{}</span><span class="s2">. y_shape: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">(</span>
+                <span class="s2">&quot;y_train and y_test must have same dimensions. Given: </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_conditional_network_input</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">architecture</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Object&quot;</span><span class="p">)</span>
+        <span class="n">has_error</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;in_features&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">inpt_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_features&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">inpt_dim</span> <span class="o">==</span> <span class="n">in_dim</span><span class="p">:</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">inpt_dim</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">in_dim</span><span class="p">):</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="s2">&quot;in_channels&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">inpt_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_channels&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inpt_dim</span> <span class="o">==</span> <span class="n">in_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">inpt_dim</span> <span class="o">==</span> <span class="n">y_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No layer with `in_features`, `in_channels` or `num_features` found.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">has_error</span><span class="p">:</span>
+            <span class="n">required_dim</span> <span class="o">=</span> <span class="n">get_input_dim</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">required_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">first_layer</span> <span class="o">=</span> <span class="s2">&quot;torch.nn.Linear(in_features=</span><span class="si">{}</span><span class="s2">, out_features=...)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">required_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">first_layer</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;torch.nn.Conv2d(in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=...)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">required_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                    <span class="s2">&quot;</span><span class="se">\t\t\t\t\t\t\t\t\t</span><span class="s2">torch.nn.ConvTranspose2d(in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=...)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">required_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                    <span class="s2">&quot;</span><span class="se">\t\t\t\t\t\t\t\t\t</span><span class="s2">torch.nn.Linear(in_features=</span><span class="si">{}</span><span class="s2">, out_features=...) if torch.nn.Flatten() is used before&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">required_dim</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">**</span><span class="si">{}</span><span class="s2">** is a conditional network.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;The y_dim (label) will be concatenated to the input of this network.</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;The first layer will receive input shape: </span><span class="si">{}</span><span class="s2"> due to y_dim=</span><span class="si">{}</span><span class="s2">. &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">required_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;Given: </span><span class="si">{}</span><span class="s2">.(Reshape &amp; Flatten not considered)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">layer</span><span class="p">))</span> <span class="o">+</span>
+                <span class="s2">&quot;First layer should be of the form: </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_layer</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;Check on github for notebooks of conditional GANs.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_unconditional_network_input</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">architecture</span> <span class="o">=</span> <span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Object&quot;</span><span class="p">)</span>
+        <span class="n">has_error</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">concat_input</span> <span class="o">=</span> <span class="n">get_input_dim</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;in_features&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">inpt_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_features&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">inpt_dim</span> <span class="o">==</span> <span class="n">concat_input</span><span class="p">:</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">inpt_dim</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">concat_input</span><span class="p">):</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="s2">&quot;in_channels&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">inpt_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_channels&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">inpt_dim</span> <span class="o">==</span> <span class="n">concat_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">has_error</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;No input layer found. No Linear or Conv2d layers?&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">has_error</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">first_layer</span> <span class="o">=</span> <span class="s2">&quot;torch.nn.Linear(in_features=</span><span class="si">{}</span><span class="s2">, out_features=...)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">first_layer</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;torch.nn.Conv2d(in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=...)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                    <span class="s2">&quot;</span><span class="se">\t\t\t\t\t\t\t\t\t</span><span class="s2">torch.nn.ConvTranspose2d(in_channels=</span><span class="si">{}</span><span class="s2">, out_channels=...)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_dim</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                    <span class="s2">&quot;</span><span class="se">\t\t\t\t\t\t\t\t\t</span><span class="s2">torch.nn.Linear(in_features=</span><span class="si">{}</span><span class="s2">, out_features=...) if torch.nn.Flatten() is used before&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">in_dim</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">**</span><span class="si">{}</span><span class="s2">** is **not** a conditional network. The y_dim (label) will **not** be concatenated to the input of this network.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;The first layer will receive input shape: </span><span class="si">{}</span><span class="s2"> (same as x_dim). Given: </span><span class="si">{}</span><span class="s2">.(Reshape &amp; Flatten not considered)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">layer</span><span class="p">))</span> <span class="o">+</span>
+                <span class="s2">&quot;First layer should be of the form: </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_layer</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;Check on github for notebooks of conditional GANs.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions during training</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.fit"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">print_every</span><span class="o">=</span><span class="s2">&quot;1e&quot;</span><span class="p">,</span> <span class="n">save_model_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_images_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="o">=</span><span class="s2">&quot;1e&quot;</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Trains the model, iterating over all contained networks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train : np.array</span>
+<span class="sd">            Training data for the generative adversarial network. Usually images.</span>
+<span class="sd">        y_train: np.array</span>
+<span class="sd">            Training labels for the generative adversarial network. Might be images or one-hot encoded vector.</span>
+<span class="sd">        X_test : np.array, optional</span>
+<span class="sd">            Testing data for the generative adversarial network. Must have same shape as X_train.</span>
+<span class="sd">        y_train: np.array</span>
+<span class="sd">            Testing labels for the generative adversarial network. Might be images or one-hot encoded vector.</span>
+<span class="sd">        epochs : int, optional</span>
+<span class="sd">            Number of epochs (passes over the training data set) performed during training.</span>
+<span class="sd">        batch_size : int, optional</span>
+<span class="sd">            Batch size used when creating the data loader from X_train. Ignored if torch.utils.data.DataLoader is passed</span>
+<span class="sd">            for X_train.</span>
+<span class="sd">        steps : dict, optional</span>
+<span class="sd">            Dictionary with names of the networks to indicate how often they should be trained, i.e. {&quot;Generator&quot;: 5} indicates</span>
+<span class="sd">            that the generator is trained 5 times while all other networks are trained once.</span>
+<span class="sd">        print_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the losses for the train data should be printed to the console. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_model_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the model should be saved. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_images_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the images for the losses and fixed_noise should be saved. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_losses_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the losses for the train and test data should be calculated. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        enable_tensorboard : bool, optional</span>
+<span class="sd">            Flag to indicate whether subdirectory folder/tensorboard should be created to log losses and images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">,</span> <span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">,</span> <span class="n">save_periods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_training</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
+            <span class="n">print_every</span><span class="o">=</span><span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="o">=</span><span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="o">=</span><span class="n">save_images_every</span><span class="p">,</span>
+            <span class="n">save_losses_every</span><span class="o">=</span><span class="n">save_losses_every</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="o">=</span><span class="n">enable_tensorboard</span>
+        <span class="p">)</span>
+        <span class="n">max_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+        <span class="n">test_x_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">test_y_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span> <span class="o">=</span> <span class="n">save_periods</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_images_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_images</span><span class="p">(</span>
+                <span class="n">images</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">),</span>
+                <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EPOCH:&quot;</span><span class="p">,</span> <span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">batch</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">):</span>
+                <span class="n">batch</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">epoch</span><span class="o">*</span><span class="n">max_batches</span> <span class="o">+</span> <span class="n">batch</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">y_batch</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_grad</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_backward</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">print_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">y_batch</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_summarise_batch</span><span class="p">(</span>
+                        <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="n">max_batches</span><span class="o">=</span><span class="n">max_batches</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span>
+                        <span class="n">max_epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">print_every</span><span class="o">=</span><span class="n">print_every</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">save_model_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_model_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;models/model_</span><span class="si">{}</span><span class="s2">.torch&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">save_images_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_images_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_images</span><span class="p">(</span>
+                        <span class="n">images</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">),</span>
+                        <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_losses_plot</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">save_losses_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_losses_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">y_batch</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;Train&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">enable_tensorboard</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_scalars</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">test_x_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_losses</span><span class="p">(</span>
+                            <span class="n">X_batch</span><span class="o">=</span><span class="n">test_x_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">test_x_batch</span><span class="p">)),</span>
+                            <span class="n">y_batch</span><span class="o">=</span><span class="n">test_y_batch</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">enable_tensorboard</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_log_scalars</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_test</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">(</span><span class="n">writers</span><span class="o">=</span><span class="p">[</span><span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">])</span></div>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Logging during training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="nf">_log_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">images_produced</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">lbl</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="p">]</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_log_images</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="n">images</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">,</span> <span class="n">y_batch</span><span class="o">=</span><span class="n">y_batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_append_losses</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># After training</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.get_training_results"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.get_training_results">[docs]</a>    <span class="k">def</span> <span class="nf">get_training_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Call after training to get fixed_noise samples and losses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        by_epoch : bool, optional</span>
+<span class="sd">            If true one loss value per epoch is returned for every logged_loss. Otherwise frequency is given</span>
+<span class="sd">            by `save_losses_every` argument of `fit`, i.e. `save_losses_every=10` saves losses every 10th batch,</span>
+<span class="sd">            `save_losses_every=&quot;0.25e` saves losses 4 times per epoch.</span>
+<span class="sd">        agg : None, optional</span>
+<span class="sd">            Aggregation function used if by_epoch is true, otherwise ignored. Default is np.mean for all batches</span>
+<span class="sd">            in one epoch.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        losses_dict : dict</span>
+<span class="sd">            Dictionary containing all loss types logged during training</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">)</span>
+        <span class="n">losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_losses</span><span class="p">(</span><span class="n">by_epoch</span><span class="o">=</span><span class="n">by_epoch</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">losses</span></div>
+
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.get_fixed_labels"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.get_fixed_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_fixed_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_labels</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Utility functions</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.concatenate"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.concatenate">[docs]</a>    <span class="k">def</span> <span class="nf">concatenate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor1</span><span class="p">,</span> <span class="n">tensor2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Concatenates two tensors appropriately depending on their shape.</span>
+
+<span class="sd">        Tensor1 and Tensor2 can either have 2 or 4 dimensions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tensor1 : torch.Tensor</span>
+<span class="sd">            First tensor.</span>
+<span class="sd">        tensor2 : torch.Tensor</span>
+<span class="sd">            Second tensor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            Concatenated tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">tensor1</span><span class="o">=</span><span class="n">tensor1</span><span class="p">,</span> <span class="n">tensor2</span><span class="o">=</span><span class="n">tensor2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.generate"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.generate">[docs]</a>    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate output with generator.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        y : np.array</span>
+<span class="sd">            Labels for outputs to be produced.</span>
+<span class="sd">        z : None, optional</span>
+<span class="sd">            Latent input vector to produce an output from.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            Output produced by generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractConditionalGenerativeModel.predict"><a class="viewcode-back" href="../../../../vegans.models.conditional.html#vegans.models.conditional.AbstractConditionalGenerativeModel.AbstractConditionalGenerativeModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Use the critic / discriminator to predict if input is real / fake.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : np.array</span>
+<span class="sd">            Images or samples to be predicted.</span>
+<span class="sd">        y : np.array</span>
+<span class="sd">            Labels for outputs to be predicted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            Array with one output per x indicating the realness of an input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">assert</span> <span class="n">x_dim</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">adv_in_dim</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;If `y` is None, x must have correct shape. Given: </span><span class="si">{}</span><span class="s2">. Expected: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_dim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adv_in_dim</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_X_transformer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">inpt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_X_transformer</span><span class="p">(</span><span class="n">inpt</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either `y` or `z` must be not None.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inpt</span> <span class="o">=</span> <span class="n">z</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">inpt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Z_transformer</span><span class="p">(</span><span class="n">inpt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sample</span>
+        <span class="k">return</span> <span class="n">sample</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="../../../../copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>vegans.models.unconditional package &mdash; vegans 0.2.1 documentation</title>
+  <title>vegans.models.unconditional package &mdash; vegans  documentation</title>
   
 
   
@@ -88,7 +88,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="README.html">Readme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="vegans.html">vegans package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="vegans.html#subpackages">Subpackages</a><ul class="current">
@@ -103,7 +103,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
 </ul>
 
             
@@ -184,45 +183,1349 @@
 </div>
 <div class="section" id="module-vegans.models.unconditional.AAE">
 <span id="vegans-models-unconditional-aae-module"></span><h2>vegans.models.unconditional.AAE module<a class="headerlink" href="#module-vegans.models.unconditional.AAE" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="aae">
+<h3>AAE<a class="headerlink" href="#aae" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Adversarial Autoencoder[1].</p>
+<p>Instead of using the Kullback Leibler divergence to improve the latent space distribution
+we use a discriminator to determine the “realness” of the latent vector.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Encoder: Binary cross-entropy + Mean-squared error</p></li>
+<li><p>Generator: Mean-squared error</p></li>
+<li><p>Adversary: Binary cross-entropy</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_z: Weight for the discriminator loss computing the realness of the latent z dimension.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1511.05644.pdf">https://arxiv.org/pdf/1511.05644.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.AAE.AAE">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.AAE.</span></code><code class="sig-name descname"><span class="pre">AAE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/AAE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AAE.html#AAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AAE.AAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_z</strong> (<em>float</em>) – Weight for the discriminator loss computing the realness of the latent z dimension.</p></li>
+<li><p><strong>adv_type</strong> (<em>&quot;Discriminator&quot;</em><em>, </em><em>&quot;Critic&quot;</em><em> or </em><em>&quot;Autoencoder&quot;</em>) – Indicating which adversarial architecture will be used.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.AAE.AAE.calculate_losses">
+<code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AAE.html#AAE.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AAE.AAE.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AAE.AAE.encode">
+<code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AAE.html#AAE.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AAE.AAE.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.AbstractGAN1v1">
 <span id="vegans-models-unconditional-abstractgan1v1-module"></span><h2>vegans.models.unconditional.AbstractGAN1v1 module<a class="headerlink" href="#module-vegans.models.unconditional.AbstractGAN1v1" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.</span></code><code class="sig-name descname"><span class="pre">AbstractGAN1v1</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_called_from_conditional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGAN1v1.html#AbstractGAN1v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel</span></code></a></p>
+<p>Abstract class for GAN with structure of one generator and
+one discriminator / critic. Examples are the original <cite>VanillaGAN</cite>, <cite>WassersteinGAN</cite>
+and <cite>WassersteinGANGP</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>lambda_grad</strong> (<em>float</em>) – Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1.calculate_losses">
+<code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGAN1v1.html#AbstractGAN1v1.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the losses for GANs using a 1v1 architecture.</p>
+<p>This method is called within the <cite>AbstractGenerativeModel</cite> main <cite>fit()</cite> loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_batch</strong> (<em>torch.Tensor</em>) – Current x batch.</p></li>
+<li><p><strong>Z_batch</strong> (<em>torch.Tensor</em>) – Current z batch.</p></li>
+<li><p><strong>who</strong> (<em>None</em><em>, </em><em>optional</em>) – Name of the network that should be trained.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vegans.models.unconditional.AbstractGANGAE">
+<span id="vegans-models-unconditional-abstractgangae-module"></span><h2>vegans.models.unconditional.AbstractGANGAE module<a class="headerlink" href="#module-vegans.models.unconditional.AbstractGANGAE" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.AbstractGANGAE.</span></code><code class="sig-name descname"><span class="pre">AbstractGANGAE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_called_from_conditional</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGANGAE.html#AbstractGANGAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel</span></code></a></p>
+<p>Abstract class for GAN with structure of one generator, one discriminator / critic and
+one encoder. Examples are the <cite>LRGAN</cite>, <cite>VAEGAN</cite> and <cite>BicycleGAN</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>lambda_grad</strong> (<em>float</em>) – Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE.calculate_losses">
+<code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGANGAE.html#AbstractGANGAE.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the losses for GANs using a 1v1 architecture.</p>
+<p>This method is called within the <cite>AbstractGenerativeModel</cite> main <cite>fit()</cite> loop.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_batch</strong> (<em>torch.Tensor</em>) – Current x batch.</p></li>
+<li><p><strong>Z_batch</strong> (<em>torch.Tensor</em>) – Current z batch.</p></li>
+<li><p><strong>who</strong> (<em>None</em><em>, </em><em>optional</em>) – Name of the network that should be trained.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE.encode">
+<code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGANGAE.html#AbstractGANGAE.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-vegans.models.unconditional.AbstractGenerativeModel">
 <span id="vegans-models-unconditional-abstractgenerativemodel-module"></span><h2>vegans.models.unconditional.AbstractGenerativeModel module<a class="headerlink" href="#module-vegans.models.unconditional.AbstractGenerativeModel" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.</span></code><code class="sig-name descname"><span class="pre">AbstractGenerativeModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should
+at least inherit from this class. If a conditional version is implemented look at <cite>AbstractConditionalGenerativeModel</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._build_images">
+<code class="sig-name descname"><span class="pre">_build_images</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._build_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._build_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build matplotlib figure containing all images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>images</strong> (<em>torch.Tensor</em><em>(</em><em>)</em>) – A torch Tensor containing the images to be plotted by matplotlib.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>fig, axs</strong> – Objects containing the figure as well as all separate axis objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>plt.Figure, np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._calculate_feature_loss">
+<code class="sig-name descname"><span class="pre">_calculate_feature_loss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_fake</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._calculate_feature_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._calculate_feature_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates feature loss if <cite>self.feature_layer</cite> is not None.</p>
+<p>Every network takes the <cite>feature_layer</cite> argument in its constructor.
+If it is not None, a layer of the discriminator / critic should be specified.
+A feature loss will be calculated which is the MSE between the output for real
+and fake samples of the specified <cite>self.feature_layer</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_real</strong> (<em>torch.Tensor</em>) – Real samples.</p></li>
+<li><p><strong>X_fake</strong> (<em>torch.Tensor</em>) – Fake samples.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._check_dict_keys">
+<code class="sig-name descname"><span class="pre">_check_dict_keys</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">where</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._check_dict_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._check_dict_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if <cite>param_dict</cite> has the correct form.</p>
+<p>The correct form is {“Network1”: value1, “Network2”: value2, …} for every network.
+This utility function checks if every network in <cite>self.neural_nets</cite> has an entry in <cite>param_dict</cite>
+and if every entry in <cite>param_dict</cite> exits in <cite>self.neural_nets</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param_dict</strong> (<em>TYPE</em>) – Parameter dictionary</p></li>
+<li><p><strong>where</strong> (<em>TYPE</em>) – Specifies the location from which the function is called for meaningful <cite>KeyError</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>KeyError</strong> – If <cite>param_dict</cite> is not of the specified form.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._create_steps">
+<code class="sig-name descname"><span class="pre">_create_steps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._create_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._create_steps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <cite>self.steps</cite> dictionary.</p>
+<p>The created dictionary must be of the form {“Network1”: steps1, “Network2”: steps2, …}. During training
+“Network1” will be trained for <cite>steps1</cite> steps, and so on.
+Functionality similar to <cite>self_define_optimizers()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>steps</strong> (<em>None</em><em>, </em><em>dict</em>) – If not None a dictionary of the form {“Network1”: steps1, “Network2”: steps2, …} is expected.
+This dictionary might also be partially filled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._define_optimizers">
+<code class="sig-name descname"><span class="pre">_define_optimizers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._define_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._define_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the optimizers dictionary.</p>
+<p>After this step self.optimizers must exist and be of the form
+{“Network1”: optimizer1, “Network2”: optimizer2, …}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optim</strong> (<em>torch.optim</em><em> or </em><em>dict</em>) – If dict, must be of form {“Network1”: torch.optim1, “Network2”: torch.optim2, …}. If one network is
+not specified as a key of the dictionary the default optimizer (self._default_optimizer()) will be
+fetched.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – If dict, must be of form {“Network1”: optim_kwargs1, “Network2”: optim_kwargs1, …}. If one network is
+not specified as a key of the dictionary no arguments = {} are passed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._get_batch">
+<code class="sig-name descname"><span class="pre">_get_batch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._get_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._get_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the first batch of the training and testing data for the consistency checks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._log_scalars">
+<code class="sig-name descname"><span class="pre">_log_scalars</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._log_scalars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._log_scalars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log all scalars with tensorboard.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._save_losses_plot">
+<code class="sig-name descname"><span class="pre">_save_losses_plot</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._save_losses_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._save_losses_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the <cite>losses.png</cite> plot in the <cite>self.folder</cite> path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_data">
+<code class="sig-name descname"><span class="pre">_set_up_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._set_up_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>If <cite>X_train</cite> / <cite>X_test</cite> are not data loaders, create them.</p>
+<p>Also asserts their input shapes for consistency.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_saver">
+<code class="sig-name descname"><span class="pre">_set_up_saver</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">print_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_model_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_images_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_losses_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_batches</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._set_up_saver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates saving indicators if strings are passed. Additionally corresponding folders are created
+in <cite>self.folder</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Returns all saving indicators as integers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_training">
+<code class="sig-name descname"><span class="pre">_set_up_training</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_model_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_images_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_losses_every</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_tensorboard</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._set_up_training"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the dataloaders, SummaryWriters for tensorboard and transform the saving indicators.</p>
+<p>This function creates all data needed during training like the data loaders and save steps.
+It also creates the hyperparameter dictionary and the <cite>steps</cite> dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._string_to_batchnr">
+<code class="sig-name descname"><span class="pre">_string_to_batchnr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_batches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._string_to_batchnr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._string_to_batchnr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms string of the form “0.2e” into 0.2 and performs basic sanity checks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._summarise_batch">
+<code class="sig-name descname"><span class="pre">_summarise_batch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_batches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_epochs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_every</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel._summarise_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._summarise_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print summary statistics after a specified amount of batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<em>int</em>) – Current batch.</p></li>
+<li><p><strong>max_batches</strong> (<em>int</em>) – Maximum number of total batches.</p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – Current epoch.</p></li>
+<li><p><strong>max_epochs</strong> (<em>int</em>) – Maximum number of total epochs.</p></li>
+<li><p><strong>print_every</strong> (<em>int</em>) – After how many batches the summary should be printed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.calculate_losses">
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.eval">
+<code class="sig-name descname"><span class="pre">eval</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.eval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set all networks to evaluation mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.fit">
+<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1e'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_model_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_images_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_losses_every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1e'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_tensorboard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the model, iterating over all contained networks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_train</strong> (<em>np.array</em><em> or </em><em>torch.utils.data.DataLoader</em>) – Training data for the generative network. Usually images.</p></li>
+<li><p><strong>X_test</strong> (<em>np.array</em><em>, </em><em>optional</em>) – Testing data for the generative network. Must have same shape as X_train.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of epochs (passes over the training data set) performed during training.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Batch size used when creating the data loader from X_train. Ignored if torch.utils.data.DataLoader is passed
+for X_train.</p></li>
+<li><p><strong>steps</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary with names of the networks to indicate how often they should be trained, i.e. {“Generator”: 5} indicates
+that the generator is trained 5 times while all other networks are trained once.</p></li>
+<li><p><strong>print_every</strong> (<em>int</em><em>, </em><em>string</em><em>, </em><em>optional</em>) – Indicates after how many batches the losses for the train data should be printed to the console. Can also be a string
+of the form “0.25e” (4 times per epoch), “1e” (once per epoch) or “3e” (every third epoch).</p></li>
+<li><p><strong>save_model_every</strong> (<em>int</em><em>, </em><em>string</em><em>, </em><em>optional</em>) – Indicates after how many batches the model should be saved. Can also be a string
+of the form “0.25e” (4 times per epoch), “1e” (once per epoch) or “3e” (every third epoch).</p></li>
+<li><p><strong>save_images_every</strong> (<em>int</em><em>, </em><em>string</em><em>, </em><em>optional</em>) – Indicates after how many batches the images for the losses and fixed_noise should be saved. Can also be a string
+of the form “0.25e” (4 times per epoch), “1e” (once per epoch) or “3e” (every third epoch).</p></li>
+<li><p><strong>save_losses_every</strong> (<em>int</em><em>, </em><em>string</em><em>, </em><em>optional</em>) – Indicates after how many batches the losses for the train and test data should be calculated. Can also be a string
+of the form “0.25e” (4 times per epoch), “1e” (once per epoch) or “3e” (every third epoch).</p></li>
+<li><p><strong>enable_tensorboard</strong> (<em>bool</em><em>, </em><em>optional</em>) – Flag to indicate whether subdirectory folder/tensorboard should be created to log losses and images.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.generate">
+<code class="sig-name descname"><span class="pre">generate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate output with generator / decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>None</em><em>, </em><em>optional</em>) – Latent input vector to produce an output from.</p></li>
+<li><p><strong>n</strong> (<em>None</em><em>, </em><em>optional</em>) – Number of outputs to be generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output produced by generator / decoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_hyperparameters">
+<code class="sig-name descname"><span class="pre">get_hyperparameters</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.get_hyperparameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary containing all relevant hyperparameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary containing all relevant hyperparameters.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_losses">
+<code class="sig-name descname"><span class="pre">get_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">by_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.get_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_losses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get losses logged during training</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>by_epoch</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true one loss value per epoch is returned for every logged_loss. Otherwise frequency is given
+by <cite>save_losses_every</cite> argument of <cite>fit</cite>, i.e. <cite>save_losses_every=10</cite> saves losses every 10th batch,
+<cite>save_losses_every=”0.25e</cite> saves losses 4 times per epoch.</p></li>
+<li><p><strong>agg</strong> (<em>None</em><em>, </em><em>optional</em>) – Aggregation function used if by_epoch is true, otherwise ignored. Default is np.mean for all batches
+in one epoch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>losses_dict</strong> – Dictionary containing all loss types logged during training</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_number_params">
+<code class="sig-name descname"><span class="pre">get_number_params</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.get_number_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_number_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of parameters in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary containing the number of parameters per network.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_training_results">
+<code class="sig-name descname"><span class="pre">get_training_results</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">by_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.get_training_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_training_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call after training to get fixed_noise samples and losses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>by_epoch</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true one loss value per epoch is returned for every logged_loss. Otherwise frequency is given
+by <cite>save_losses_every</cite> argument of <cite>fit</cite>, i.e. <cite>save_losses_every=10</cite> saves losses every 10th batch,
+<cite>save_losses_every=”0.25e</cite> saves losses 4 times per epoch.</p></li>
+<li><p><strong>agg</strong> (<em>None</em><em>, </em><em>optional</em>) – Aggregation function used if by_epoch is true, otherwise ignored. Default is np.mean for all batches
+in one epoch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>samples</strong> (<em>np.array</em>) – Images produced with the final model for the fixed_noise.</p></li>
+<li><p><strong>losses_dict</strong> (<em>dict</em>) – Dictionary containing all loss types logged during training</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.load">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load an already trained model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>TYPE</em>) – path to the saved file.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Trained model</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel">AbstractGenerativeModel</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.predict">
+<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use the critic / discriminator to predict if input is real / fake.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>np.array</em>) – Images or samples to be predicted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Array with one output per x indicating the realness of an input.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.sample">
+<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample from the latent distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Number of samples drawn from the latent distribution.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Random numbers with shape of [n, <a href="#id2"><span class="problematic" id="id3">*</span></a>z_dim]</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.save">
+<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves model in the model folder as torch / pickle object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – name of the saved file. folder specified in the constructor used
+in absolute path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.summary">
+<code class="sig-name descname"><span class="pre">summary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print summary of the model in Keras style way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>save</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true summary is saved in model folder, printed to console otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.to">
+<code class="sig-name descname"><span class="pre">to</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all networks to device.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.train">
+<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/AbstractGenerativeModel.html#AbstractGenerativeModel.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set all networks to training mode.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-vegans.models.unconditional.BicycleGAN">
 <span id="vegans-models-unconditional-bicyclegan-module"></span><h2>vegans.models.unconditional.BicycleGAN module<a class="headerlink" href="#module-vegans.models.unconditional.BicycleGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="bicyclegan">
+<h3>BicycleGAN<a class="headerlink" href="#bicyclegan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the BicycleGAN[1], a combination of the VAEGAN and the LRGAN.</p>
+<p>It utilizes both steps of the Variational Autoencoder (Kullback-Leibler Loss) and uses the same
+encoder architecture for the latent regression of generated images.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Binary cross-entropy + L1-latent-loss + L1-reconstruction-loss</p></li>
+<li><p>Discriminator: Binary cross-entropy</p></li>
+<li><p>Encoder: Kullback-Leibler Loss + L1-latent-loss + L1-reconstruction-loss</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+<li><p>lambda_x: Weight for the reconstruction loss of the real x dimensions.</p></li>
+<li><p>lambda_z: Weight for the reconstruction loss of the latent z dimensions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id4"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1711.11586.pdf">https://arxiv.org/pdf/1711.11586.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.BicycleGAN.BicycleGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.BicycleGAN.</span></code><code class="sig-name descname"><span class="pre">BicycleGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_KL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/BicycleGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/BicycleGAN.html#BicycleGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.BicycleGAN.BicycleGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE" title="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_KL</strong> (<em>float</em>) – Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+<li><p><strong>lambda_x</strong> (<em>float</em>) – Weight for the reconstruction loss of the real x dimensions.</p></li>
+<li><p><strong>lambda_z</strong> (<em>float</em>) – Weight for the reconstruction loss of the latent z dimensions.</p></li>
+<li><p><strong>adv_type</strong> (<em>&quot;Discriminator&quot;</em><em>, </em><em>&quot;Critic&quot;</em><em> or </em><em>&quot;Autoencoder&quot;</em>) – Indicating which adversarial architecture will be used.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.EBGAN">
 <span id="vegans-models-unconditional-ebgan-module"></span><h2>vegans.models.unconditional.EBGAN module<a class="headerlink" href="#module-vegans.models.unconditional.EBGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ebgan">
+<h3>EBGAN<a class="headerlink" href="#ebgan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Energy based GAN[1].</p>
+<p>Uses an auto-encoder as the adversary structure.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: L2 (Mean Squared Error)</p></li>
+<li><p>Autoencoder: L2 (Mean Squared Error)</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>m: Cut off for the hinge loss. Look at reference for more information.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1609.03126.pdf">https://arxiv.org/pdf/1609.03126.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.EBGAN.EBGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.EBGAN.</span></code><code class="sig-name descname"><span class="pre">EBGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/EBGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/EBGAN.html#EBGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.EBGAN.EBGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>m</strong> (<em>float</em>) – Cut off for the hinge loss. Look at reference for more information.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.InfoGAN">
 <span id="vegans-models-unconditional-infogan-module"></span><h2>vegans.models.unconditional.InfoGAN module<a class="headerlink" href="#module-vegans.models.unconditional.InfoGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="infogan">
+<h3>InfoGAN<a class="headerlink" href="#infogan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the InfoGAN[1].</p>
+<p>It introduces an encoder network which maps the generator output back to the latent
+input space. This should help to prevent mode collapse and improve image variety.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Binary cross-entropy + Normal Log-Likelihood + Multinomial Log-Likelihood</p></li>
+<li><p>Discriminator: Binary cross-entropy</p></li>
+<li><p>Encoder: Normal Log-Likelihood + Multinomial Log-Likelihood</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>c_dim_discrete: Number of discrete multinomial dimensions (might be list of independent multinomial spaces).</p></li>
+<li><p>c_dim_continuous: Number of continuous normal dimensions.</p></li>
+<li><p>lambda_z: Weight for the reconstruction loss for the latent z dimensions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id6"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://dl.acm.org/doi/10.5555/3157096.3157340">https://dl.acm.org/doi/10.5555/3157096.3157340</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.InfoGAN.InfoGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.InfoGAN.</span></code><code class="sig-name descname"><span class="pre">InfoGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_dim_discrete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_dim_continuous</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/InfoGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/InfoGAN.html#InfoGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.InfoGAN.InfoGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>c_dim_discrete</strong> (<em>int</em><em>, </em><em>list</em>) – Number of discrete multinomial dimensions (might be list of independent multinomial spaces).</p></li>
+<li><p><strong>c_dim_continuous</strong> (<em>int</em>) – Number of continuous normal dimensions.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_z</strong> (<em>float</em>) – Weight for the reconstruction loss for the latent z dimensions.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.InfoGAN.InfoGAN.calculate_losses">
+<code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/InfoGAN.html#InfoGAN.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.InfoGAN.InfoGAN.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.InfoGAN.InfoGAN.encode">
+<code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/InfoGAN.html#InfoGAN.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.InfoGAN.InfoGAN.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.InfoGAN.InfoGAN.generate">
+<code class="sig-name descname"><span class="pre">generate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/InfoGAN.html#InfoGAN.generate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.InfoGAN.InfoGAN.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate output with generator / decoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>z</strong> (<em>None</em><em>, </em><em>optional</em>) – Latent input vector to produce an output from.</p></li>
+<li><p><strong>n</strong> (<em>None</em><em>, </em><em>optional</em>) – Number of outputs to be generated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Output produced by generator / decoder.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.InfoGAN.InfoGAN.sample_c">
+<code class="sig-name descname"><span class="pre">sample_c</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/InfoGAN.html#InfoGAN.sample_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.InfoGAN.InfoGAN.sample_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample the conditional vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Number of outputs to be generated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.KLGAN">
 <span id="vegans-models-unconditional-klgan-module"></span><h2>vegans.models.unconditional.KLGAN module<a class="headerlink" href="#module-vegans.models.unconditional.KLGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="klgan">
+<h3>KLGAN<a class="headerlink" href="#klgan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Kullback Leibler GAN.</p>
+<p>Uses the Kullback Leibler loss for the generator.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Kullback-Leibler</p></li>
+<li><p>Autoencoder: Binary cross-entropy</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>eps: Small value preventing overflow and nans when calculating the Kullback-Leibler divergence.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id7"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/">https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.KLGAN.KLGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.KLGAN.</span></code><code class="sig-name descname"><span class="pre">KLGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/KLGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/KLGAN.html#KLGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.KLGAN.KLGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Small value preventing overflow and nans when calculating the Kullback-Leibler divergence.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.LRGAN">
 <span id="vegans-models-unconditional-lrgan-module"></span><h2>vegans.models.unconditional.LRGAN module<a class="headerlink" href="#module-vegans.models.unconditional.LRGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="lrgan">
+<h3>LRGAN<a class="headerlink" href="#lrgan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the latent regressor GAN well described in the BicycleGAN paper[1].</p>
+<p>It introduces an encoder network which maps the generator output back to the latent
+input space. This should help to prevent mode collapse and improve image variety.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Binary cross-entropy + L1-latent-loss (Mean Absolute Error)</p></li>
+<li><p>Discriminator: Binary cross-entropy</p></li>
+<li><p>Encoder: L1-latent-loss (Mean Absolute Error)</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_z: Weight for the reconstruction loss for the latent z dimensions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id8"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1711.11586.pdf">https://arxiv.org/pdf/1711.11586.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.LRGAN.LRGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.LRGAN.</span></code><code class="sig-name descname"><span class="pre">LRGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/LRGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/LRGAN.html#LRGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.LRGAN.LRGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE" title="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_z</strong> (<em>float</em>) – Weight for the reconstruction loss for the latent z dimensions.</p></li>
+<li><p><strong>adv_type</strong> (<em>&quot;Discriminator&quot;</em><em>, </em><em>&quot;Critic&quot;</em><em> or </em><em>&quot;Autoencoder&quot;</em>) – Indicating which adversarial architecture will be used.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.LSGAN">
 <span id="vegans-models-unconditional-lsgan-module"></span><h2>vegans.models.unconditional.LSGAN module<a class="headerlink" href="#module-vegans.models.unconditional.LSGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="lsgan">
+<h3>LSGAN<a class="headerlink" href="#lsgan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Least-Squares GAN[1].</p>
+<p>Uses the L2 norm for evaluating the realness of real and fake images.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: L2 (Mean Squared Error)</p></li>
+<li><p>Discriminator: L2 (Mean Squared Error)</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id9"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf">https://openaccess.thecvf.com/content_ICCV_2017/papers/Mao_Least_Squares_Generative_ICCV_2017_paper.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.LSGAN.LSGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.LSGAN.</span></code><code class="sig-name descname"><span class="pre">LSGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/LSGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/LSGAN.html#LSGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.LSGAN.LSGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.VAEGAN">
 <span id="vegans-models-unconditional-vaegan-module"></span><h2>vegans.models.unconditional.VAEGAN module<a class="headerlink" href="#module-vegans.models.unconditional.VAEGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vaegan">
+<h3>VAEGAN<a class="headerlink" href="#vaegan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Variational Autoencoder Generative Adversarial Network[1].</p>
+<p>Trains on Kullback-Leibler loss for the latent space and attaches a adversary to get better quality output.
+The Decoder acts as the generator.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Encoder: Kullback-Leibler</p></li>
+<li><p>Generator / Decoder: Binary cross-entropy</p></li>
+<li><p>Adversary: Binary cross-entropy</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+<li><p>lambda_x: Weight for the reconstruction loss of the real x dimensions.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id10"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1512.09300.pdf">https://arxiv.org/pdf/1512.09300.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.VAEGAN.VAEGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.VAEGAN.</span></code><code class="sig-name descname"><span class="pre">VAEGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_KL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adv_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Discriminator'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/VAEGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/VAEGAN.html#VAEGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.VAEGAN.VAEGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE" title="vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGANGAE.AbstractGANGAE</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_KL</strong> (<em>float</em>) – Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+<li><p><strong>lambda_x</strong> (<em>float</em>) – Weight for the reconstruction loss of the real x dimensions.</p></li>
+<li><p><strong>adv_type</strong> (<em>&quot;Discriminator&quot;</em><em>, </em><em>&quot;Critic&quot;</em><em> or </em><em>&quot;Autoencoder&quot;</em>) – Indicating which adversarial architecture will be used.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.VanillaGAN">
 <span id="vegans-models-unconditional-vanillagan-module"></span><h2>vegans.models.unconditional.VanillaGAN module<a class="headerlink" href="#module-vegans.models.unconditional.VanillaGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vanillagan">
+<h3>VanillaGAN<a class="headerlink" href="#vanillagan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the original Generative adversarial network[1].</p>
+<p>Uses the binary cross-entropy for evaluating the realness of real and fake images.
+The discriminator tries to output 1 for real images and 0 for fake images, whereas the
+generator tries to force the discriminator to output 1 for fake images.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Binary cross-entropy</p></li>
+<li><p>Discriminator: Binary cross-entropy</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id11"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://papers.nips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf">https://papers.nips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.VanillaGAN.VanillaGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.VanillaGAN.</span></code><code class="sig-name descname"><span class="pre">VanillaGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/VanillaGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/VanillaGAN.html#VanillaGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.VanillaGAN.VanillaGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.VanillaVAE">
 <span id="vegans-models-unconditional-vanillavae-module"></span><h2>vegans.models.unconditional.VanillaVAE module<a class="headerlink" href="#module-vegans.models.unconditional.VanillaVAE" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="vanillavae">
+<h3>VanillaVAE<a class="headerlink" href="#vanillavae" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Variational Autoencoder[1].</p>
+<p>Trains on Kullback-Leibler loss and mean squared error reconstruction loss.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Encoder: Kullback-Leibler</p></li>
+<li><p>Decoder: L2 (Mean Squared Error)</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.Adam</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_KL: Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id12"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/pdf/1906.02691.pdf">https://arxiv.org/pdf/1906.02691.pdf</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.VanillaVAE.VanillaVAE">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.VanillaVAE.</span></code><code class="sig-name descname"><span class="pre">VanillaVAE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_KL</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/VanillaVAE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/VanillaVAE.html#VanillaVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.VanillaVAE.VanillaVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel" title="vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder architecture. Produces predictions in the latent space.</p></li>
+<li><p><strong>decoder</strong> (<em>nn.Module</em>) – Decoder architecture. Produces output in the real space.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_KL</strong> (<em>float</em>) – Weight for the encoder loss computing the Kullback-Leibler divergence in the latent space.</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="vegans.models.unconditional.VanillaVAE.VanillaVAE.calculate_losses">
+<code class="sig-name descname"><span class="pre">calculate_losses</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z_batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">who</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/VanillaVAE.html#VanillaVAE.calculate_losses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.VanillaVAE.VanillaVAE.calculate_losses" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="vegans.models.unconditional.VanillaVAE.VanillaVAE.encode">
+<code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/VanillaVAE.html#VanillaVAE.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.VanillaVAE.VanillaVAE.encode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.WassersteinGAN">
 <span id="vegans-models-unconditional-wassersteingan-module"></span><h2>vegans.models.unconditional.WassersteinGAN module<a class="headerlink" href="#module-vegans.models.unconditional.WassersteinGAN" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wassersteingan">
+<h3>WassersteinGAN<a class="headerlink" href="#wassersteingan" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Wasserstein GAN[1].</p>
+<p>Uses the Wasserstein loss to determine the realness of real and fake images.
+The Wasserstein loss has several theoretical advantages over the Jensen-Shanon divergence
+minimised by the original GAN. In this architecture the critic (discriminator) is often
+trained multiple times for every generator step.
+Lipschitz continuity is “enforced” by weight clipping.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Wasserstein</p></li>
+<li><p>Critic: Wasserstein</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.RMSprop</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>clip_val: Clip value for the critic to maintain Lipschitz continuity.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id13"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://export.arxiv.org/pdf/1701.07875">https://export.arxiv.org/pdf/1701.07875</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.WassersteinGAN.WassersteinGAN">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.WassersteinGAN.</span></code><code class="sig-name descname"><span class="pre">WassersteinGAN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/WassersteinGAN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/WassersteinGAN.html#WassersteinGAN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.WassersteinGAN.WassersteinGAN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>clip_val</strong> (<em>float</em>) – Clip value for the critic to maintain Lipschitz continuity.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional.WassersteinGANGP">
 <span id="vegans-models-unconditional-wassersteingangp-module"></span><h2>vegans.models.unconditional.WassersteinGANGP module<a class="headerlink" href="#module-vegans.models.unconditional.WassersteinGANGP" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="wassersteingangp">
+<h3>WassersteinGANGP<a class="headerlink" href="#wassersteingangp" title="Permalink to this headline">¶</a></h3>
+<p>Implements the Wasserstein GAN Gradient Penalized[1].</p>
+<p>Uses the Wasserstein loss to determine the realness of real and fake images.
+The Wasserstein loss has several theoretical advantages over the Jensen-Shanon divergence
+minimised by the original GAN. In this architecture the critic (discriminator) is often
+trained multiple times for every generator step.
+Lipschitz continuity is “enforced” by gradient penalization.</p>
+<dl class="simple">
+<dt>Losses:</dt><dd><ul class="simple">
+<li><p>Generator: Wasserstein</p></li>
+<li><p>Critic: Wasserstein + Gradient penalization</p></li>
+</ul>
+</dd>
+<dt>Default optimizer:</dt><dd><ul class="simple">
+<li><p>torch.optim.RMSprop</p></li>
+</ul>
+</dd>
+<dt>Custom parameter:</dt><dd><ul class="simple">
+<li><p>lambda_grad: Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id14"><span class="brackets">1</span></dt>
+<dd><p><a class="reference external" href="https://arxiv.org/abs/1704.00028">https://arxiv.org/abs/1704.00028</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="vegans.models.unconditional.WassersteinGANGP.WassersteinGANGP">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">vegans.models.unconditional.WassersteinGANGP.</span></code><code class="sig-name descname"><span class="pre">WassersteinGANGP</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adversary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_noise_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./veganModels/WassersteinGANGP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vegans/models/unconditional/WassersteinGANGP.html#WassersteinGANGP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#vegans.models.unconditional.WassersteinGANGP.WassersteinGANGP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1" title="vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1"><code class="xref py py-class docutils literal notranslate"><span class="pre">vegans.models.unconditional.AbstractGAN1v1.AbstractGAN1v1</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>generator</strong> (<em>nn.Module</em>) – Generator architecture. Produces output in the real space.</p></li>
+<li><p><strong>adversary</strong> (<em>nn.Module</em>) – Adversary architecture. Produces predictions for real and fake samples to differentiate them.</p></li>
+<li><p><strong>x_dim</strong> (<em>list</em><em>, </em><em>tuple</em>) – Number of the output dimensions of the generator and input dimension of the discriminator / critic.
+In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</p></li>
+<li><p><strong>z_dim</strong> (<em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em>) – Number of the latent dimensions for the generator input. Might have dimensions of an image.</p></li>
+<li><p><strong>optim</strong> (<em>dict</em><em> or </em><em>torch.optim</em>) – Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network
+name keys and torch.optim as value, i.e. {“Generator”: torch.optim.Adam}.</p></li>
+<li><p><strong>optim_kwargs</strong> (<em>dict</em>) – Optimizer keyword arguments used for each network. Must be a dictionary with network
+name keys and dictionary with keyword arguments as value, i.e. {“Generator”: {“lr”: 0.0001}}.</p></li>
+<li><p><strong>lambda_grad</strong> (<em>float</em>) – Weight for the reconstruction loss of the gradients. Pushes the norm of the gradients to 1.</p></li>
+<li><p><strong>feature_layer</strong> (<em>torch.nn.*</em>) – Output layer used to compute the feature loss. Should be from either the discriminator or critic.
+If <cite>feature_layer</cite> is not None, the original generator loss is replaced by a feature loss, introduced
+[here](<a class="reference external" href="https://arxiv.org/abs/1606.03498v1">https://arxiv.org/abs/1606.03498v1</a>).</p></li>
+<li><p><strong>fixed_noise_size</strong> (<em>int</em>) – Number of images shown when logging. The fixed noise is used to produce the images in the folder/images
+subdirectory, the tensorboard images tab and the samples in get_training_results().</p></li>
+<li><p><strong>device</strong> (<em>string</em>) – Device used while training the model. Either “cpu” or “cuda”.</p></li>
+<li><p><strong>ngpu</strong> (<em>int</em>) – Number of gpus used during training if device == “cuda”.</p></li>
+<li><p><strong>folder</strong> (<em>string</em>) – Creates a folder in the current working directory with this name. All relevant files like summary, images, models and
+tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name
+already exists a time stamp is appended to make it unique.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="module-vegans.models.unconditional">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vegans.models.unconditional" title="Permalink to this headline">¶</a></h2>
@@ -243,7 +1546,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; <a href="copyright.html">Copyright</a> 2021, Unit8.
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
 
     </p>
   </div>

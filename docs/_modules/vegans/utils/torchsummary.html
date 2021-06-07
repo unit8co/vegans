@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.utils.torchsummary &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="copyright" title="Copyright" href="../../../copyright.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vegans.utils.torchsummary</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vegans.utils.torchsummary</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Full credit for this module goes to github user `sksq96` (Shubham Chandel)</span>
+<span class="sd">and the other authors of the `pytorch-summary` package.</span>
+
+<span class="sd">Check out their implementation on github: https://github.com/sksq96/pytorch-summary.</span>
+
+<span class="sd">Unfortunately the package is currently (2021-05-04) no longer under development and a conda version does not exist.</span>
+<span class="sd">This would block us from creating a conda distribution. Their package is published under the MIT License, so we fork</span>
+<span class="sd">their code (2021-05-04) and use it in this module here.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="kn">import</span> <span class="n">Variable</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="summary"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.torchsummary.summary">[docs]</a><span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span><span class="p">),</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">result</span><span class="p">,</span> <span class="n">params_info</span> <span class="o">=</span> <span class="n">summary_string</span><span class="p">(</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">params_info</span></div>
+
+
+<div class="viewcode-block" id="summary_string"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.torchsummary.summary_string">[docs]</a><span class="k">def</span> <span class="nf">summary_string</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span><span class="p">),</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dtypes</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span>
+
+    <span class="n">summary_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">register_hook</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">hook</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">module_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+
+            <span class="n">m_key</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%i</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">module_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;input_shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+            <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;input_shape&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_size</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;output_shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">size</span><span class="p">())[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;output_shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+                <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;output_shape&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_size</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">):</span>
+                <span class="n">params</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">size</span><span class="p">())))</span>
+                <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;trainable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">requires_grad</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="s2">&quot;bias&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="s2">&quot;size&quot;</span><span class="p">):</span>
+                <span class="n">params</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">size</span><span class="p">())))</span>
+            <span class="n">summary</span><span class="p">[</span><span class="n">m_key</span><span class="p">][</span><span class="s2">&quot;nb_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">hooks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">register_forward_hook</span><span class="p">(</span><span class="n">hook</span><span class="p">))</span>
+
+    <span class="c1"># multiple inputs to the network</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_size</span><span class="p">]</span>
+
+    <span class="c1"># batch_size of 2 for batchnorm</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="n">in_size</span><span class="p">)</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+         <span class="k">for</span> <span class="n">in_size</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)]</span>
+
+    <span class="c1"># create properties</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="n">hooks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># register hook</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">register_hook</span><span class="p">)</span>
+
+    <span class="c1"># make a forward pass</span>
+    <span class="c1"># print(x.shape)</span>
+    <span class="n">model</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># remove these hooks</span>
+    <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hooks</span><span class="p">:</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;----------------------------------------------------------------&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">line_new</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;20}</span><span class="s2">  </span><span class="si">{:&gt;25}</span><span class="s2"> </span><span class="si">{:&gt;15}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="s2">&quot;Layer (type)&quot;</span><span class="p">,</span> <span class="s2">&quot;Output Shape&quot;</span><span class="p">,</span> <span class="s2">&quot;Param #&quot;</span><span class="p">)</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="n">line_new</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;================================================================&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">total_params</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_output</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">trainable_params</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">:</span>
+        <span class="c1"># input_shape, output_shape, trainable, nb_params</span>
+        <span class="n">line_new</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;20}</span><span class="s2">  </span><span class="si">{:&gt;25}</span><span class="s2"> </span><span class="si">{:&gt;15}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">layer</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;output_shape&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;</span><span class="si">{0:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;nb_params&quot;</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">total_params</span> <span class="o">+=</span> <span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;nb_params&quot;</span><span class="p">]</span>
+
+        <span class="n">total_output</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;output_shape&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;trainable&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;trainable&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">trainable_params</span> <span class="o">+=</span> <span class="n">summary</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="s2">&quot;nb_params&quot;</span><span class="p">]</span>
+        <span class="n">summary_str</span> <span class="o">+=</span> <span class="n">line_new</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="c1"># assume 4 bytes/number (float on cuda).</span>
+    <span class="n">total_input_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="p">()))</span>
+                           <span class="o">*</span> <span class="n">batch_size</span> <span class="o">*</span> <span class="mf">4.</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span>
+    <span class="n">total_output_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">total_output</span> <span class="o">*</span> <span class="mf">4.</span> <span class="o">/</span>
+                            <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span>  <span class="c1"># x2 for gradients</span>
+    <span class="n">total_params_size</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">total_params</span> <span class="o">*</span> <span class="mf">4.</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mf">2.</span><span class="p">))</span>
+    <span class="n">total_size</span> <span class="o">=</span> <span class="n">total_params_size</span> <span class="o">+</span> <span class="n">total_output_size</span> <span class="o">+</span> <span class="n">total_input_size</span>
+
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;================================================================&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Total params: </span><span class="si">{0:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_params</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Trainable params: </span><span class="si">{0:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">trainable_params</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Non-trainable params: </span><span class="si">{0:,}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_params</span> <span class="o">-</span>
+                                                        <span class="n">trainable_params</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;----------------------------------------------------------------&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Input size (MB): </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">total_input_size</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Forward/backward pass size (MB): </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">total_output_size</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Params size (MB): </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">total_params_size</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;Estimated Total Size (MB): </span><span class="si">%0.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">total_size</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">summary_str</span> <span class="o">+=</span> <span class="s2">&quot;----------------------------------------------------------------&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="c1"># return summary</span>
+    <span class="k">return</span> <span class="n">summary_str</span><span class="p">,</span> <span class="p">(</span><span class="n">total_params</span><span class="p">,</span> <span class="n">trainable_params</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="../../../copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

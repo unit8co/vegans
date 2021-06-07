@@ -26,6 +26,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
+from vegans.utils.layers import LayerReshape
 from vegans.models.unconditional.VAEGAN import VAEGAN
 from vegans.utils.networks import Encoder, Generator, Adversary
 from vegans.models.conditional.AbstractConditionalGANGAE import AbstractConditionalGANGAE
@@ -107,11 +108,13 @@ class ConditionalVAEGAN(AbstractConditionalGANGAE, VAEGAN):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
@@ -121,12 +124,16 @@ class ConditionalVAEGAN(AbstractConditionalGANGAE, VAEGAN):
         self.hyperparameters["adv_type"] = adv_type
 
         if self.secure:
-            if self.encoder.output_size == self.z_dim:
-                raise ValueError(
-                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
-
+            # TODO: Remove those lines or use them again, but not commented
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
+            assert (self.generator.output_size == self.x_dim), (
+                "Decoder output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
+            )
+            
 
     #########################################################################
     # Actions during training

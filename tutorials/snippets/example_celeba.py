@@ -23,51 +23,48 @@ from vegans.models.conditional.ConditionalVanillaVAE import ConditionalVanillaVA
 
 if __name__ == '__main__':
 
-    datapath = "./data/"
-    train_dataloader = loading.load_data(datapath, which="CelebA", batch_size=8, max_loaded_images=3000)
+    loader = loading.CelebALoader(batch_size=16, max_loaded_images=1000, output_shape=32)
+    train_dataloader = loader.load()
 
     epochs = 3
 
     X_train, y_train = iter(train_dataloader).next()
     x_dim = X_train.numpy().shape[1:]
     y_dim = y_train.numpy().shape[1:]
-    z_dim = 16
-    gen_in_dim = utils.get_input_dim(dim1=z_dim, dim2=y_dim)
-    adv_in_dim = utils.get_input_dim(dim1=x_dim, dim2=y_dim)
+    z_dim = 128
 
     ######################################C###################################
     # Architecture
     #########################################################################
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="example")
-    critic = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Critic", which="example")
-    encoder = loading.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    autoencoder = loading.load_autoencoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
-    decoder = loading.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="example")
+    # loader = loading.ExampleLoader()
+    generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator")
+    critic = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Critic")
+    encoder = loader.load_encoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    decoder = loader.load_decoder(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
 
     #########################################################################
     # Training
     #########################################################################
     models = [
-        # ConditionalAAE, ConditionalBicycleGAN, ConditionalEBGAN,
-        # ConditionalKLGAN, ConditionalLRGAN, ConditionalLSGAN,
-        # ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
-        # ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        # ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
-        ConditionalKLGAN
+        #ConditionalBicycleGAN, ConditionalKLGAN
+        ConditionalLRGAN, ConditionalLSGAN,
+        ConditionalPix2Pix, ConditionalVAEGAN, ConditionalVanillaGAN,
+        ConditionalVanillaVAE , ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
+        ConditionalWassersteinGAN, ConditionalWassersteinGANGP,
     ]
 
     for model in models:
         kwargs = {"x_dim": x_dim, "z_dim": z_dim, "y_dim": y_dim}
 
         if model.__name__ in ["ConditionalAAE"]:
-            discriminator_aee = loading.load_adversary(x_dim=z_dim, z_dim=None, y_dim=y_dim, adv_type="Discriminator", which="example")
+            discriminator_aee = loading.ExampleLoader().load_adversary(x_dim=z_dim, y_dim=y_dim, adv_type="Discriminator")
             gan_model = model(
                 generator=generator, adversary=discriminator_aee, encoder=encoder, **kwargs
             )
 
         elif model.__name__ in ["ConditionalBicycleGAN", "ConditionalVAEGAN"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 generator=generator, adversary=discriminator, encoder=encoder_reduced, **kwargs
             )
@@ -89,7 +86,7 @@ if __name__ == '__main__':
             )
 
         elif model.__name__ in ["ConditionalVanillaVAE"]:
-            encoder_reduced = loading.load_encoder(x_dim=x_dim, z_dim=z_dim//2, y_dim=y_dim, which="example")
+            encoder_reduced = loader.load_encoder(x_dim=x_dim, z_dim=z_dim*2, y_dim=y_dim)
             gan_model = model(
                 encoder=encoder_reduced, decoder=decoder, **kwargs
             )
@@ -111,9 +108,9 @@ if __name__ == '__main__':
             batch_size=None,
             epochs=epochs,
             steps=None,
-            print_every="0.2e",
+            print_every=500,
             save_model_every=None,
-            save_images_every="0.2e",
+            save_images_every="0.1e",
             save_losses_every=10,
             enable_tensorboard=False
         )
@@ -123,19 +120,13 @@ if __name__ == '__main__':
         title = "Epochs: {}, z_dim: {}, Time trained: {} minutes\nParams: {}\n\n".format(
             epochs, z_dim, training_time, gan_model.get_number_params()
         )
-        fixed_labels = np.argmax(gan_model.get_fixed_labels(), axis=1)
-        fig, axs = utils.plot_images(images=samples.reshape(-1, 32, 32), labels=fixed_labels, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig, axs = utils.plot_images(images=samples, show=False)
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"generated_images.png")
+        plt.savefig(gan_model.folder+"/generated_images.png")
+
         fig, axs = utils.plot_losses(losses=losses, show=False)
-        fig.suptitle(
-            title,
-            fontsize=12
-        )
+        fig.suptitle(title, fontsize=12)
         fig.tight_layout()
-        plt.savefig(gan_model.folder+"losses.png")
+        plt.savefig(gan_model.folder+"/losses.png")
         # gan_model.save()

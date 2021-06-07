@@ -20,6 +20,14 @@ vegans.models.unconditional.AbstractGAN1v1 module
    :undoc-members:
    :show-inheritance:
 
+vegans.models.unconditional.AbstractGANGAE module
+-------------------------------------------------
+
+.. automodule:: vegans.models.unconditional.AbstractGANGAE
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 vegans.models.unconditional.AbstractGenerativeModel module
 ----------------------------------------------------------
 

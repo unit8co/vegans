@@ -1,0 +1,1068 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.models.unconditional.AbstractGenerativeModel &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="copyright" title="Copyright" href="../../../../copyright.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vegans.models.unconditional.AbstractGenerativeModel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vegans.models.unconditional.AbstractGenerativeModel</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">vegans.utils.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">MSELoss</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">make_grid</span>
+<span class="kn">from</span> <span class="nn">torch.utils.tensorboard</span> <span class="kn">import</span> <span class="n">SummaryWriter</span>
+<span class="kn">from</span> <span class="nn">vegans.utils.utils</span> <span class="kn">import</span> <span class="n">plot_losses</span><span class="p">,</span> <span class="n">plot_images</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractGenerativeModel</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should</span>
+<span class="sd">    at least inherit from this class. If a conditional version is implemented look at `AbstractConditionalGenerativeModel`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_dim : list, tuple</span>
+<span class="sd">        Number of the output dimensions of the generator and input dimension of the discriminator / critic.</span>
+<span class="sd">        In the case of images this will be [nr_channels, nr_height_pixels, nr_width_pixels].</span>
+<span class="sd">    z_dim : int, list, tuple</span>
+<span class="sd">        Number of the latent dimensions for the generator input. Might have dimensions of an image.</span>
+<span class="sd">    optim : dict or torch.optim</span>
+<span class="sd">        Optimizer used for each network. Could be either an optimizer from torch.optim or a dictionary with network</span>
+<span class="sd">        name keys and torch.optim as value, i.e. {&quot;Generator&quot;: torch.optim.Adam}.</span>
+<span class="sd">    optim_kwargs : dict</span>
+<span class="sd">        Optimizer keyword arguments used for each network. Must be a dictionary with network</span>
+<span class="sd">        name keys and dictionary with keyword arguments as value, i.e. {&quot;Generator&quot;: {&quot;lr&quot;: 0.0001}}.</span>
+<span class="sd">    feature_layer : torch.nn.*</span>
+<span class="sd">        Output layer used to compute the feature loss. Should be from either the discriminator or critic.</span>
+<span class="sd">        If `feature_layer` is not None, the original generator loss is replaced by a feature loss, introduced</span>
+<span class="sd">        [here](https://arxiv.org/abs/1606.03498v1).</span>
+<span class="sd">    fixed_noise_size : int</span>
+<span class="sd">        Number of images shown when logging. The fixed noise is used to produce the images in the folder/images</span>
+<span class="sd">        subdirectory, the tensorboard images tab and the samples in get_training_results().</span>
+<span class="sd">    device : string</span>
+<span class="sd">        Device used while training the model. Either &quot;cpu&quot; or &quot;cuda&quot;.</span>
+<span class="sd">    ngpu : int</span>
+<span class="sd">        Number of gpus used during training if device == &quot;cuda&quot;.</span>
+<span class="sd">    folder : string</span>
+<span class="sd">        Creates a folder in the current working directory with this name. All relevant files like summary, images, models and</span>
+<span class="sd">        tensorboard output are written there. Existing folders are never overwritten or deleted. If a folder with the same name</span>
+<span class="sd">        already exists a time stamp is appended to make it unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions before training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="p">,</span> <span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="p">,</span> <span class="n">feature_layer</span><span class="p">,</span> <span class="n">fixed_noise_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">secure</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">x_dim</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_dim</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">z_dim</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">z_dim</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">=</span> <span class="n">ngpu</span> <span class="k">if</span> <span class="n">ngpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secure</span> <span class="o">=</span> <span class="n">secure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise_size</span> <span class="o">=</span> <span class="n">fixed_noise_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+        <span class="k">elif</span> <span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;device must be cuda or cpu.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">feature_layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">feature_layer</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="p">(</span>
+                <span class="s2">&quot;`feature_layer` must inherit from nn.Module. Is: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">feature_layer</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_layer</span> <span class="o">=</span> <span class="n">feature_layer</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_layer</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;folder&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+                    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                    <span class="n">now</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">now</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_functions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_define_loss</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_define_optimizers</span><span class="p">(</span><span class="n">optim</span><span class="o">=</span><span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="o">=</span><span class="n">optim_kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">fixed_noise_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x_dim&quot;</span><span class="p">:</span> <span class="n">x_dim</span><span class="p">,</span> <span class="s2">&quot;z_dim&quot;</span><span class="p">:</span> <span class="n">z_dim</span><span class="p">,</span> <span class="s2">&quot;ngpu&quot;</span><span class="p">:</span> <span class="n">ngpu</span><span class="p">,</span> <span class="s2">&quot;folder&quot;</span><span class="p">:</span> <span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;optimizers&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">,</span>
+            <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="s2">&quot;loss_functions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_functions</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_run</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;generator&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;adversary&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span> <span class="o">=</span> <span class="s2">&quot;GAN&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Z_transformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_X_transformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adversary</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;encoder&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;decoder&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TYPE</span> <span class="o">=</span> <span class="s2">&quot;VAE&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_Z_transformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_X_transformer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Model should either have self.generator and self.adversary (self.TYPE = &#39;GAN&#39;) or </span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">+</span>
+                <span class="s2">&quot;self.decoder and self.encoder (self.TYPE = &#39;VAE&#39;).&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">images_produced</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Z_transformer</span><span class="o">.</span><span class="n">output_size</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._define_optimizers"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._define_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">_define_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optim</span><span class="p">,</span> <span class="n">optim_kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Define the optimizers dictionary.</span>
+
+<span class="sd">        After this step self.optimizers must exist and be of the form</span>
+<span class="sd">        {&quot;Network1&quot;: optimizer1, &quot;Network2&quot;: optimizer2, ...}</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        optim : torch.optim or dict</span>
+<span class="sd">            If dict, must be of form {&quot;Network1&quot;: torch.optim1, &quot;Network2&quot;: torch.optim2, ...}. If one network is</span>
+<span class="sd">            not specified as a key of the dictionary the default optimizer (self._default_optimizer()) will be</span>
+<span class="sd">            fetched.</span>
+<span class="sd">        optim_kwargs : dict</span>
+<span class="sd">            If dict, must be of form {&quot;Network1&quot;: optim_kwargs1, &quot;Network2&quot;: optim_kwargs1, ...}. If one network is</span>
+<span class="sd">            not specified as a key of the dictionary no arguments = {} are passed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dict_optim_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">dict_optim_kwargs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optim_kwargs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">opt_kwargs</span> <span class="ow">in</span> <span class="n">optim_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dict_optim_kwargs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_dict_keys</span><span class="p">(</span><span class="n">param_dict</span><span class="o">=</span><span class="n">dict_optim_kwargs</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s2">&quot;_define_optimizers_kwargs&quot;</span><span class="p">)</span>
+
+        <span class="n">dict_optim</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">optim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dict_optim</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_optimizer</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optim</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">optim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dict_optim</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">opt</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dict_optim</span><span class="p">:</span>
+                    <span class="n">dict_optim</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_optimizer</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dict_optim</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">optim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_dict_keys</span><span class="p">(</span><span class="n">param_dict</span><span class="o">=</span><span class="n">dict_optim</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s2">&quot;_define_optimizers&quot;</span><span class="p">)</span>
+
+        <span class="n">optimizers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">network</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">optimizers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_optim</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">params</span><span class="o">=</span><span class="n">network</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="o">**</span><span class="n">dict_optim_kwargs</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">optimizers</span></div>
+
+    <span class="k">def</span> <span class="nf">_default_optimizer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._check_dict_keys"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._check_dict_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_check_dict_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">where</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Checks if `param_dict` has the correct form.</span>
+
+<span class="sd">        The correct form is {&quot;Network1&quot;: value1, &quot;Network2&quot;: value2, ...} for every network.</span>
+<span class="sd">        This utility function checks if every network in `self.neural_nets` has an entry in `param_dict`</span>
+<span class="sd">        and if every entry in `param_dict` exits in `self.neural_nets`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param_dict : TYPE</span>
+<span class="sd">            Parameter dictionary</span>
+<span class="sd">        where : TYPE</span>
+<span class="sd">            Specifies the location from which the function is called for meaningful `KeyError`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        KeyError</span>
+<span class="sd">            If `param_dict` is not of the specified form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="p">:</span>
+                <span class="n">available_nets</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Error in </span><span class="si">{}</span><span class="s2">: `</span><span class="si">{}</span><span class="s2">` not in self.neural_nets. Must be one of: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">available_nets</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Error in </span><span class="si">{}</span><span class="s2">: self.</span><span class="si">{}</span><span class="s2"> not in param_dict.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">where</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_check_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;neural_nets&quot;</span><span class="p">),</span> <span class="s2">&quot;Model must have attribute &#39;neural_nets&#39;.&quot;</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">),</span> <span class="s2">&quot;Model must have attribute &#39;device&#39;.&quot;</span>
+        <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;optimizers&quot;</span><span class="p">),</span> <span class="s2">&quot;Model must have attribute &#39;optimizers&#39;.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;ngpu must be positive integer. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ngpu</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;z_dim must either have length 1 (for vector input) or 3 (for image input). Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">z_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;x_dim must either have length 1 (for vector input) or 3 (for image input). Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="s2">&quot;&#39;neural_nets&#39; attribute of AbstractGenerativeModel must be dictionary.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_dict_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s2">&quot;_define_optimizer_kwargs&quot;</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_define_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._set_up_training"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_training">[docs]</a>    <span class="k">def</span> <span class="nf">_set_up_training</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span>
+        <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create the dataloaders, SummaryWriters for tensorboard and transform the saving indicators.</span>
+
+<span class="sd">        This function creates all data needed during training like the data loaders and save steps.</span>
+<span class="sd">        It also creates the hyperparameter dictionary and the `steps` dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_data</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+        <span class="p">)</span>
+        <span class="n">nr_test</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+        <span class="n">writer_train</span> <span class="o">=</span> <span class="n">writer_test</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">enable_tensorboard</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">writer_train</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;tensorboard/train/&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">writer_test</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;tensorboard/test/&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_steps</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+        <span class="n">save_periods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_saver</span><span class="p">(</span>
+            <span class="n">print_every</span><span class="o">=</span><span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="o">=</span><span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="o">=</span><span class="n">save_images_every</span><span class="p">,</span>
+            <span class="n">save_losses_every</span><span class="o">=</span><span class="n">save_losses_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="n">epochs</span><span class="p">,</span> <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">batch_size</span><span class="p">,</span> <span class="s2">&quot;steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span>
+            <span class="s2">&quot;print_every&quot;</span><span class="p">:</span> <span class="n">print_every</span><span class="p">,</span> <span class="s2">&quot;save_model_every&quot;</span><span class="p">:</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="s2">&quot;save_images_every&quot;</span><span class="p">:</span> <span class="n">save_images_every</span><span class="p">,</span>
+            <span class="s2">&quot;enable_tensorboard&quot;</span><span class="p">:</span> <span class="n">enable_tensorboard</span><span class="p">,</span> <span class="s2">&quot;nr_train&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="s2">&quot;nr_test&quot;</span><span class="p">:</span> <span class="n">nr_test</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">,</span> <span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">,</span> <span class="n">save_periods</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._set_up_data"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_data">[docs]</a>    <span class="k">def</span> <span class="nf">_set_up_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; If `X_train` / `X_test` are not data loaders, create them.</span>
+
+<span class="sd">        Also asserts their input shapes for consistency.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x_train_batch</span><span class="p">,</span> <span class="n">y_train_batch</span><span class="p">,</span> <span class="n">x_test_batch</span><span class="p">,</span> <span class="n">y_test_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_batch</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">secure</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assert_shapes</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">x_train_batch</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train_batch</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">x_test_batch</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="n">y_test_batch</span><span class="p">)</span>
+
+        <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">X_train</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">):</span>
+            <span class="n">train_data</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DataSet</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_train</span><span class="p">)</span>
+            <span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+
+        <span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">X_test</span>
+        <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">):</span>
+            <span class="n">test_data</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">DataSet</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_test</span><span class="p">)</span>
+            <span class="n">test_dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._get_batch"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._get_batch">[docs]</a>    <span class="k">def</span> <span class="nf">_get_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the first batch of the training and testing data for the consistency checks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">y_train</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;If `X_train` is of type torch.utils.data.DataLoader, `y_train` must be None. The dataloader must &quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;return values for X and y when iterating.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">x_train_batch</span><span class="p">,</span> <span class="n">y_train_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">x_train_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">y_train_batch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_train_batch</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span>
+            <span class="n">y_train_batch</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span> <span class="k">if</span> <span class="n">y_train</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;If `X_test` is of type torch.utils.data.DataLoader, `y_test` must be None. The dataloader must &quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;return values for X and y when iterating.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">x_test_batch</span><span class="p">,</span> <span class="n">y_test_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">x_test_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">y_test_batch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x_test_batch</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span> <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">y_test_batch</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span> <span class="k">if</span> <span class="n">y_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">x_train_batch</span><span class="p">,</span> <span class="n">y_train_batch</span><span class="p">,</span> <span class="n">x_test_batch</span><span class="p">,</span> <span class="n">y_test_batch</span></div>
+
+    <span class="k">def</span> <span class="nf">_assert_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;X_train must be either have 2 or 4 shape dimensions. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span>
+            <span class="s2">&quot;Try to use X_train.reshape(-1, 1) or X_train.reshape(-1, 1, height, width).&quot;</span>
+        <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;Wrong input shape for adversary / encoder. Given: </span><span class="si">{}</span><span class="s2">. Needed: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="p">(</span>
+                <span class="s2">&quot;X_train and X_test must have same dimensions. Given: </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._create_steps"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._create_steps">[docs]</a>    <span class="k">def</span> <span class="nf">_create_steps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates the `self.steps` dictionary.</span>
+
+<span class="sd">        The created dictionary must be of the form {&quot;Network1&quot;: steps1, &quot;Network2&quot;: steps2, ...}. During training</span>
+<span class="sd">        &quot;Network1&quot; will be trained for `steps1` steps, and so on.</span>
+<span class="sd">        Functionality similar to `self_define_optimizers()`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        steps : None, dict</span>
+<span class="sd">            If not None a dictionary of the form {&quot;Network1&quot;: steps1, &quot;Network2&quot;: steps2, ...} is expected.</span>
+<span class="sd">            This dictionary might also be partially filled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">neural_net</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">steps</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="nb">dict</span><span class="p">),</span> <span class="s2">&quot;steps parameter must be of type dict. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">steps</span><span class="p">))</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+                    <span class="n">steps</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_dict_keys</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s2">&quot;_create_steps&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">steps</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._set_up_saver"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._set_up_saver">[docs]</a>    <span class="k">def</span> <span class="nf">_set_up_saver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculates saving indicators if strings are passed. Additionally corresponding folders are created</span>
+<span class="sd">        in `self.folder`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Returns all saving indicators as integers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">print_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_string_to_batchnr</span><span class="p">(</span><span class="n">log_string</span><span class="o">=</span><span class="n">print_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="o">=</span><span class="n">nr_batches</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;print_every&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">save_model_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">save_model_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_string_to_batchnr</span><span class="p">(</span><span class="n">log_string</span><span class="o">=</span><span class="n">save_model_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="o">=</span><span class="n">nr_batches</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;save_model_every&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;`folder` argument in constructor was set to `None`. `save_model_every` must be None or `folder` needs to be specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;models/&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">save_images_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">save_images_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_string_to_batchnr</span><span class="p">(</span><span class="n">log_string</span><span class="o">=</span><span class="n">save_images_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="o">=</span><span class="n">nr_batches</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;save_images_every&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;`folder` argument in constructor was set to `None`. `save_images_every` must be None or `folder` needs to be specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;images/&quot;</span><span class="p">))</span>
+        <span class="n">save_losses_every</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_string_to_batchnr</span><span class="p">(</span><span class="n">log_string</span><span class="o">=</span><span class="n">save_losses_every</span><span class="p">,</span> <span class="n">nr_batches</span><span class="o">=</span><span class="n">nr_batches</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;save_losses_every&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_training_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_timer</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_training_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._string_to_batchnr"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._string_to_batchnr">[docs]</a>    <span class="k">def</span> <span class="nf">_string_to_batchnr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_string</span><span class="p">,</span> <span class="n">nr_batches</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Transforms string of the form &quot;0.2e&quot; into 0.2 and performs basic sanity checks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">log_string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">log_string</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;e&quot;</span><span class="p">),</span> <span class="s2">&quot;If `</span><span class="si">{}</span><span class="s2">` is string, must end with &#39;e&#39; (for epoch), e.g. 0.25e.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">save_epochs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">log_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;e&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">log_string</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">save_epochs</span><span class="o">*</span><span class="n">nr_batches</span><span class="p">),</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">log_string</span></div>
+
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Actions during training</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractGenerativeModel.fit"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">print_every</span><span class="o">=</span><span class="s2">&quot;1e&quot;</span><span class="p">,</span> <span class="n">save_model_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_images_every</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_losses_every</span><span class="o">=</span><span class="s2">&quot;1e&quot;</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Trains the model, iterating over all contained networks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train : np.array or torch.utils.data.DataLoader</span>
+<span class="sd">            Training data for the generative network. Usually images.</span>
+<span class="sd">        X_test : np.array, optional</span>
+<span class="sd">            Testing data for the generative network. Must have same shape as X_train.</span>
+<span class="sd">        epochs : int, optional</span>
+<span class="sd">            Number of epochs (passes over the training data set) performed during training.</span>
+<span class="sd">        batch_size : int, optional</span>
+<span class="sd">            Batch size used when creating the data loader from X_train. Ignored if torch.utils.data.DataLoader is passed</span>
+<span class="sd">            for X_train.</span>
+<span class="sd">        steps : dict, optional</span>
+<span class="sd">            Dictionary with names of the networks to indicate how often they should be trained, i.e. {&quot;Generator&quot;: 5} indicates</span>
+<span class="sd">            that the generator is trained 5 times while all other networks are trained once.</span>
+<span class="sd">        print_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the losses for the train data should be printed to the console. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_model_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the model should be saved. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_images_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the images for the losses and fixed_noise should be saved. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        save_losses_every : int, string, optional</span>
+<span class="sd">            Indicates after how many batches the losses for the train and test data should be calculated. Can also be a string</span>
+<span class="sd">            of the form &quot;0.25e&quot; (4 times per epoch), &quot;1e&quot; (once per epoch) or &quot;3e&quot; (every third epoch).</span>
+<span class="sd">        enable_tensorboard : bool, optional</span>
+<span class="sd">            Flag to indicate whether subdirectory folder/tensorboard should be created to log losses and images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_run</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Run initializer of the AbstractGenerativeModel class is your subclass!&quot;</span><span class="p">)</span>
+        <span class="n">train_dataloader</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">,</span> <span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">,</span> <span class="n">save_periods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_training</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span>
+            <span class="n">print_every</span><span class="o">=</span><span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="o">=</span><span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="o">=</span><span class="n">save_images_every</span><span class="p">,</span>
+            <span class="n">save_losses_every</span><span class="o">=</span><span class="n">save_losses_every</span><span class="p">,</span> <span class="n">enable_tensorboard</span><span class="o">=</span><span class="n">enable_tensorboard</span>
+        <span class="p">)</span>
+        <span class="n">max_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span>
+        <span class="n">test_x_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">test_dataloader</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="k">if</span> <span class="n">X_test</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">print_every</span><span class="p">,</span> <span class="n">save_model_every</span><span class="p">,</span> <span class="n">save_images_every</span><span class="p">,</span> <span class="n">save_losses_every</span> <span class="o">=</span> <span class="n">save_periods</span>
+        <span class="n">train_x_batch</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">train_x_batch</span><span class="p">)</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Return value from train_dataloader has wrong shape. Should return object of size batch_size. &quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;Did you pass a dataloader to `X_train` containing labels as well?&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">save_images_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_images</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">),</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;EPOCH:&quot;</span><span class="p">,</span> <span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">batch</span><span class="p">,</span> <span class="n">X</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">):</span>
+                <span class="n">batch</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">step</span> <span class="o">=</span> <span class="n">epoch</span><span class="o">*</span><span class="n">max_batches</span> <span class="o">+</span> <span class="n">batch</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+                <span class="n">Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="n">name</span><span class="p">]):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_zero_grad</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_backward</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="n">who</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">print_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_summarise_batch</span><span class="p">(</span>
+                        <span class="n">batch</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="n">max_batches</span><span class="o">=</span><span class="n">max_batches</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span>
+                        <span class="n">max_epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> <span class="n">print_every</span><span class="o">=</span><span class="n">print_every</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">save_model_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_model_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;models/model_</span><span class="si">{}</span><span class="s2">.torch&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">save_images_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_images_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_images</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">),</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_save_losses_plot</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="n">save_losses_every</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="n">save_losses_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_log_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;Train&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">enable_tensorboard</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_scalars</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_train</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">test_x_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_log_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">test_x_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">test_x_batch</span><span class="p">)),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;Test&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">enable_tensorboard</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_log_scalars</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer_test</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_up</span><span class="p">(</span><span class="n">writers</span><span class="o">=</span><span class="p">[</span><span class="n">writer_train</span><span class="p">,</span> <span class="n">writer_test</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="AbstractGenerativeModel.calculate_losses"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.calculate_losses">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">calculate_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._calculate_feature_loss"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._calculate_feature_loss">[docs]</a>    <span class="k">def</span> <span class="nf">_calculate_feature_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_real</span><span class="p">,</span> <span class="n">X_fake</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculates feature loss if `self.feature_layer` is not None.</span>
+
+<span class="sd">        Every network takes the `feature_layer` argument in its constructor.</span>
+<span class="sd">        If it is not None, a layer of the discriminator / critic should be specified.</span>
+<span class="sd">        A feature loss will be calculated which is the MSE between the output for real</span>
+<span class="sd">        and fake samples of the specified `self.feature_layer`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_real : torch.Tensor</span>
+<span class="sd">            Real samples.</span>
+<span class="sd">        X_fake : torch.Tensor</span>
+<span class="sd">            Fake samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X_real_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_layer</span><span class="p">(</span><span class="n">X_real</span><span class="p">)</span>
+        <span class="n">X_fake_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_layer</span><span class="p">(</span><span class="n">X_fake</span><span class="p">)</span>
+        <span class="n">feature_loss</span> <span class="o">=</span> <span class="n">MSELoss</span><span class="p">()(</span><span class="n">X_real_features</span><span class="p">,</span> <span class="n">X_fake_features</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feature_loss</span></div>
+
+    <span class="k">def</span> <span class="nf">_zero_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">who</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">[</span><span class="n">who</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">[</span><span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">optimizer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="k">def</span> <span class="nf">_backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&#39;self._losses&#39; empty when performing &#39;_backward&#39;.&quot;</span>
+        <span class="k">if</span> <span class="n">who</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">[</span><span class="n">who</span><span class="p">]</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">[</span><span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">who</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">who</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">[</span><span class="n">who</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">[</span><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">optimizer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Logging during training</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractGenerativeModel._summarise_batch"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._summarise_batch">[docs]</a>    <span class="k">def</span> <span class="nf">_summarise_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">max_batches</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">max_epochs</span><span class="p">,</span> <span class="n">print_every</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print summary statistics after a specified amount of batches.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch : int</span>
+<span class="sd">            Current batch.</span>
+<span class="sd">        max_batches : int</span>
+<span class="sd">            Maximum number of total batches.</span>
+<span class="sd">        epoch : int</span>
+<span class="sd">            Current epoch.</span>
+<span class="sd">        max_epochs : int</span>
+<span class="sd">            Maximum number of total epochs.</span>
+<span class="sd">        print_every : int</span>
+<span class="sd">            After how many batches the summary should be printed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">epoch</span><span class="o">*</span><span class="n">max_batches</span> <span class="o">+</span> <span class="n">batch</span>
+        <span class="n">max_steps</span> <span class="o">=</span> <span class="n">max_epochs</span><span class="o">*</span><span class="n">max_batches</span>
+        <span class="n">remaining_batches</span> <span class="o">=</span> <span class="n">max_epochs</span><span class="o">*</span><span class="n">max_batches</span> <span class="o">-</span> <span class="n">step</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Step: </span><span class="si">{}</span><span class="s2"> / </span><span class="si">{}</span><span class="s2"> (Epoch: </span><span class="si">{}</span><span class="s2"> / </span><span class="si">{}</span><span class="s2">, Batch: </span><span class="si">{}</span><span class="s2"> / </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">step</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">,</span> <span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_epochs</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">max_batches</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="o">*</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_training_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_timer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_training_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_training_times</span><span class="p">)</span>
+        <span class="n">time_per_batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_training_times</span><span class="p">)</span> <span class="o">/</span> <span class="n">print_every</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Time left: ~</span><span class="si">{}</span><span class="s2"> minutes (Steps remaining: </span><span class="si">{}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">remaining_batches</span><span class="o">*</span><span class="n">time_per_batch</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">remaining_batches</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_timer</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_log_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">images_produced</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">grid</span> <span class="o">=</span> <span class="n">make_grid</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">add_image</span><span class="p">(</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_images</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;images/image_</span><span class="si">{}</span><span class="s2">.png&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">))</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Images saved as </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._build_images"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._build_images">[docs]</a>    <span class="k">def</span> <span class="nf">_build_images</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Build matplotlib figure containing all images.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        images : torch.Tensor()</span>
+<span class="sd">            A torch Tensor containing the images to be plotted by matplotlib.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig, axs: plt.Figure, np.array</span>
+<span class="sd">            Objects containing the figure as well as all separate axis objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">images_produced</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot_images</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_log_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_losses</span><span class="p">(</span><span class="n">X_batch</span><span class="o">=</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">Z_batch</span><span class="o">=</span><span class="n">Z_batch</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_append_losses</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_append_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;logged_losses&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logged_losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_logged_losses</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logged_losses</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_create_logged_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">with_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span><span class="p">[</span><span class="s2">&quot;nr_test&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">logged_losses</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Train&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="k">if</span> <span class="n">with_test</span><span class="p">:</span>
+            <span class="n">logged_losses</span><span class="p">[</span><span class="s2">&quot;Test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">logged_losses</span><span class="p">[</span><span class="s2">&quot;Train&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">with_test</span><span class="p">:</span>
+                <span class="n">logged_losses</span><span class="p">[</span><span class="s2">&quot;Test&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">logged_losses</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._save_losses_plot"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._save_losses_plot">[docs]</a>    <span class="k">def</span> <span class="nf">_save_losses_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates the `losses.png` plot in the `self.folder` path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;logged_losses&quot;</span><span class="p">):</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plot_losses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logged_losses</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;losses.png&quot;</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel._log_scalars"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel._log_scalars">[docs]</a>    <span class="k">def</span> <span class="nf">_log_scalars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">writer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Log all scalars with tensorboard.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_losses</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;Loss/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">step</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;Time/Total&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_training_time</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">add_scalar</span><span class="p">(</span><span class="s2">&quot;Time/Batch&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_training_times</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span></div>
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># After training</span>
+    <span class="c1">#########################################################################</span>
+    <span class="k">def</span> <span class="nf">_clean_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="p">[</span><span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="k">for</span> <span class="n">writer</span> <span class="ow">in</span> <span class="n">writers</span> <span class="k">if</span> <span class="n">writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.get_training_results"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_training_results">[docs]</a>    <span class="k">def</span> <span class="nf">get_training_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Call after training to get fixed_noise samples and losses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        by_epoch : bool, optional</span>
+<span class="sd">            If true one loss value per epoch is returned for every logged_loss. Otherwise frequency is given</span>
+<span class="sd">            by `save_losses_every` argument of `fit`, i.e. `save_losses_every=10` saves losses every 10th batch,</span>
+<span class="sd">            `save_losses_every=&quot;0.25e` saves losses 4 times per epoch.</span>
+<span class="sd">        agg : None, optional</span>
+<span class="sd">            Aggregation function used if by_epoch is true, otherwise ignored. Default is np.mean for all batches</span>
+<span class="sd">            in one epoch.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        samples : np.array</span>
+<span class="sd">            Images produced with the final model for the fixed_noise.</span>
+<span class="sd">        losses_dict : dict</span>
+<span class="sd">            Dictionary containing all loss types logged during training</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fixed_noise</span><span class="p">)</span>
+        <span class="n">losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_losses</span><span class="p">(</span><span class="n">by_epoch</span><span class="o">=</span><span class="n">by_epoch</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="n">agg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">losses</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.get_losses"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_losses">[docs]</a>    <span class="k">def</span> <span class="nf">get_losses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">agg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get losses logged during training</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        by_epoch : bool, optional</span>
+<span class="sd">            If true one loss value per epoch is returned for every logged_loss. Otherwise frequency is given</span>
+<span class="sd">            by `save_losses_every` argument of `fit`, i.e. `save_losses_every=10` saves losses every 10th batch,</span>
+<span class="sd">            `save_losses_every=&quot;0.25e` saves losses 4 times per epoch.</span>
+<span class="sd">        agg : None, optional</span>
+<span class="sd">            Aggregation function used if by_epoch is true, otherwise ignored. Default is np.mean for all batches</span>
+<span class="sd">            in one epoch.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        losses_dict : dict</span>
+<span class="sd">            Dictionary containing all loss types logged during training</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span>
+        <span class="k">assert</span> <span class="n">callable</span><span class="p">(</span><span class="n">agg</span><span class="p">),</span> <span class="s2">&quot;agg: Aggregation function must be callable.&quot;</span>
+        <span class="n">losses_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logged_losses</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">by_epoch</span><span class="p">:</span>
+            <span class="n">epochs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">()[</span><span class="s2">&quot;epochs&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">loss_dict</span> <span class="ow">in</span> <span class="n">losses_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">losses</span> <span class="ow">in</span> <span class="n">loss_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">batches_per_epoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span> <span class="o">//</span> <span class="n">epochs</span>
+                    <span class="n">loss_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">losses</span><span class="p">[</span><span class="n">epoch</span><span class="o">*</span><span class="n">batches_per_epoch</span><span class="p">:(</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">batches_per_epoch</span><span class="p">]</span> <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">)]</span>
+                    <span class="n">loss_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">agg</span><span class="p">(</span><span class="n">loss_epoch</span><span class="p">)</span> <span class="k">for</span> <span class="n">loss_epoch</span> <span class="ow">in</span> <span class="n">loss_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="n">losses_dict</span></div>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Saving and loading</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractGenerativeModel.save"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Saves model in the model folder as torch / pickle object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            name of the saved file. folder specified in the constructor used</span>
+<span class="sd">            in absolute path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;model.torch&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Model saved to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="n">name</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.load"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.load">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Load an already trained model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : TYPE</span>
+<span class="sd">            path to the saved file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        AbstractGenerativeModel</span>
+<span class="sd">            Trained model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Utility functions</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="AbstractGenerativeModel.sample"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sample from the latent distribution.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n : int</span>
+<span class="sd">            Number of samples drawn from the latent distribution.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.tensor</span>
+<span class="sd">            Random numbers with shape of [n, *z_dim]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">z_dim</span><span class="p">),</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.generate"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.generate">[docs]</a>    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate output with generator / decoder.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z : None, optional</span>
+<span class="sd">            Latent input vector to produce an output from.</span>
+<span class="sd">        n : None, optional</span>
+<span class="sd">            Number of outputs to be generated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            Output produced by generator / decoder.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">z</span><span class="o">=</span><span class="n">z</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.predict"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Use the critic / discriminator to predict if input is real / fake.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x : np.array</span>
+<span class="sd">            Images or samples to be predicted.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.array</span>
+<span class="sd">            Array with one output per x indicating the realness of an input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_X_transformer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">predictions</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.get_hyperparameters"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_hyperparameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a dictionary containing all relevant hyperparameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary containing all relevant hyperparameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparameters</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.summary"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Print summary of the model in Keras style way.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        save : bool, optional</span>
+<span class="sd">            If true summary is saved in model folder, printed to console otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;`folder` argument in constructor was set to `None`. `enable_tensorboard` must be False or `folder` needs to be specified.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">sys_stdout_temp</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;summary.txt&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">neural_net</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">neural_net</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Hyperparameters</span><span class="se">\n</span><span class="s2">---------------&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_hyperparameters</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: ---&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">sys_stdout_temp</span>
+            <span class="n">sys_stdout_temp</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.get_number_params"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.get_number_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the number of parameters in the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary containing the number of parameters per network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nr_params_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">neural_net</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">nr_params_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">neural_net</span><span class="o">.</span><span class="n">get_number_params</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">nr_params_dict</span></div>
+
+
+<div class="viewcode-block" id="AbstractGenerativeModel.eval"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.eval">[docs]</a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set all networks to evaluation mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="p">[</span><span class="n">network</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">network</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.train"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set all networks to training mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">training</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="p">[</span><span class="n">network</span><span class="o">.</span><span class="n">train</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">network</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="AbstractGenerativeModel.to"><a class="viewcode-back" href="../../../../vegans.models.unconditional.html#vegans.models.unconditional.AbstractGenerativeModel.AbstractGenerativeModel.to">[docs]</a>    <span class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Map all networks to device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">[</span><span class="n">network</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">network</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neural_nets</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span></div>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one of &#39;z&#39; and &#39;n&#39; is needed.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">z</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either &#39;z&#39; or &#39;n&#39; must be not None.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Z_transformer</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sample</span>
+        <span class="k">return</span> <span class="n">sample</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="../../../../copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

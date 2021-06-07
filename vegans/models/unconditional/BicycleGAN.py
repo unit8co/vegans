@@ -28,6 +28,7 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import L1Loss
+from vegans.utils.layers import LayerReshape
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.models.unconditional.AbstractGANGAE import AbstractGANGAE
 
@@ -107,11 +108,13 @@ class BicycleGAN(AbstractGANGAE):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(shape=z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
@@ -126,6 +129,15 @@ class BicycleGAN(AbstractGANGAE):
                 "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
                 "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
             )
+            # TODO
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
+
+    def _default_optimizer(self):
+        return torch.optim.Adam
 
     def _define_loss(self):
         loss_functions = super()._define_loss()

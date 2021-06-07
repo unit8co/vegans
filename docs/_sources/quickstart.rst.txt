@@ -25,37 +25,27 @@ Loading data
 
 Here we will quickly load in the data. Dedicated data loaders exist for
 
-- MNIST
-- FashionMNIST
-- CelebA
-- CIFAR10
+- MNIST: MNISTLoader
+- FashionMNIST: FashionMNISTLoader
+- CelebA: CelebALoader
+- CIFAR10: Cifar10Loader
+- CIFAR100: Cifar100Loader
 
-Only the first two are downloaded automatically. The last two need to be downloaded manually but links to the sources of the data are provided
-if the data does not yet exist in the ``root`` directory.
-
+Only the first two are downloaded automatically.
 Let's load the ``MNIST`` data with the ``loading`` module::
 
-    root = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(root=root, which="mnist", download=True)
+    import vegans.utils.loading as loading
+    loader = loading.MNISTLoader(root=None)
+    X_train, y_train, X_test, y_test = loader.load()
 
-This downloads the data into ``root`` if it does not yet exist in there. Each image will be of shape ``(32, 32)`` but vegans requires for the usage
-of convolutional neural networks a third dimension for the number of channels. This can easily be done with numpy::
-
-    X_train = X_train.reshape((-1, 1, 32, 32))
-    X_test = X_test.reshape((-1, 1, 32, 32))
-
-To be able to use a conditional network we also need to one-hot encode the labels. This can also be done with numpy (we recommend the usage of scikit-learn, but want to avoid additional dependencies)::
-
-    nb_classes = len(set(y_train))
-    y_train = np.eye(nb_classes)[y_train.reshape(-1)]
-    y_test = np.eye(nb_classes)[y_test.reshape(-1)]
+This downloads the data into ``root`` (default is: {{ Home directory }}/.vegans) if it does not yet exist in there. Each image for the mnist data will be of shape ``(1, 32, 32)``, while the labels will be of shape [10, 1], a one-hot encoded version of the original labels.
 
 Now we can start defining our networks.
 
 Model definition
 ----------------
 
-What kind of networks you need to define depends on which algorithm you use. Mainly there are three different choices:
+The kind of networks you need to define depends on which algorithm you use. Mainly there are three different choices:
 
 1. GAN1v1 require
     - Generator
@@ -140,8 +130,8 @@ GAN training. We will use the following architecture::
 
 Almost the same architecture can be loaded in one line again from the loading module which takes care of choosing the right input dimension::
 
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="mnist")
+    generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator")
 
     gan_model = ConditionalVanillaGAN(
         generator=generator, adversary=discriminator, x_dim=x_dim, z_dim=z_dim, y_dim=y_dim,
@@ -201,21 +191,15 @@ This is the previous code in one single block::
     from vegans.utils.utils import plot_images
     from vegans.GAN import ConditionalVanillaGAN
 
-    root = "./data/"
-    X_train, y_train, X_test, y_test = loading.load_data(root=root, which="mnist", download=True)
-
-    X_train = X_train.reshape((-1, 1, 32, 32))
-    X_test = X_test.reshape((-1, 1, 32, 32))
-    nb_classes = len(set(y_train))
-    y_train = np.eye(nb_classes)[y_train.reshape(-1)]
-    y_test = np.eye(nb_classes)[y_test.reshape(-1)]
+    loader = loading.MNISTLoader(root=None)
+    X_train, y_train, X_test, y_test = loader.load()
 
     x_dim = X_train.shape[1:]
     y_dim = y_train.shape[1:]
     z_dim = 64
 
-    generator = loading.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, which="mnist")
-    discriminator = loading.load_adversary(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim, adv_type="Discriminator", which="mnist")
+    generator = loader.load_generator(x_dim=x_dim, z_dim=z_dim, y_dim=y_dim)
+    discriminator = loader.load_adversary(x_dim=x_dim, y_dim=y_dim, adv_type="Discriminator")
 
     gan_model = ConditionalVanillaGAN(
         generator=generator, adversary=discriminator,

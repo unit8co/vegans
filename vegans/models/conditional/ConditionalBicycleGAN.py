@@ -27,6 +27,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 
+from vegans.utils.layers import LayerReshape
 from vegans.models.unconditional.BicycleGAN import BicycleGAN
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.models.conditional.AbstractConditionalGANGAE import AbstractConditionalGANGAE
@@ -111,11 +112,13 @@ class ConditionalBicycleGAN(AbstractConditionalGANGAE, BicycleGAN):
         )
         self.mu = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(z_dim)
         ).to(self.device)
         self.log_variance = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim))
+            nn.Linear(np.prod(self.encoder.output_size), np.prod(z_dim)),
+            LayerReshape(z_dim)
         ).to(self.device)
 
         self.lambda_KL = lambda_KL
@@ -126,11 +129,15 @@ class ConditionalBicycleGAN(AbstractConditionalGANGAE, BicycleGAN):
         self.hyperparameters["lambda_z"] = lambda_z
 
         if self.secure:
-            if self.encoder.output_size == self.z_dim:
-                raise ValueError(
-                    "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
-                    "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
-                )
+            assert (self.generator.output_size == self.x_dim), (
+                "Generator output shape must be equal to x_dim. {} vs. {}.".format(self.generator.output_size, self.x_dim)
+            )
+            # TODO: Remove those lines or use them again, but not commented
+            # if self.encoder.output_size == self.z_dim:
+            #     raise ValueError(
+            #         "Encoder output size is equal to z_dim, but for VAE algorithms the encoder last layers for mu and sigma " +
+            #         "are constructed by the algorithm itself.\nSpecify up to the second last layer for this particular encoder."
+            #     )
 
 
     #########################################################################
