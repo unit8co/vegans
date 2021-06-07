@@ -45,7 +45,6 @@ jobs:
 
   check-snippets:
     runs-on: ubuntu-latest
-
     steps:
       - name: "1. Clone repository"
         uses: actions/checkout@v2
@@ -58,7 +57,7 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements/core.txt
 
-      - name: "3. Run examples ${{ matrix.example-name }}"
+      - name: "3. Run snippet: example_quickstart.py"
         run: |
           PYTHONPATH=./ python ./tutorials/snippets/example_quickstart.py
 
@@ -85,6 +84,3 @@ jobs:
       - name: "3. Run example: ${{ matrix.example-name }}"
         run: |
            runipy ./tutorials/notebooks/${{ matrix.example-name }}
-
-
-
