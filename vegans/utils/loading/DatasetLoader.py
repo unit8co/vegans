@@ -6,7 +6,7 @@ from pathlib import Path
 from zipfile import ZipFile
 from abc import ABC, abstractmethod
 
-_SOURCE = "https://vegans-data.s3.eu-west-3.amazonaws.com/"
+_SOURCE = "https://vegansstorage.blob.core.windows.net/vegansstorage/"
 _DEFAULT_ROOT = '.vegans/datasets/'
 
 class DatasetMetaData():
