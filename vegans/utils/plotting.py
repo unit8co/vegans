@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from vegans.utils.processing import invert_channel_order
+
+
 def plot_losses(losses, show=True, share=False):
     """
     Plots losses for generator and discriminator on a common plot.
