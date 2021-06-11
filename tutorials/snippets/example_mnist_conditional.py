@@ -2,7 +2,7 @@ import torch
 
 import numpy as np
 import matplotlib.pyplot as plt
-import vegans.utils.utils as utils
+import vegans.utils as utils
 import vegans.utils.loading as loading
 
 from vegans.GAN import (

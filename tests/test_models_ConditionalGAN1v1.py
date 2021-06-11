@@ -11,7 +11,7 @@ from vegans.GAN import (
     ConditionalWassersteinGANGP,
     ConditionalPix2Pix
 )
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.utils.layers import LayerReshape
 
 networks = [

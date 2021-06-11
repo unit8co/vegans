@@ -25,8 +25,8 @@ import torch
 import numpy as np
 import torch.nn as nn
 
-from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import get_input_dim
+from vegans.utils import WassersteinLoss
 from vegans.models.unconditional.AAE import AAE
 from vegans.utils.networks import Encoder, Generator, Adversary
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel

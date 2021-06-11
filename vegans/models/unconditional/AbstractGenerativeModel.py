@@ -5,7 +5,7 @@ import json
 import torch
 
 import numpy as np
-import vegans.utils.utils as utils
+import vegans.utils as utils
 import matplotlib.pyplot as plt
 
 from torch.nn import MSELoss
@@ -14,7 +14,7 @@ from abc import ABC, abstractmethod
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 from torch.utils.tensorboard import SummaryWriter
-from vegans.utils.utils import plot_losses, plot_images
+from vegans.utils import plot_losses, plot_images
 
 class AbstractGenerativeModel(ABC):
     """The AbstractGenerativeModel is the most basic building block of vegans. All GAN implementation should

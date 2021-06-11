@@ -27,8 +27,8 @@ import torch.nn as nn
 from torch.nn import MSELoss
 from torch.nn import BCELoss, L1Loss
 
-from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import get_input_dim
+from vegans.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversary, Autoencoder
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
 

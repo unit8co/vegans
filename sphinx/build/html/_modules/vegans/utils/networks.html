@@ -1,0 +1,418 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>vegans.utils.networks &mdash; vegans  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="copyright" title="Copyright" href="../../../copyright.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> vegans
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">vegans</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>vegans.utils.networks</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for vegans.utils.networks</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">vegans.utils.torchsummary</span> <span class="kn">import</span> <span class="n">summary</span>
+
+
+<div class="viewcode-block" id="NeuralNetwork"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.NeuralNetwork">[docs]</a><span class="k">class</span> <span class="nc">NeuralNetwork</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Basic abstraction for single networks.</span>
+
+<span class="sd">    These networks form the building blocks for the generative adversarial networks.</span>
+<span class="sd">    Mainly responsible for consistency checks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="n">input_size</span>
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">=</span> <span class="n">ngpu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secure</span> <span class="o">=</span> <span class="n">secure</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">input_size</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_size</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">),</span> <span class="s2">&quot;`network` must be instance of nn.Module.&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">network</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_type</span> <span class="o">=</span> <span class="s2">&quot;Sequential&quot;</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_type</span> <span class="o">=</span> <span class="s2">&quot;Object&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">secure</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ngpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ngpu</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">())])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="o">==</span><span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ngpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_shape</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+<div class="viewcode-block" id="NeuralNetwork.forward"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.NeuralNetwork.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+    <span class="k">def</span> <span class="nf">_validate_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">iterative_layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_type</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">iterative_layers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;in_features&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">first_input</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_features&quot;</span><span class="p">]</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="s2">&quot;in_channels&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">first_input</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;in_channels&quot;</span><span class="p">]</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="s2">&quot;num_features&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                <span class="n">first_input</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;num_features&quot;</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No layer with `in_features`, `in_channels` or `num_features` found.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">([</span><span class="n">first_input</span><span class="p">])</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">first_input</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">Input mismatch for **</span><span class="si">{}</span><span class="s2">**:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">Expected (first layer &#39;in_features&#39;/&#39;in_channels&#39;): </span><span class="si">{}</span><span class="s2">. Given input_size (z_dim/x_dim (+y_dim)): </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">first_input</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">ONLY RELEVANT IF CONDITIONAL NETWORK IS USED:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">If you are trying to use a conditional model please make sure you adjusted the input size</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">of the first layer in this architecture for the label vector / image.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">In this case, use vegans.utils.utils.get_input_dim(in_dim, y_dim) and adjust this architecture&#39;s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>
+                <span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">first layer input accordingly. See the conditional examples on github for help.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;Sequential&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">network</span>
+        <span class="k">elif</span> <span class="n">input_type</span> <span class="o">==</span> <span class="s2">&quot;Object&quot;</span><span class="p">:</span>
+            <span class="n">iterative_net</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">layers</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;_modules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
+                        <span class="n">iterative_net</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="n">iterative_net</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">iterative_net</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">NotImplemented</span><span class="p">(</span><span class="s2">&quot;Network must be Sequential or Object.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_output_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sample_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">sample_input</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+    <span class="c1">#########################################################################</span>
+    <span class="c1"># Utility functions</span>
+    <span class="c1">#########################################################################</span>
+<div class="viewcode-block" id="NeuralNetwork.summary"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.NeuralNetwork.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Input shape: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_size</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="NeuralNetwork.get_number_params"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.NeuralNetwork.get_number_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Generator&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Adversary"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Adversary">[docs]</a><span class="k">class</span> <span class="nc">Adversary</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Implements adversary architecture.</span>
+
+<span class="sd">    Might either be a discriminator (output [0, 1]) or critic (output [-Inf, Inf]).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">adv_type</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">secure</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">last_layer_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Sequential&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">last_layer_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Object&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">valid_last_layer</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">valid_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="s2">&quot;Critic&quot;</span><span class="p">,</span> <span class="s2">&quot;Autoencoder&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">adv_type</span> <span class="o">==</span> <span class="s2">&quot;Discriminator&quot;</span><span class="p">:</span>
+                <span class="n">valid_last_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">adv_type</span> <span class="o">==</span> <span class="s2">&quot;Critic&quot;</span><span class="p">:</span>
+                <span class="n">valid_last_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">adv_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_types</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`adv_type` must be one of </span><span class="si">{}</span><span class="s2">. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_types</span><span class="p">,</span> <span class="n">adv_type</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">adv_type</span>
+
+            <span class="k">if</span> <span class="n">valid_last_layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">last_layer_type</span> <span class="ow">in</span> <span class="n">valid_last_layer</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="s2">&quot;Last layer activation function of </span><span class="si">{}</span><span class="s2"> needs to be one of &#39;</span><span class="si">{}</span><span class="s2">&#39;. Given: </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">adv_type</span><span class="p">,</span> <span class="n">valid_last_layer</span><span class="p">,</span> <span class="n">last_layer_type</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Adversary&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Adversary.predict"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Adversary.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Encoder"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Encoder">[docs]</a><span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">secure</span><span class="p">:</span>
+            <span class="n">valid_last_layer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">last_layer_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Sequential&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">last_layer_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="o">.</span><span class="n">_get_iterative_layers</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">input_type</span><span class="o">=</span><span class="s2">&quot;Object&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">assert</span> <span class="n">last_layer_type</span> <span class="ow">in</span> <span class="n">valid_last_layer</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;Last layer activation function of Encoder needs to be one of &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">valid_last_layer</span><span class="p">)</span> <span class="o">+</span>
+                <span class="s2">&quot;Given: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">last_layer_type</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Encoder&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Decoder"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Decoder">[docs]</a><span class="k">class</span> <span class="nc">Decoder</span><span class="p">(</span><span class="n">NeuralNetwork</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">input_size</span><span class="o">=</span><span class="n">input_size</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Decoder&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">ngpu</span><span class="o">=</span><span class="n">ngpu</span><span class="p">,</span> <span class="n">secure</span><span class="o">=</span><span class="n">secure</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Autoencoder"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Autoencoder">[docs]</a><span class="k">class</span> <span class="nc">Autoencoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Autoencoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Autoencoder&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span>
+
+<div class="viewcode-block" id="Autoencoder.forward"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Autoencoder.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Autoencoder.summary"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Autoencoder.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Autoencoder.get_number_params"><a class="viewcode-back" href="../../../vegans.utils.html#vegans.utils.networks.Autoencoder.get_number_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_number_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the number of parameters in the model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary containing the number of parameters per network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nr_params_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Encoder&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">get_number_params</span><span class="p">(),</span>
+            <span class="s2">&quot;Decoder&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">get_number_params</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">nr_params_dict</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; <a href="../../../copyright.html">Copyright</a> 2021, tn.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -12,6 +12,14 @@ vegans.models.conditional.AbstractConditionalGAN1v1 module
    :undoc-members:
    :show-inheritance:
 
+vegans.models.conditional.AbstractConditionalGANGAE module
+----------------------------------------------------------
+
+.. automodule:: vegans.models.conditional.AbstractConditionalGANGAE
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 vegans.models.conditional.AbstractConditionalGenerativeModel module
 -------------------------------------------------------------------
 

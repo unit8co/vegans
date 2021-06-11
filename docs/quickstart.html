@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Quickstart guide &mdash; vegans 0.2.1 documentation</title>
+  <title>Quickstart guide &mdash; vegans  documentation</title>
   
 
   
@@ -39,7 +39,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="next" title="vegans" href="README.html" />
+    <link rel="next" title="MIT License" href="copyright.html" />
     <link rel="prev" title="Welcome to vegans’s documentation!" href="index.html" /> 
 </head>
 
@@ -97,9 +97,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#full-code-snippet">Full code snippet</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="README.html">Readme</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 </ul>
 
             
@@ -191,35 +190,25 @@
 <h2>Loading data<a class="headerlink" href="#loading-data" title="Permalink to this headline">¶</a></h2>
 <p>Here we will quickly load in the data. Dedicated data loaders exist for</p>
 <ul class="simple">
-<li><p>MNIST</p></li>
-<li><p>FashionMNIST</p></li>
-<li><p>CelebA</p></li>
-<li><p>CIFAR10</p></li>
+<li><p>MNIST: MNISTLoader</p></li>
+<li><p>FashionMNIST: FashionMNISTLoader</p></li>
+<li><p>CelebA: CelebALoader</p></li>
+<li><p>CIFAR10: Cifar10Loader</p></li>
+<li><p>CIFAR100: Cifar100Loader</p></li>
 </ul>
-<p>Only the first two are downloaded automatically. The last two need to be downloaded manually but links to the sources of the data are provided
-if the data does not yet exist in the <code class="docutils literal notranslate"><span class="pre">root</span></code> directory.</p>
-<p>Let’s load the <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> data with the <code class="docutils literal notranslate"><span class="pre">loading</span></code> module:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root</span> <span class="o">=</span> <span class="s2">&quot;./data/&quot;</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<p>Only the first two are downloaded automatically.
+Let’s load the <code class="docutils literal notranslate"><span class="pre">MNIST</span></code> data with the <code class="docutils literal notranslate"><span class="pre">loading</span></code> module:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">vegans.utils.loading</span> <span class="k">as</span> <span class="nn">loading</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">MNISTLoader</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>This downloads the data into <code class="docutils literal notranslate"><span class="pre">root</span></code> if it does not yet exist in there. Each image will be of shape <code class="docutils literal notranslate"><span class="pre">(32,</span> <span class="pre">32)</span></code> but vegans requires for the usage
-of convolutional neural networks a third dimension for the number of channels. This can easily be done with numpy:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
-<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>To be able to use a conditional network we also need to one-hot encode the labels. This can also be done with numpy (we recommend the usage of scikit-learn, but want to avoid additional dependencies):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nb_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
-<span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
-</pre></div>
-</div>
+<p>This downloads the data into <code class="docutils literal notranslate"><span class="pre">root</span></code> (default is: {{ Home directory }}/.vegans) if it does not yet exist in there. Each image for the mnist data will be of shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">32,</span> <span class="pre">32)</span></code>, while the labels will be of shape [10, 1], a one-hot encoded version of the original labels.</p>
 <p>Now we can start defining our networks.</p>
 </div>
 <div class="section" id="model-definition">
 <h2>Model definition<a class="headerlink" href="#model-definition" title="Permalink to this headline">¶</a></h2>
-<p>What kind of networks you need to define depends on which algorithm you use. Mainly there are three different choices:</p>
+<p>The kind of networks you need to define depends on which algorithm you use. Mainly there are three different choices:</p>
 <ol class="arabic simple">
 <li><dl class="simple">
 <dt>GAN1v1 require</dt><dd><ul class="simple">
@@ -335,8 +324,8 @@ GAN training. We will use the following architecture:</p>
 </pre></div>
 </div>
 <p>Almost the same architecture can be loaded in one line again from the loading module which takes care of choosing the right input dimension:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
-<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">generator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">)</span>
 
 <span class="n">gan_model</span> <span class="o">=</span> <span class="n">ConditionalVanillaGAN</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span>
@@ -395,21 +384,15 @@ and your hardware.</p>
 <span class="kn">from</span> <span class="nn">vegans.utils.utils</span> <span class="kn">import</span> <span class="n">plot_images</span>
 <span class="kn">from</span> <span class="nn">vegans.GAN</span> <span class="kn">import</span> <span class="n">ConditionalVanillaGAN</span>
 
-<span class="n">root</span> <span class="o">=</span> <span class="s2">&quot;./data/&quot;</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
-<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
-<span class="n">nb_classes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">y_train</span><span class="p">))</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
-<span class="n">y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">nb_classes</span><span class="p">)[</span><span class="n">y_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">loader</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">MNISTLoader</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
 <span class="n">x_dim</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 <span class="n">y_dim</span> <span class="o">=</span> <span class="n">y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 <span class="n">z_dim</span> <span class="o">=</span> <span class="mi">64</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
-<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loading</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;mnist&quot;</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_generator</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">z_dim</span><span class="o">=</span><span class="n">z_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">)</span>
+<span class="n">discriminator</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">load_adversary</span><span class="p">(</span><span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">adv_type</span><span class="o">=</span><span class="s2">&quot;Discriminator&quot;</span><span class="p">)</span>
 
 <span class="n">gan_model</span> <span class="o">=</span> <span class="n">ConditionalVanillaGAN</span><span class="p">(</span>
     <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span> <span class="n">adversary</span><span class="o">=</span><span class="n">discriminator</span><span class="p">,</span>
@@ -457,7 +440,7 @@ and your hardware.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="README.html" class="btn btn-neutral float-right" title="vegans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="copyright.html" class="btn btn-neutral float-right" title="MIT License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to vegans’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
@@ -465,7 +448,7 @@ and your hardware.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; <a href="copyright.html">Copyright</a> 2021, Unit8.
+        &#169; <a href="copyright.html">Copyright</a> 2021, tn.
 
     </p>
   </div>

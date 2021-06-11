@@ -2,7 +2,7 @@ import torch
 import pytest
 
 import numpy as np
-import vegans.utils.utils as utils
+import vegans.utils as utils
 import vegans.utils.loading as loading
 
 def test_Dataset():

@@ -26,7 +26,7 @@ import numpy as np
 import torch.nn as nn
 
 from torch.nn import MSELoss, BCELoss, L1Loss
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import WassersteinLoss
 from vegans.utils.networks import Encoder, Generator, Autoencoder, Adversary
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 

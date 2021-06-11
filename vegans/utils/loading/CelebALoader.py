@@ -6,7 +6,7 @@ import vegans.utils.loading.architectures as architectures
 
 from PIL import Image
 from torch.utils.data import DataLoader
-from vegans.utils.utils import invert_channel_order
+from vegans.utils import invert_channel_order
 from vegans.utils.loading.DatasetLoader import DatasetLoader, DatasetMetaData
 
 class CelebALoader(DatasetLoader):

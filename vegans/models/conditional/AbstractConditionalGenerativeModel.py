@@ -3,11 +3,11 @@ import torch
 
 import numpy as np
 import matplotlib.pyplot as plt
-import vegans.utils.utils as utils
+import vegans.utils as utils
 
 from torch.nn import MSELoss
 from torchvision.utils import make_grid
-from vegans.utils.utils import get_input_dim
+from vegans.utils import get_input_dim
 from vegans.utils.networks import NeuralNetwork
 from vegans.models.unconditional.AbstractGenerativeModel import AbstractGenerativeModel
 
@@ -161,7 +161,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 "The first layer will receive input shape: {} due to y_dim={}. ".format(required_dim, y_dim) +
                 "Given: {}.(Reshape & Flatten not considered)\n".format(str(layer)) +
                 "First layer should be of the form: {}.\n\n".format(first_layer) +
-                "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
+                "Please use vegans.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
                 "Check on github for notebooks of conditional GANs.\n\n"
             )
 
@@ -201,7 +201,7 @@ class AbstractConditionalGenerativeModel(AbstractGenerativeModel):
                 "\n\n**{}** is **not** a conditional network. The y_dim (label) will **not** be concatenated to the input of this network.\n\n".format(name) +
                 "The first layer will receive input shape: {} (same as x_dim). Given: {}.(Reshape & Flatten not considered)\n".format(in_dim, str(layer)) +
                 "First layer should be of the form: {}.\n\n".format(first_layer) +
-                "Please use vegans.utils.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
+                "Please use vegans.utils.get_input_dim(in_dim, y_dim) to get the correct input dimensions.\n" +
                 "Check on github for notebooks of conditional GANs.\n\n"
             )
 

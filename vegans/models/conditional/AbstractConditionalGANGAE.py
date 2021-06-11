@@ -1,8 +1,8 @@
 import torch
 
 from torch.nn import BCELoss
-from vegans.utils.utils import get_input_dim
-from vegans.utils.utils import WassersteinLoss
+from vegans.utils import get_input_dim
+from vegans.utils import WassersteinLoss
 from vegans.utils.networks import Generator, Adversary, Encoder
 from vegans.models.unconditional.AbstractGANGAE import AbstractGANGAE
 from vegans.models.conditional.AbstractConditionalGenerativeModel import AbstractConditionalGenerativeModel
